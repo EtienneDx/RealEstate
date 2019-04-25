@@ -18,6 +18,7 @@ public class DataStore
     public final String logFilePath = RealEstate.pluginDirPath + "GriefProtection_RealEstate.log";
     public final String chatPrefix = "[" + ChatColor.GOLD + "RealEstate" + ChatColor.WHITE + "] ";
     
+    public String cfgSignsHeader;
     public List<String> cfgSigns;
 
     public List<String> cfgSellKeywords;
@@ -55,12 +56,15 @@ public class DataStore
     List<String> getConfigList(YamlConfiguration config, String path, List<String> defVal)
     {
     	config.addDefault(path, defVal);
-    	return config.getStringList(path);
+    	List<String> ret = config.getStringList(path);
+    	ret.replaceAll(String::toLowerCase);
+    	return ret;
     }
     
     public void loadConfig(YamlConfiguration config)
     {
-    	this.cfgSigns = getConfigList(config, "RealEstate.Keywords.Signs", Arrays.asList("re", "realestate"));
+    	this.cfgSignsHeader = config.getString("RealEstate.Keywords.SignsHeader", "[RealEstate]");
+    	this.cfgSigns = getConfigList(config, "RealEstate.Keywords.Signs", Arrays.asList("[re]", "[realestate]"));
 
     	this.cfgSellKeywords = getConfigList(config, "RealEstate.Keywords.Sell", Arrays.asList("sell", "selling", "for sale"));
     	this.cfgLeaseKeywords = getConfigList(config, "RealEstate.Keywords.Lease", Arrays.asList("rent", "renting", "for rent", "lease", "for lease"));
@@ -89,6 +93,7 @@ public class DataStore
     public void saveConfig()
     {
     	FileConfiguration outConfig = new YamlConfiguration();
+    	outConfig.set("RealEstate.Keywords.SignsHeader", this.cfgSignsHeader);
     	outConfig.set("RealEstate.Keywords.Signs", this.cfgSigns);
     	
     	outConfig.set("RealEstate.Keywords.Sell", this.cfgSellKeywords);

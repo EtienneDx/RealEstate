@@ -62,7 +62,7 @@ public class RealEstate extends JavaPlugin
         
         ConfigurationSerialization.registerClass(ClaimSell.class);
         
-        this.transactionsStore = new TransactionsStore();
+        RealEstate.transactionsStore = new TransactionsStore();
 	}
 
     public void addLogEntry(String entry)

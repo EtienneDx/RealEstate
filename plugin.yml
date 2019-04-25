@@ -45,7 +45,7 @@ permissions:
       realestate.subclaim.rent: true
       realestate.subclaim.lease: true
   realestate.admin:
-    description: Allows the player to have access to Real Estate informations
+    description: Allows the player to sell and lease admin claims, as well as see plugin informations
     default: op
   realestate.info:
     description: Allow the player to get informations about the claim
