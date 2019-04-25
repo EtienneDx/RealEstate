@@ -1,0 +1,80 @@
+name: RealEstate
+main: me.EtienneDx.RealEstate
+version: 0.1
+authors: [EtienneDx]
+depend: [GriefPrevention, Vault]
+
+commands:
+  re:
+    description: Access to the GriefProtection_RealEstate informations.
+    usage: /<command> ?
+    aliases: [realestate]
+    permission: realestate.info
+    permission-message: You do not have access to that command!
+    
+permissions:
+  realestate.*:
+    description: Gives access to all Real Estate permissions
+    default: op
+    children:
+      realestate.info: true
+      realestate.admin: true
+      realestate.claim.buy: true
+      realestate.claim.sell: true
+      realestate.claim.rent: true
+      realestate.claim.lease: true
+      realestate.subclaim.buy: true
+      realestate.subclaim.sell: true
+      realestate.subclaim.rent: true
+      realestate.subclaim.lease: true
+      realestate.ignore.limit: true
+  realestate.claim.*:
+    description: Allows the player full access over claims
+    default: op
+    children:
+      realestate.claim.buy: true
+      realestate.claim.sell: true
+      realestate.claim.rent: true
+      realestate.claim.lease: true
+  realestate.subclaim.*:
+    description: Allows the player full access over subclaims
+    default: op
+    children:
+      realestate.subclaim.buy: true
+      realestate.subclaim.sell: true
+      realestate.subclaim.rent: true
+      realestate.subclaim.lease: true
+  realestate.admin:
+    description: Allows the player to have access to Real Estate informations
+    default: op
+  realestate.info:
+    description: Allow the player to get informations about the claim
+    default: true
+  realestate.claim.buy:
+    description: Allows the player to buy claims
+    default: true
+  realestate.claim.sell:
+    description: Allows the player to sell claims
+    default: true
+  realestate.claim.rent:
+    description: Allows the player to rent claims
+    default: true
+  realestate.claim.lease:
+    description: Allows the player to lease claims
+    default: true
+  realestate.subclaim.buy:
+    description: Allows the player to buy subclaims
+    default: true
+  realestate.subclaim.sell:
+    description: Allows the player to sell subclaims
+    default: true
+  realestate.subclaim.rent:
+    description: Allows the player to rent subclaims
+    default: true
+  realestate.subclaim.lease:
+    description: Allows the player to lease subclaims
+    default: true
+  realestate.ignore.limit:
+    description: Allows the player to buy bigger claims than his available claim size
+    default: false
+     
