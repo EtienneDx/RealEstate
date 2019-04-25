@@ -1,4 +1,4 @@
-package me.EtienneDx.GPRE;
+package me.EtienneDx.RealEstate;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -6,8 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Logger;
 
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,12 +17,18 @@ public class RealEstate extends JavaPlugin
 {
 	Logger log;
     DataStore dataStore;
+	public final static String pluginDirPath = "plugins" + File.separator + "GriefProtection_RealEstate" + File.separator;
     public static boolean vaultPresent = false;
     public static Economy econ = null;
     public static Permission perms = null;
+    
+    public static RealEstate instance = null;
+    
+    public static TransactionsStore transactionsStore = null;
 	
 	public void onEnable()
 	{
+		RealEstate.instance = this;
         this.log = getLogger();
         
         if (checkVault())
@@ -52,24 +57,13 @@ public class RealEstate extends JavaPlugin
                 return;
             }
         }
-        loadConfig(false);
-	}
-	
-	private void loadConfig(boolean reload)
-    {
-        FileConfiguration config = YamlConfiguration.loadConfiguration(new File(this.dataStore.configFilePath));
-        FileConfiguration outConfig = new YamlConfiguration();
-
+        this.dataStore.loadConfig();// loads config or default
+        this.dataStore.saveConfig();// save eventual default
         
-        try
-        {
-            outConfig.save(this.dataStore.configFilePath);
-        }
-        catch (IOException exception)
-        {
-            this.log.info("Unable to write to the configuration file at \"" + this.dataStore.configFilePath + "\"");
-        }
-    }
+        ConfigurationSerialization.registerClass(ClaimSell.class);
+        
+        this.transactionsStore = new TransactionsStore();
+	}
 
     public void addLogEntry(String entry)
     {
