@@ -6,6 +6,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.plugin.PluginManager;
 
@@ -93,6 +94,26 @@ public class REListener implements Listener
 				
 				RealEstate.transactionsStore.sell(claim, player, price, (Sign)event.getBlock());
 			}
+		}
+	}
+	
+	@EventHandler
+	public void onBreakBlock(BlockBreakEvent event)
+	{
+		if(event.getBlock() instanceof Sign)
+		{
+			Claim claim = GriefPrevention.instance.dataStore.getClaimAt(event.getBlock().getLocation(), false, null);
+			Transaction tr = RealEstate.transactionsStore.getTransaction(claim);
+			if(tr.getHolder() == event.getBlock() && !tr.getOwner().equals(event.getPlayer().getUniqueId()) && 
+					!RealEstate.perms.has(event.getPlayer(), "realestate.destroysigns"))
+			{
+				event.getPlayer().sendMessage(RealEstate.instance.dataStore.chatPrefix + 
+						ChatColor.RED + "Only the author of the sell/rent sign is allowed to destroy it");
+				event.setCancelled(true);
+				return;
+			}
+			// the sign has been destroy, we can remove the transaction
+			RealEstate.transactionsStore.cancelTransaction(claim);
 		}
 	}
 }

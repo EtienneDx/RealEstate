@@ -19,6 +19,7 @@ permissions:
     children:
       realestate.info: true
       realestate.admin: true
+      realestate.destroysigns: true
       realestate.claim.buy: true
       realestate.claim.sell: true
       realestate.claim.rent: true
@@ -77,4 +78,6 @@ permissions:
   realestate.ignore.limit:
     description: Allows the player to buy bigger claims than his available claim size
     default: false
-     
+  realestate.destroysigns:
+    description: Allows the player to destroy any sign representing a transaction
+    default: op

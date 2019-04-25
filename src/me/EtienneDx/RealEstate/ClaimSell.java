@@ -12,14 +12,15 @@ import net.md_5.bungee.api.ChatColor;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 
-public class ClaimSell implements ConfigurationSerializable
+public class ClaimSell implements ConfigurationSerializable, Transaction
 {
-	public long claimId;
+	long claimId;
 	private UUID owner = null;
 	private double price;
-	private Sign sign = null;
+	Sign sign = null;
 	
 	public ClaimSell(Map<String, Object> map)
 	{
@@ -34,7 +35,7 @@ public class ClaimSell implements ConfigurationSerializable
 	public ClaimSell(Claim claim, Player player, double price, Sign sign)
 	{
 		this.claimId = claim.getID();
-		this.owner = player.getUniqueId();
+		this.owner = player != null ? player.getUniqueId() : null;
 		this.price = price;
 		this.sign = sign;
 	}
@@ -63,5 +64,17 @@ public class ClaimSell implements ConfigurationSerializable
 			map.put("signLocation", sign.getLocation());
 		
 		return map;
+	}
+
+	@Override
+	public Block getHolder()
+	{
+		return (Block) sign;
+	}
+
+	@Override
+	public UUID getOwner()
+	{
+		return owner;
 	}
 }
