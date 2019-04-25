@@ -1,5 +1,5 @@
 name: RealEstate
-main: me.EtienneDx.RealEstate
+main: me.EtienneDx.RealEstate.RealEstate
 version: 0.1
 authors: [EtienneDx]
 depend: [GriefPrevention, Vault]
@@ -28,7 +28,6 @@ permissions:
       realestate.subclaim.sell: true
       realestate.subclaim.rent: true
       realestate.subclaim.lease: true
-      realestate.ignore.limit: true
   realestate.claim.*:
     description: Allows the player full access over claims
     default: op
@@ -75,9 +74,6 @@ permissions:
   realestate.subclaim.lease:
     description: Allows the player to lease subclaims
     default: true
-  realestate.ignore.limit:
-    description: Allows the player to buy bigger claims than his available claim size
-    default: false
   realestate.destroysigns:
     description: Allows the player to destroy any sign representing a transaction
     default: op

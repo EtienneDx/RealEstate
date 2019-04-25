@@ -93,7 +93,7 @@ public class DataStore
     public void saveConfig()
     {
     	FileConfiguration outConfig = new YamlConfiguration();
-    	outConfig.set("RealEstate.Keywords.SignsHeader", this.cfgSignsHeader);
+    	outConfig.set("RealEstate.Keywords.SignsHeader", ChatColor.GOLD + this.cfgSignsHeader);
     	outConfig.set("RealEstate.Keywords.Signs", this.cfgSigns);
     	
     	outConfig.set("RealEstate.Keywords.Sell", this.cfgSellKeywords);

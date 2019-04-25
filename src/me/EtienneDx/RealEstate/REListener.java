@@ -6,8 +6,10 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.PluginManager;
 
 import me.ryanhamshire.GriefPrevention.Claim;
@@ -41,6 +43,7 @@ public class REListener implements Listener
 			{
 				player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + "This claim is already to sell/lease!");
                 event.setCancelled(true);
+                event.getBlock().breakNaturally();
                 return;
 			}
 			
@@ -91,8 +94,37 @@ public class REListener implements Listener
 				}
 				
 				// we should be good to sell it now
+				event.setCancelled(true);// need to cancel the event, so we can update the sign elsewhere
+				RealEstate.transactionsStore.sell(claim, player, price, event.getBlock().getLocation());
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onPlayerInteract(PlayerInteractEvent event)
+	{
+		if(event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && event.getClickedBlock().getState() instanceof Sign)
+		{
+			Sign sign = (Sign)event.getClickedBlock().getState();
+			if(ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase(ChatColor.stripColor(RealEstate.instance.dataStore.cfgSignsHeader)))// it is a real estate sign
+			{
+				Player player = event.getPlayer();
+				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(event.getClickedBlock().getLocation(), false, null);
 				
-				RealEstate.transactionsStore.sell(claim, player, price, (Sign)event.getBlock());
+				if(!RealEstate.transactionsStore.anyTransaction(claim))
+				{
+	                player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + 
+	                		"This claim is no longer for rent or for sell, sorry...");
+	                event.getClickedBlock().breakNaturally();
+	                event.setCancelled(true);
+	                return;
+				}
+				
+				Transaction tr = RealEstate.transactionsStore.getTransaction(claim);
+				if(player.isSneaking())
+					tr.preview(player);
+				else
+					tr.interact(player);
 			}
 		}
 	}
@@ -100,11 +132,11 @@ public class REListener implements Listener
 	@EventHandler
 	public void onBreakBlock(BlockBreakEvent event)
 	{
-		if(event.getBlock() instanceof Sign)
+		if(event.getBlock().getState() instanceof Sign)
 		{
 			Claim claim = GriefPrevention.instance.dataStore.getClaimAt(event.getBlock().getLocation(), false, null);
 			Transaction tr = RealEstate.transactionsStore.getTransaction(claim);
-			if(tr.getHolder() == event.getBlock() && !tr.getOwner().equals(event.getPlayer().getUniqueId()) && 
+			if(tr.getHolder() == event.getBlock() && event.getPlayer() != null && !tr.getOwner().equals(event.getPlayer().getUniqueId()) && 
 					!RealEstate.perms.has(event.getPlayer(), "realestate.destroysigns"))
 			{
 				event.getPlayer().sendMessage(RealEstate.instance.dataStore.chatPrefix + 

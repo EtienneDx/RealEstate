@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
-import org.bukkit.block.Sign;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -24,13 +24,19 @@ public class TransactionsStore
     
     public HashMap<String, ClaimSell> claimSell;
     
+    public TransactionsStore()
+    {
+    	loadData();
+    }
+    
     public void loadData()
     {
     	claimSell = new HashMap<>();
     	
     	FileConfiguration config = YamlConfiguration.loadConfiguration(new File(this.dataFilePath));
-    	for(String key : config.getKeys(false))
+    	for(String key : config.getKeys(true))
     	{
+			RealEstate.instance.log.info(key);
     		if(key.startsWith("Sell."))
     		{
     			ClaimSell cs = (ClaimSell)config.get(key);
@@ -54,7 +60,7 @@ public class TransactionsStore
 		}
     }
 
-	public void sell(Claim claim, Player player, double price, Sign sign)
+	public void sell(Claim claim, Player player, double price, Location sign)
 	{
 		ClaimSell cs = new ClaimSell(claim, player, price, sign);
 		claimSell.put(claim.getID().toString(), cs);
@@ -105,7 +111,20 @@ public class TransactionsStore
 	public void cancelTransaction(Claim claim)
 	{
 		if(claimSell.containsKey(claim.getID().toString()))
+		{
+			Transaction tr = getTransaction(claim);
+			tr.getHolder().breakNaturally();
 			claimSell.remove(claim.getID().toString());
+		}
 		saveData();
+	}
+
+	public void cancelTransaction(Transaction tr)
+	{
+		if(tr instanceof ClaimSell)
+		{
+			tr.getHolder().breakNaturally();
+			claimSell.remove(String.valueOf(((ClaimSell) tr).claimId));
+		}
 	}
 }

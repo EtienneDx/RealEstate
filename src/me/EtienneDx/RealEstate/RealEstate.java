@@ -57,12 +57,15 @@ public class RealEstate extends JavaPlugin
                 return;
             }
         }
+        this.dataStore = new DataStore();
         this.dataStore.loadConfig();// loads config or default
         this.dataStore.saveConfig();// save eventual default
         
         ConfigurationSerialization.registerClass(ClaimSell.class);
         
         RealEstate.transactionsStore = new TransactionsStore();
+        
+        new REListener().registerEvents();
 	}
 
     public void addLogEntry(String entry)
