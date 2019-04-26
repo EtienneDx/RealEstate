@@ -17,7 +17,7 @@ public class RealEstate extends JavaPlugin
 {
 	Logger log;
     DataStore dataStore;
-	public final static String pluginDirPath = "plugins" + File.separator + "GriefProtection_RealEstate" + File.separator;
+	public final static String pluginDirPath = "plugins" + File.separator + "RealEstate" + File.separator;
     public static boolean vaultPresent = false;
     public static Economy econ = null;
     public static Permission perms = null;
@@ -60,8 +60,9 @@ public class RealEstate extends JavaPlugin
         this.dataStore = new DataStore();
         this.dataStore.loadConfig();// loads config or default
         this.dataStore.saveConfig();// save eventual default
-        
+
         ConfigurationSerialization.registerClass(ClaimSell.class);
+        ConfigurationSerialization.registerClass(ClaimRent.class);
         
         RealEstate.transactionsStore = new TransactionsStore();
         

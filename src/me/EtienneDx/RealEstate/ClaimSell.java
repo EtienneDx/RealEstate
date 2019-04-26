@@ -1,10 +1,5 @@
 package me.EtienneDx.RealEstate;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 
 import me.ryanhamshire.GriefPrevention.Claim;
@@ -16,39 +11,20 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 
-public class ClaimSell implements ConfigurationSerializable, Transaction
+public class ClaimSell extends ClaimTransaction
 {
-	long claimId;
-	private UUID owner = null;
-	private double price;
-	Location sign = null;
-	
-	public ClaimSell(Map<String, Object> map)
-	{
-		this.claimId = Long.valueOf(String.valueOf(map.get("claimId")));
-		if(map.get("owner") != null)
-			this.owner = UUID.fromString((String) map.get("owner"));
-		this.price = (double) map.get("price");
-		if(map.get("signLocation") != null)
-			this.sign = (Location) map.get("signLocation");
-	}
-
 	public ClaimSell(Claim claim, Player player, double price, Location sign)
 	{
-		this.claimId = claim.getID().longValue();
-		this.owner = player != null ? player.getUniqueId() : null;
-		this.price = price;
-		this.sign = sign;
+		super(claim, player, price, sign);
 	}
-	
-	public void updateSign()
+
+	@Override
+	public void update()
 	{
 		if(sign.getBlock().getState() instanceof Sign)
 		{
-			RealEstate.instance.log.info("updating sign");
 			Sign s = (Sign) sign.getBlock().getState();
 			s.setLine(0, RealEstate.instance.dataStore.cfgSignsHeader);
 			s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.dataStore.cfgReplaceSell);
@@ -59,35 +35,7 @@ public class ClaimSell implements ConfigurationSerializable, Transaction
 		else
 		{
 			RealEstate.transactionsStore.cancelTransaction(this);
-			RealEstate.instance.log.info("arrrrrf");
 		}
-	}
-
-	@Override
-	public Map<String, Object> serialize()
-	{
-		Map<String, Object> map = new HashMap<>();
-		
-		map.put("claimId", this.claimId);
-		if(owner != null)
-			map.put("owner", owner.toString());
-		map.put("price", this.price);
-		if(sign != null)
-			map.put("signLocation", sign);
-		
-		return map;
-	}
-
-	@Override
-	public Block getHolder()
-	{
-		return sign.getBlock();
-	}
-
-	@Override
-	public UUID getOwner()
-	{
-		return owner;
 	}
 
 	@Override
@@ -225,7 +173,7 @@ public class ClaimSell implements ConfigurationSerializable, Transaction
 		if(player.hasPermission("realestate.info"))
 		{
 			String claimType = claim.parent == null ? "claim" : "subclaim";
-			msg = ChatColor.BLUE + "-----= " + ChatColor.WHITE + "[" + ChatColor.GOLD + "RealEstate Info" + ChatColor.WHITE + "]" + 
+			msg = ChatColor.BLUE + "-----= " + ChatColor.WHITE + "[" + ChatColor.GOLD + "RealEstate Sale Info" + ChatColor.WHITE + "]" + 
 					ChatColor.BLUE + " =-----\n";
 			msg += ChatColor.AQUA + "This " + claimType + " is for sale for " +
 					ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + "\n";

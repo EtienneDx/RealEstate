@@ -51,7 +51,7 @@ permissions:
     description: Allow the player to get informations about the claim
     default: true
   realestate.claim.buy:
-    description: Allows the player to buy claims
+    description: Allows the player to buy claims (buying, paying rents, paying leases)
     default: true
   realestate.claim.sell:
     description: Allows the player to sell claims
@@ -63,7 +63,7 @@ permissions:
     description: Allows the player to lease claims
     default: true
   realestate.subclaim.buy:
-    description: Allows the player to buy subclaims
+    description: Allows the player to buy subclaims (buying, paying rents)
     default: true
   realestate.subclaim.sell:
     description: Allows the player to sell subclaims

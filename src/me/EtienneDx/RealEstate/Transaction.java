@@ -11,4 +11,5 @@ public interface Transaction
 	public UUID getOwner();
 	public void interact(Player player);
 	public void preview(Player player);
+	public void update();
 }

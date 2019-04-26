@@ -19,24 +19,31 @@ public class DataStore
     public final String chatPrefix = "[" + ChatColor.GOLD + "RealEstate" + ChatColor.WHITE + "] ";
     
     public String cfgSignsHeader;
-    public List<String> cfgSigns;
+    //public List<String> cfgSigns;
 
     public List<String> cfgSellKeywords;
+    public List<String> cfgRentKeywords;
     public List<String> cfgLeaseKeywords;
 
     public String cfgReplaceSell;
+    public String cfgReplaceRent;
     public String cfgReplaceLease;
     
     public boolean cfgEnableSell;
     public boolean cfgEnableLease;
     
     public boolean cfgTransferClaimBlocks;
-    
+
     public boolean cfgMessageOwner;
+    public boolean cfgMessageBuyer;
     public boolean cfgBroadcastSell;
 
     public double cfgPriceSellPerBlock;
+    public double cfgPriceRentPerBlock;
     public double cfgPriceLeasePerBlock;
+
+    public String cfgRentTime;
+    public String cfgLeaseTime;
     
     public DataStore()
     {
@@ -63,13 +70,15 @@ public class DataStore
     
     public void loadConfig(YamlConfiguration config)
     {
-    	this.cfgSignsHeader = config.getString("RealEstate.Keywords.SignsHeader", "[RealEstate]");
-    	this.cfgSigns = getConfigList(config, "RealEstate.Keywords.Signs", Arrays.asList("[re]", "[realestate]"));
+    	this.cfgSignsHeader = config.getString("RealEstate.Keywords.SignsHeader", ChatColor.GOLD + "[RealEstate]");
+    	//this.cfgSigns = getConfigList(config, "RealEstate.Keywords.Signs", Arrays.asList("[re]", "[realestate]"));
 
-    	this.cfgSellKeywords = getConfigList(config, "RealEstate.Keywords.Sell", Arrays.asList("sell", "selling", "for sale"));
-    	this.cfgLeaseKeywords = getConfigList(config, "RealEstate.Keywords.Lease", Arrays.asList("rent", "renting", "for rent", "lease", "for lease"));
+    	this.cfgSellKeywords = getConfigList(config, "RealEstate.Keywords.Sell", Arrays.asList("[sell]", "[sellclaim]", "[sc]", "[re]", "[realestate]"));
+    	this.cfgRentKeywords = getConfigList(config, "RealEstate.Keywords.Rent", Arrays.asList("[rent]", "[rent claim]", "[rc]"));
+    	this.cfgLeaseKeywords = getConfigList(config, "RealEstate.Keywords.Lease", Arrays.asList("[lease]", "[lease claim]", "[lc]"));
 
     	this.cfgReplaceSell = config.getString("RealEstate.Keywords.Replace.Sell", "FOR SALE");
+    	this.cfgReplaceRent = config.getString("RealEstate.Keywords.Replace.Rent", "FOR RENT");
     	this.cfgReplaceLease = config.getString("RealEstate.Keywords.Replace.Lease", "FOR LEASE");
 
     	this.cfgEnableSell = config.getBoolean("RealEstate.Rules.Sell", true);
@@ -78,10 +87,15 @@ public class DataStore
     	this.cfgTransferClaimBlocks = config.getBoolean("RealEstate.Rules.TransferClaimBlocks", true);
 
         this.cfgMessageOwner = config.getBoolean("RealEstate.Messaging.MessageOwner", true);
+        this.cfgMessageBuyer = config.getBoolean("RealEstate.Messaging.MessageBuyer", true);
         this.cfgBroadcastSell = config.getBoolean("RealEstate.Messaging.BroadcastSell", true);
 
-        this.cfgPriceSellPerBlock = config.getDouble("RealEstate.DefaultPricesPerBlock.Sell", 5.0);
-        this.cfgPriceLeasePerBlock = config.getDouble("RealEstate.DefaultPricesPerBlock.Lease", 2.0);
+        this.cfgPriceSellPerBlock = config.getDouble("RealEstate.Default.PricesPerBlock.Sell", 5.0);
+        this.cfgPriceRentPerBlock = config.getDouble("RealEstate.Default.PricesPerBlock.Rent", 2.0);
+        this.cfgPriceLeasePerBlock = config.getDouble("RealEstate.Default.PricesPerBlock.Lease", 2.0);
+        
+        this.cfgRentTime = config.getString("RealEstate.Default.Duration.Rent", "7D");
+        this.cfgLeaseTime = config.getString("RealEstate.Default.Duration.Lease", "7D");
     }
     
     public void loadConfig()
@@ -93,13 +107,15 @@ public class DataStore
     public void saveConfig()
     {
     	FileConfiguration outConfig = new YamlConfiguration();
-    	outConfig.set("RealEstate.Keywords.SignsHeader", ChatColor.GOLD + this.cfgSignsHeader);
-    	outConfig.set("RealEstate.Keywords.Signs", this.cfgSigns);
+    	outConfig.set("RealEstate.Keywords.SignsHeader", this.cfgSignsHeader);
+    	//outConfig.set("RealEstate.Keywords.Signs", this.cfgSigns);
     	
     	outConfig.set("RealEstate.Keywords.Sell", this.cfgSellKeywords);
+    	outConfig.set("RealEstate.Keywords.Rent", this.cfgRentKeywords);
     	outConfig.set("RealEstate.Keywords.Lease", this.cfgLeaseKeywords);
 
     	outConfig.set("RealEstate.Keywords.Replace.Sell", this.cfgReplaceSell);
+    	outConfig.set("RealEstate.Keywords.Replace.Rent", this.cfgReplaceRent);
     	outConfig.set("RealEstate.Keywords.Replace.Lease", this.cfgReplaceLease);
 
     	outConfig.set("RealEstate.Rules.Sell", this.cfgEnableSell);
@@ -108,10 +124,15 @@ public class DataStore
     	outConfig.set("RealEstate.Rules.TransferClaimBlocks", this.cfgTransferClaimBlocks);
 
     	outConfig.set("RealEstate.Messaging.MessageOwner", this.cfgMessageOwner);
+    	outConfig.set("RealEstate.Messaging.MessageBuyer", this.cfgMessageBuyer);
     	outConfig.set("RealEstate.Messaging.BroadcastSell", this.cfgBroadcastSell);
 
-    	outConfig.set("RealEstate.DefaultPricePerBlock.Sell", this.cfgPriceSellPerBlock);
-    	outConfig.set("RealEstate.DefaultPricePerBlock.Lease", this.cfgPriceLeasePerBlock);
+    	outConfig.set("RealEstate.Default.PricePerBlock.Sell", this.cfgPriceSellPerBlock);
+    	outConfig.set("RealEstate.Default.PricePerBlock.Rent", this.cfgPriceRentPerBlock);
+    	outConfig.set("RealEstate.Default.PricePerBlock.Lease", this.cfgPriceLeasePerBlock);
+
+    	outConfig.set("RealEstate.Default.Duration.Rent", this.cfgRentTime);
+    	outConfig.set("RealEstate.Default.Duration.Lease", this.cfgLeaseTime);
     	
     	try
         {
