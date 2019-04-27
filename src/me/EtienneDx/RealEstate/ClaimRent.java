@@ -70,7 +70,7 @@ public class ClaimRent extends ClaimTransaction
 				s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.dataStore.cfgReplaceRent);
 				//s.setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
 				s.setLine(2, price + " " + RealEstate.econ.currencyNamePlural());
-				s.setLine(3, getTime(duration, null, false));
+				s.setLine(3, Utils.getTime(duration, null, false));
 				s.update(true);
 			}
 			else
@@ -94,13 +94,13 @@ public class ClaimRent extends ClaimTransaction
 				else
 				{
 					s.setLine(0, RealEstate.instance.dataStore.cfgSignsHeader);
-					s.setLine(1, "Rented by " + Bukkit.getOfflinePlayer(rentedBy).getName());
+					s.setLine(1, ("Rented by " + Bukkit.getOfflinePlayer(rentedBy).getName()).substring(0, 16));
 					s.setLine(2, "Time remaining : ");
 					
 					int daysLeft = duration - days - 1;// we need to remove the current day
 					Duration timeRemaining = Duration.ofHours(24).minus(hours);
 					
-					s.setLine(3, getTime(daysLeft, timeRemaining, false));
+					s.setLine(3, Utils.getTime(daysLeft, timeRemaining, false));
 					s.update(true);
 				}
 				
@@ -110,29 +110,6 @@ public class ClaimRent extends ClaimTransaction
 		{
 			RealEstate.transactionsStore.cancelTransaction(this);
 		}
-	}
-	
-	private String getTime(int days, Duration hours, boolean details)
-	{
-		String time = "";
-		if(days >= 7)
-		{
-			time += (days / 7) + " week" + (days >= 14 ? "s" : "");
-		}
-		if(days % 7 > 0)
-		{
-			time += (time.isEmpty() ? "" : " ") + (days % 7) + " day" + (days % 7 > 1 ? "s" : "");
-		}
-		if((details || days < 7) && hours != null && hours.toHours() > 0)
-		{
-			time += (time.isEmpty() ? "" : " ") + hours.toHours() + " hour" + (hours.toHours() > 1 ? "s" : "");
-		}
-		if((details || days == 0) && hours != null && (time.isEmpty() || hours.toMinutes() % 60 > 0))
-		{
-			time += (time.isEmpty() ? "" : " ") + (hours.toMinutes() % 60) + " min" + (hours.toMinutes() % 60 > 1 ? "s" : "");
-		}
-		
-		return time;
 	}
 
 	private void unRent(boolean msgBuyer)
@@ -194,6 +171,24 @@ public class ClaimRent extends ClaimTransaction
 		update();
 		RealEstate.transactionsStore.saveData();
 	}
+	
+	@Override
+	public boolean tryCancelTransaction(Player p)
+	{
+		if(rentedBy != null)
+		{
+			Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
+			if(p != null)
+				p.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + "This " + (claim.parent == null ? "claim" : "subclaim") + 
+            		" is currently rented, you can't cancel the transaction!");
+            return false;
+		}
+		else
+		{
+			RealEstate.transactionsStore.cancelTransaction(this);
+			return true;
+		}
+	}
 
 	@Override
 	public void interact(Player player)
@@ -242,6 +237,7 @@ public class ClaimRent extends ClaimTransaction
 		{
 			rentedBy = player.getUniqueId();
 			startDate = LocalDateTime.now();
+			autoRenew = false;
 			claim.setPermission(rentedBy.toString(), ClaimPermission.Build);
 			update();
 			RealEstate.transactionsStore.saveData();
@@ -264,7 +260,7 @@ public class ClaimRent extends ClaimTransaction
                         "X: " + sign.getBlockX() + ", " +
                         "Y: " + sign.getBlockY() + ", " +
                         "Z: " + sign.getBlockZ() + "] " +
-                        " for " + price + " " + RealEstate.econ.currencyNamePlural());
+                        " for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
 			}
 			
 			player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.AQUA + "You have successfully rented this " + claimType + 
@@ -286,7 +282,11 @@ public class ClaimRent extends ClaimTransaction
 			{
 				msg += ChatColor.AQUA + "This " + claimType + " is for rent for " +
 						ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + " for a duration of " + 
-						ChatColor.GREEN + getTime(duration, null, true) + "\n";
+						ChatColor.GREEN + Utils.getTime(duration, null, true) + "\n";
+				if(rentedBy.equals(player.getUniqueId()) && RealEstate.instance.dataStore.cfgEnableAutoRenew)
+				{
+					msg += ChatColor.AQUA + "Automatic renew is currently " + ChatColor.LIGHT_PURPLE + (autoRenew ? "enable" : "disable") + "\n";
+				}
 				if(claimType.equalsIgnoreCase("claim"))
 				{
 					msg += ChatColor.AQUA + "The current owner is: " + ChatColor.GREEN + claim.getOwnerName();
@@ -312,7 +312,7 @@ public class ClaimRent extends ClaimTransaction
 				msg += ChatColor.AQUA + "This " + claimType + " is currently rented by " + 
 						ChatColor.GREEN + Bukkit.getOfflinePlayer(rentedBy).getName() + ChatColor.AQUA + " for " +
 						ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + " for another " + 
-						ChatColor.GREEN + getTime(daysLeft, timeRemaining, true) + "\n";
+						ChatColor.GREEN + Utils.getTime(daysLeft, timeRemaining, true) + "\n";
 				if(claimType.equalsIgnoreCase("claim"))
 				{
 					msg += ChatColor.AQUA + "The current owner is: " + ChatColor.GREEN + claim.getOwnerName();

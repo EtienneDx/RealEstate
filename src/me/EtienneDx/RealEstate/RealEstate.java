@@ -63,6 +63,7 @@ public class RealEstate extends JavaPlugin
 
         ConfigurationSerialization.registerClass(ClaimSell.class);
         ConfigurationSerialization.registerClass(ClaimRent.class);
+        ConfigurationSerialization.registerClass(ClaimLease.class);
         
         RealEstate.transactionsStore = new TransactionsStore();
         

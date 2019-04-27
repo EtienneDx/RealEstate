@@ -30,7 +30,10 @@ public class DataStore
     public String cfgReplaceLease;
     
     public boolean cfgEnableSell;
+    public boolean cfgEnableRent;
     public boolean cfgEnableLease;
+
+    public boolean cfgEnableAutoRenew;
     
     public boolean cfgTransferClaimBlocks;
 
@@ -44,6 +47,8 @@ public class DataStore
 
     public String cfgRentTime;
     public String cfgLeaseTime;
+    
+    public int cfgLeasePayments;
     
     public DataStore()
     {
@@ -82,7 +87,10 @@ public class DataStore
     	this.cfgReplaceLease = config.getString("RealEstate.Keywords.Replace.Lease", "FOR LEASE");
 
     	this.cfgEnableSell = config.getBoolean("RealEstate.Rules.Sell", true);
+    	this.cfgEnableRent = config.getBoolean("RealEstate.Rules.Rent", true);
     	this.cfgEnableLease = config.getBoolean("RealEstate.Rules.Lease", true);
+
+    	this.cfgEnableAutoRenew = config.getBoolean("RealEstate.Rules.AutomaticRenew", true);
 
     	this.cfgTransferClaimBlocks = config.getBoolean("RealEstate.Rules.TransferClaimBlocks", true);
 
@@ -96,6 +104,8 @@ public class DataStore
         
         this.cfgRentTime = config.getString("RealEstate.Default.Duration.Rent", "7D");
         this.cfgLeaseTime = config.getString("RealEstate.Default.Duration.Lease", "7D");
+        
+        this.cfgLeasePayments = config.getInt("RealEstate.Default.PaymentsCount.Lease", 5);
     }
     
     public void loadConfig()
@@ -119,7 +129,10 @@ public class DataStore
     	outConfig.set("RealEstate.Keywords.Replace.Lease", this.cfgReplaceLease);
 
     	outConfig.set("RealEstate.Rules.Sell", this.cfgEnableSell);
+    	outConfig.set("RealEstate.Rules.Rent", this.cfgEnableRent);
     	outConfig.set("RealEstate.Rules.Lease", this.cfgEnableLease);
+
+    	outConfig.set("RealEstate.Rules.AutomaticRenew", this.cfgEnableAutoRenew);
 
     	outConfig.set("RealEstate.Rules.TransferClaimBlocks", this.cfgTransferClaimBlocks);
 
@@ -133,6 +146,8 @@ public class DataStore
 
     	outConfig.set("RealEstate.Default.Duration.Rent", this.cfgRentTime);
     	outConfig.set("RealEstate.Default.Duration.Lease", this.cfgLeaseTime);
+    	
+    	outConfig.set("RealEstate.Default.PaymentsCount.Lease", this.cfgLeasePayments);
     	
     	try
         {

@@ -3,9 +3,7 @@ package me.EtienneDx.RealEstate;
 import org.bukkit.entity.Player;
 
 import me.ryanhamshire.GriefPrevention.Claim;
-import me.ryanhamshire.GriefPrevention.ClaimPermission;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import me.ryanhamshire.GriefPrevention.PlayerData;
 import net.md_5.bungee.api.ChatColor;
 
 import org.bukkit.Bukkit;
@@ -36,6 +34,13 @@ public class ClaimSell extends ClaimTransaction
 		{
 			RealEstate.transactionsStore.cancelTransaction(this);
 		}
+	}
+	
+	@Override
+	public boolean tryCancelTransaction(Player p)
+	{
+		RealEstate.transactionsStore.cancelTransaction(this);
+		return true;
 	}
 
 	@Override
@@ -82,52 +87,8 @@ public class ClaimSell extends ClaimTransaction
 		
 		if(Utils.makePayment(owner, player.getUniqueId(), price, false, true))// if payment succeed
 		{
-			// blocks transfer :
-			// if transfert is true, the seller will lose the blocks he had
-			// and the buyer will get them
-			// (that means the buyer will keep the same amount of remaining blocks after the transaction)
-			if(claimType.equalsIgnoreCase("claim") && RealEstate.instance.dataStore.cfgTransferClaimBlocks)
-			{
-				PlayerData buyerData = GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId());
-				PlayerData sellerData = GriefPrevention.instance.dataStore.getPlayerData(owner);
-				
-				// the seller has to provide the blocks
-				sellerData.setBonusClaimBlocks(sellerData.getBonusClaimBlocks() - claim.getArea());
-				if (sellerData.getBonusClaimBlocks() < 0)// can't have negative bonus claim blocks, so if need be, we take into the accrued 
-		        {
-		            sellerData.setAccruedClaimBlocks(sellerData.getAccruedClaimBlocks() + sellerData.getBonusClaimBlocks());
-		            sellerData.setBonusClaimBlocks(0);
-		        }
-				
-				// the buyer receive them
-				buyerData.setBonusClaimBlocks(buyerData.getBonusClaimBlocks() + claim.getArea());
-			}
-			
-			// start to change owner
-			if(claim.parent == null)
-				for(Claim child : claim.children)
-				{
-					child.clearPermissions();
-					child.managers.clear();
-				}
-			claim.clearPermissions();
-			
-			try
-			{
-				if(claim.parent == null)
-					GriefPrevention.instance.dataStore.changeClaimOwner(claim, player.getUniqueId());
-				else
-				{
-					claim.setPermission(player.getUniqueId().toString(), ClaimPermission.Build);
-				}
-			}
-			catch (Exception e)// error occurs when trying to change subclaim owner
-			{
-				e.printStackTrace();
-				return;
-			}
-			GriefPrevention.instance.dataStore.saveClaim(claim);
-			
+			Utils.transferClaim(claim, player.getUniqueId(), owner);
+			// normally, this is always the case, so it's not necessary, but until I proven my point, here
 			if(claim.parent != null || claim.ownerID.equals(player.getUniqueId()))
 			{
 				player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.AQUA + "You have successfully purchased this " + claimType + 

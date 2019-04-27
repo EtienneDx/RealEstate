@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 
@@ -59,7 +60,7 @@ public abstract class ClaimTransaction implements ConfigurationSerializable, Tra
 	@Override
 	public Block getHolder()
 	{
-		return sign.getBlock();
+		return sign.getBlock().getState() instanceof Sign ? sign.getBlock() : null;
 	}
 
 	@Override

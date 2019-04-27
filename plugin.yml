@@ -1,13 +1,13 @@
 name: RealEstate
 main: me.EtienneDx.RealEstate.RealEstate
-version: 0.1
+version: beta0.1
 authors: [EtienneDx]
 depend: [GriefPrevention, Vault]
 
 commands:
   re:
-    description: Access to the GriefProtection_RealEstate informations.
-    usage: /<command> ?
+    description: Access to the claim transaction information.
+    usage: /<command>
     aliases: [realestate]
     permission: realestate.info
     permission-message: You do not have access to that command!
@@ -28,6 +28,7 @@ permissions:
       realestate.subclaim.sell: true
       realestate.subclaim.rent: true
       realestate.subclaim.lease: true
+      realestate.autorenew: true
   realestate.claim.*:
     description: Allows the player full access over claims
     default: op
@@ -67,13 +68,16 @@ permissions:
     default: true
   realestate.subclaim.sell:
     description: Allows the player to sell subclaims
-    default: true
+    default: false
   realestate.subclaim.rent:
     description: Allows the player to rent subclaims
     default: true
   realestate.subclaim.lease:
     description: Allows the player to lease subclaims
-    default: true
+    default: false
   realestate.destroysigns:
     description: Allows the player to destroy any sign representing a transaction
     default: op
+  realestate.autorenew:
+    description: Allows the player to enable automatic renew for his rented claims and subclaims
+    default: true

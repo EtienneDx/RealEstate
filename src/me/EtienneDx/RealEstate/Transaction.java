@@ -12,4 +12,5 @@ public interface Transaction
 	public void interact(Player player);
 	public void preview(Player player);
 	public void update();
+	public boolean tryCancelTransaction(Player p);
 }
