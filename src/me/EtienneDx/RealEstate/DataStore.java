@@ -78,7 +78,7 @@ public class DataStore
     	this.cfgSignsHeader = config.getString("RealEstate.Keywords.SignsHeader", ChatColor.GOLD + "[RealEstate]");
     	//this.cfgSigns = getConfigList(config, "RealEstate.Keywords.Signs", Arrays.asList("[re]", "[realestate]"));
 
-    	this.cfgSellKeywords = getConfigList(config, "RealEstate.Keywords.Sell", Arrays.asList("[sell]", "[sellclaim]", "[sc]", "[re]", "[realestate]"));
+    	this.cfgSellKeywords = getConfigList(config, "RealEstate.Keywords.Sell", Arrays.asList("[sell]", "[sell claim]", "[sc]", "[re]", "[realestate]"));
     	this.cfgRentKeywords = getConfigList(config, "RealEstate.Keywords.Rent", Arrays.asList("[rent]", "[rent claim]", "[rc]"));
     	this.cfgLeaseKeywords = getConfigList(config, "RealEstate.Keywords.Lease", Arrays.asList("[lease]", "[lease claim]", "[lc]"));
 

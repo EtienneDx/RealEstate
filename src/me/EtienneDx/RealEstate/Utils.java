@@ -16,10 +16,10 @@ import net.milkbowl.vault.economy.EconomyResponse;
 
 public class Utils
 {
-    public static boolean makePayment(UUID seller, UUID buyer, double amount, boolean msgSeller, boolean msgBuyer)
+    public static boolean makePayment(UUID receiver, UUID giver, double amount, boolean msgSeller, boolean msgBuyer)
     {
     	// seller might be null if it is the server
-    	OfflinePlayer s = seller != null ? Bukkit.getOfflinePlayer(seller) : null, b = Bukkit.getOfflinePlayer(buyer);
+    	OfflinePlayer s = receiver != null ? Bukkit.getOfflinePlayer(receiver) : null, b = Bukkit.getOfflinePlayer(giver);
     	if(!RealEstate.econ.has(b, amount))
     	{
     		if(b.isOnline() && msgBuyer)

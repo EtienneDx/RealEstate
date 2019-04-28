@@ -7,8 +7,6 @@ import java.time.LocalTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.util.UUID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -20,12 +18,11 @@ import me.ryanhamshire.GriefPrevention.ClaimPermission;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import net.md_5.bungee.api.ChatColor;
 
-public class ClaimLease extends ClaimTransaction
+public class ClaimLease extends BoughtTransaction
 {
 	LocalDateTime lastPayment = null;
 	int frequency;
 	int paymentsLeft;
-	UUID buyer = null;
 	
 	public ClaimLease(Map<String, Object> map)
 	{
@@ -34,8 +31,6 @@ public class ClaimLease extends ClaimTransaction
 			lastPayment = LocalDateTime.parse((String) map.get("lastPayment"), DateTimeFormatter.ISO_DATE_TIME);
 		frequency = (int)map.get("frequency");
 		paymentsLeft = (int)map.get("paymentsLeft");
-		if(map.get("buyer") != null)
-			buyer = UUID.fromString((String)map.get("buyer"));
 	}
 	
 	public ClaimLease(Claim claim, Player player, double price, Location sign, int frequency, int paymentsLeft)
@@ -53,8 +48,6 @@ public class ClaimLease extends ClaimTransaction
 			map.put("lastPayment", lastPayment.format(DateTimeFormatter.ISO_DATE_TIME));
 		map.put("frequency", frequency);
 		map.put("paymentsLeft", paymentsLeft);
-		if(buyer != null)
-			map.put("buyer", buyer.toString());
 		
 		return map;
 	}
@@ -73,6 +66,10 @@ public class ClaimLease extends ClaimTransaction
 				s.setLine(2, paymentsLeft + "x " + price + " " + RealEstate.econ.currencyNamePlural());
 				s.setLine(3, Utils.getTime(frequency, null, false));
 				s.update(true);
+			}
+			else
+			{
+				RealEstate.transactionsStore.cancelTransaction(this);
 			}
 		}
 		else

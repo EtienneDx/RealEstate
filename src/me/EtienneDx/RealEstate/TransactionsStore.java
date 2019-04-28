@@ -147,7 +147,7 @@ public class TransactionsStore
 	
 	public boolean canCancelTransaction(Transaction tr)
 	{
-		return tr instanceof ClaimSell || (tr instanceof ClaimRent && ((ClaimRent)tr).rentedBy == null) || 
+		return tr instanceof ClaimSell || (tr instanceof ClaimRent && ((ClaimRent)tr).buyer == null) || 
 				(tr instanceof ClaimLease && ((ClaimLease)tr).buyer == null);
 	}
 
