@@ -1,7 +1,9 @@
-package me.EtienneDx.RealEstate;
+package me.EtienneDx.RealEstate.Transactions;
 
 import org.bukkit.entity.Player;
 
+import me.EtienneDx.RealEstate.RealEstate;
+import me.EtienneDx.RealEstate.Utils;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import net.md_5.bungee.api.ChatColor;
@@ -24,8 +26,8 @@ public class ClaimSell extends ClaimTransaction
 		if(sign.getBlock().getState() instanceof Sign)
 		{
 			Sign s = (Sign) sign.getBlock().getState();
-			s.setLine(0, RealEstate.instance.dataStore.cfgSignsHeader);
-			s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.dataStore.cfgReplaceSell);
+			s.setLine(0, RealEstate.instance.config.cfgSignsHeader);
+			s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceSell);
 			s.setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
 			s.setLine(3, price + " " + RealEstate.econ.currencyNamePlural());
 			s.update(true);
@@ -49,7 +51,7 @@ public class ClaimSell extends ClaimTransaction
 		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);// getting by id creates errors for subclaims
 		if(claim == null)
 		{
-            player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + "This claim does not exist!");
+            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "This claim does not exist!");
             RealEstate.transactionsStore.cancelTransaction(claim);
             return;
 		}
@@ -57,27 +59,27 @@ public class ClaimSell extends ClaimTransaction
 		
 		if (owner.equals(player.getUniqueId()))
         {
-            player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + "You already own this " + claimType + "!");
+            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You already own this " + claimType + "!");
             return;
         }
 		if(claim.parent == null && !owner.equals(claim.ownerID))
 		{
-            player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + Bukkit.getPlayer(owner).getDisplayName() + 
+            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + Bukkit.getPlayer(owner).getDisplayName() + 
             		" does not have the right to sell this " + claimType + "!");
             RealEstate.transactionsStore.cancelTransaction(claim);
             return;
 		}
 		if(!player.hasPermission("realestate." + claimType + ".buy"))
 		{
-            player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + "You do not have the permission to purchase " + 
+            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You do not have the permission to purchase " + 
             		claimType + "s!");
             return;
 		}
 		// for real claims, you may need to have enough claim blocks in reserve to purchase it (if transferClaimBlocks is false)
-		if(claimType.equalsIgnoreCase("claim") && !RealEstate.instance.dataStore.cfgTransferClaimBlocks && 
+		if(claimType.equalsIgnoreCase("claim") && !RealEstate.instance.config.cfgTransferClaimBlocks && 
 				GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId()).getRemainingClaimBlocks() < claim.getArea())
 		{
-            player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + 
+            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
             		"You don't have enough claim blocks to purchase this claim, you need to get " + ChatColor.DARK_GREEN + 
             		(claim.getArea() - GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId()).getRemainingClaimBlocks()) + 
             		ChatColor.RED + " more blocks!");
@@ -91,7 +93,7 @@ public class ClaimSell extends ClaimTransaction
 			// normally, this is always the case, so it's not necessary, but until I proven my point, here
 			if(claim.parent != null || claim.ownerID.equals(player.getUniqueId()))
 			{
-				player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.AQUA + "You have successfully purchased this " + claimType + 
+				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "You have successfully purchased this " + claimType + 
 						" for " + ChatColor.GREEN + price + RealEstate.econ.currencyNamePlural());
                 RealEstate.instance.addLogEntry(
                         "[" + RealEstate.transactionsStore.dateFormat.format(RealEstate.transactionsStore.date) + "] " + player.getName() + 
@@ -102,12 +104,12 @@ public class ClaimSell extends ClaimTransaction
                                 "Z: " + player.getLocation().getBlockZ() + "] " +
                                 "Price: " + price + " " + RealEstate.econ.currencyNamePlural());
                 
-                if(RealEstate.instance.dataStore.cfgMessageOwner)
+                if(RealEstate.instance.config.cfgMessageOwner)
                 {
                 	OfflinePlayer oldOwner = Bukkit.getOfflinePlayer(owner);
                 	if(oldOwner.isOnline())
                 	{
-                		((Player) oldOwner).sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.AQUA + player.getDisplayName() + 
+                		((Player) oldOwner).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + player.getDisplayName() + 
                 				" has purchased your " + claimType + " at " +
                                 "[" + player.getLocation().getWorld().getName() + ", " +
                                 "X: " + player.getLocation().getBlockX() + ", " +
@@ -119,7 +121,7 @@ public class ClaimSell extends ClaimTransaction
 			}
             else
             {
-                player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + "Cannot purchase claim!");
+                player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Cannot purchase claim!");
                 return;
             }
 			RealEstate.transactionsStore.cancelTransaction(claim);
@@ -150,7 +152,7 @@ public class ClaimSell extends ClaimTransaction
 		}
 		else
 		{
-			msg = RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + "You don't have the permission to view real estate informations!";
+			msg = RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to view real estate informations!";
 		}
 		player.sendMessage(msg);
 	}

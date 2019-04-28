@@ -1,4 +1,4 @@
-package me.EtienneDx.RealEstate;
+package me.EtienneDx.RealEstate.Transactions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,8 +8,8 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 public class ExitOffer implements ConfigurationSerializable
 {
-	UUID offerBy;
-	double price;
+	public UUID offerBy;
+	public double price;
 	
 	public ExitOffer(UUID offerBy, double price)
 	{

@@ -24,12 +24,12 @@ public class Utils
     	{
     		if(b.isOnline() && msgBuyer)
     		{
-    			((Player)b).sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + 
+    			((Player)b).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
     					"You don't have enough money to make this transaction!");
     		}
     		if(s != null && s.isOnline() && msgSeller)
     		{
-    			((Player)s).sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + 
+    			((Player)s).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
     					b.getName() + " doesn't have enough money to make this transaction!");
     		}
     		return false;
@@ -39,12 +39,12 @@ public class Utils
     	{
     		if(b.isOnline() && msgBuyer)
     		{
-    			((Player)b).sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + 
+    			((Player)b).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
     					"Could not withdraw the money!");
     		}
     		if(s != null && s.isOnline() && msgSeller)
     		{
-    			((Player)s).sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + 
+    			((Player)s).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
     					"Could not withdraw the money!");
     		}
     		return false;
@@ -56,12 +56,12 @@ public class Utils
     		{
     			if(b.isOnline() && msgBuyer)
         		{
-        			((Player)b).sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + 
+        			((Player)b).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
         					"Could not deposit to " + s.getName() + ", refunding Player!");
         		}
         		if(s != null && s.isOnline() && msgSeller)
         		{
-        			((Player)s).sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + 
+        			((Player)s).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
         					"Could not deposit to you, refunding" + b.getName() + "!");
         		}
         		RealEstate.econ.depositPlayer(b, amount);
@@ -101,7 +101,7 @@ public class Utils
 		// if transfert is true, the seller will lose the blocks he had
 		// and the buyer will get them
 		// (that means the buyer will keep the same amount of remaining blocks after the transaction)
-		if(claim.parent == null && RealEstate.instance.dataStore.cfgTransferClaimBlocks)
+		if(claim.parent == null && RealEstate.instance.config.cfgTransferClaimBlocks)
 		{
 			PlayerData buyerData = GriefPrevention.instance.dataStore.getPlayerData(buyer);
 			PlayerData sellerData = GriefPrevention.instance.dataStore.getPlayerData(seller);

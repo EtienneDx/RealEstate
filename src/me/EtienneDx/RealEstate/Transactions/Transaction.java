@@ -1,4 +1,4 @@
-package me.EtienneDx.RealEstate;
+package me.EtienneDx.RealEstate.Transactions;
 
 import java.util.UUID;
 

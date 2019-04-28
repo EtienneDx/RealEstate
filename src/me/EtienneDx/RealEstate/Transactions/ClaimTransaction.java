@@ -1,4 +1,4 @@
-package me.EtienneDx.RealEstate;
+package me.EtienneDx.RealEstate.Transactions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,10 +14,10 @@ import me.ryanhamshire.GriefPrevention.Claim;
 
 public abstract class ClaimTransaction implements ConfigurationSerializable, Transaction
 {
-	protected long claimId;
-	protected UUID owner = null;
-	protected double price;
-	protected Location sign = null;
+	public long claimId;
+	public UUID owner = null;
+	public double price;
+	public Location sign = null;
 	
 	public ClaimTransaction(Claim claim, Player player, double price, Location sign)
 	{

@@ -1,6 +1,6 @@
 name: RealEstate
 main: me.EtienneDx.RealEstate.RealEstate
-version: beta0.1
+version: ${project.version}
 authors: [EtienneDx]
 depend: [GriefPrevention, Vault]
 

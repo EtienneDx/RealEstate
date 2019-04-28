@@ -1,4 +1,4 @@
-package me.EtienneDx.RealEstate;
+package me.EtienneDx.RealEstate.Transactions;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +15,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import me.EtienneDx.RealEstate.RealEstate;
 import me.ryanhamshire.GriefPrevention.Claim;
 import net.md_5.bungee.api.ChatColor;
 
@@ -168,17 +169,17 @@ public class TransactionsStore
 		
 		if(player != null)
 		{
-			player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.AQUA + "You have successfully created " + 
+			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "You have successfully created " + 
 					(claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.parent == null ? "claim" : "subclaim") + " sale for " + 
 					ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
 		}
-		if(RealEstate.instance.dataStore.cfgBroadcastSell)
+		if(RealEstate.instance.config.cfgBroadcastSell)
 		{
 			for(Player p : Bukkit.getServer().getOnlinePlayers())
 			{
 				if(p != player)
 				{
-					p.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.DARK_GREEN + player.getDisplayName() + 
+					p.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.DARK_GREEN + player.getDisplayName() + 
 							ChatColor.AQUA + " has put " + 
 							(claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.parent == null ? "claim" : "subclaim") + " for sale for " + 
 							ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
@@ -187,9 +188,9 @@ public class TransactionsStore
 		}
 	}
 
-	public void rent(Claim claim, Player player, double price, Location sign, int duration)
+	public void rent(Claim claim, Player player, double price, Location sign, int duration, int rentPeriods)
 	{
-		ClaimRent cr = new ClaimRent(claim, player, price, sign, duration);
+		ClaimRent cr = new ClaimRent(claim, player, price, sign, duration, rentPeriods);
 		claimRent.put(claim.getID().toString(), cr);
 		cr.update();
 		saveData();
@@ -204,17 +205,17 @@ public class TransactionsStore
 		
 		if(player != null)
 		{
-			player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.AQUA + "You have successfully put " + 
+			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "You have successfully put " + 
 					(claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.parent == null ? "claim" : "subclaim") + " for rent for " + 
 					ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
 		}
-		if(RealEstate.instance.dataStore.cfgBroadcastSell)
+		if(RealEstate.instance.config.cfgBroadcastSell)
 		{
 			for(Player p : Bukkit.getServer().getOnlinePlayers())
 			{
 				if(p != player)
 				{
-					p.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.DARK_GREEN + player.getDisplayName() + 
+					p.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.DARK_GREEN + player.getDisplayName() + 
 							ChatColor.AQUA + " has put " + 
 							(claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.parent == null ? "claim" : "subclaim") + " for rent for " + 
 							ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
@@ -241,18 +242,18 @@ public class TransactionsStore
 		
 		if(player != null)
 		{
-			player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.AQUA + "You have successfully put " + 
+			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "You have successfully put " + 
 					(claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.parent == null ? "claim" : "subclaim") + " for lease for " + 
 					ChatColor.GREEN + paymentsCount + ChatColor.AQUA + " payments of " +
 					ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
 		}
-		if(RealEstate.instance.dataStore.cfgBroadcastSell)
+		if(RealEstate.instance.config.cfgBroadcastSell)
 		{
 			for(Player p : Bukkit.getServer().getOnlinePlayers())
 			{
 				if(p != player)
 				{
-					p.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.DARK_GREEN + player.getDisplayName() + 
+					p.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.DARK_GREEN + player.getDisplayName() + 
 							ChatColor.AQUA + " has put " + 
 							(claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.parent == null ? "claim" : "subclaim") + " for lease for " + 
 							ChatColor.GREEN + paymentsCount + ChatColor.AQUA + " payments of " +

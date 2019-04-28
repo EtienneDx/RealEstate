@@ -1,4 +1,4 @@
-package me.EtienneDx.RealEstate;
+package me.EtienneDx.RealEstate.Transactions;
 
 import java.util.Map;
 import java.util.UUID;
@@ -10,8 +10,8 @@ import me.ryanhamshire.GriefPrevention.Claim;
 
 public abstract class BoughtTransaction extends ClaimTransaction
 {
-	UUID buyer = null;
-	ExitOffer exitOffer = null;
+	public UUID buyer = null;
+	public ExitOffer exitOffer = null;
 	
 	public BoughtTransaction(Map<String, Object> map)
 	{

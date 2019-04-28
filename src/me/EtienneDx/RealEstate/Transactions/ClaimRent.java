@@ -1,4 +1,4 @@
-package me.EtienneDx.RealEstate;
+package me.EtienneDx.RealEstate.Transactions;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -13,6 +13,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
+import me.EtienneDx.RealEstate.RealEstate;
+import me.EtienneDx.RealEstate.Utils;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.ClaimPermission;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -22,7 +24,9 @@ public class ClaimRent extends BoughtTransaction
 {
 	LocalDateTime startDate = null;
 	int duration;
-	boolean autoRenew = false;
+	public boolean autoRenew = false;
+	public int periodCount = 0;
+	public int maxPeriod;
 	
 	public ClaimRent(Map<String, Object> map)
 	{
@@ -31,12 +35,15 @@ public class ClaimRent extends BoughtTransaction
 			startDate = LocalDateTime.parse((String) map.get("startDate"), DateTimeFormatter.ISO_DATE_TIME);
 		duration = (int)map.get("duration");
 		autoRenew = (boolean) map.get("autoRenew");
+		periodCount = (int) map.get("periodCount");
+		maxPeriod = (int) map.get("maxPeriod");
 	}
 	
-	public ClaimRent(Claim claim, Player player, double price, Location sign, int duration)
+	public ClaimRent(Claim claim, Player player, double price, Location sign, int duration, int rentPeriods)
 	{
 		super(claim, player, price, sign);
 		this.duration = duration;
+		this.maxPeriod = RealEstate.instance.config.cfgEnableRentPeriod ? rentPeriods : 1;
 	}
 
 	@Override
@@ -47,6 +54,8 @@ public class ClaimRent extends BoughtTransaction
 			map.put("startDate", startDate.format(DateTimeFormatter.ISO_DATE_TIME));
 		map.put("duration", duration);
 		map.put("autoRenew",  autoRenew);
+		map.put("periodCount", periodCount);
+		map.put("maxPeriod", maxPeriod);
 		
 		return map;
 	}
@@ -54,64 +63,61 @@ public class ClaimRent extends BoughtTransaction
 	@Override
 	public void update()
 	{
-		if(sign.getBlock().getState() instanceof Sign)
+		if(buyer == null)
 		{
-			Sign s = (Sign) sign.getBlock().getState();
-			if(buyer == null)
+			if(sign.getBlock().getState() instanceof Sign)
 			{
-				s.setLine(0, RealEstate.instance.dataStore.cfgSignsHeader);
-				s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.dataStore.cfgReplaceRent);
+				Sign s = (Sign) sign.getBlock().getState();
+				s.setLine(0, RealEstate.instance.config.cfgSignsHeader);
+				s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceRent);
 				//s.setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
 				s.setLine(2, price + " " + RealEstate.econ.currencyNamePlural());
-				s.setLine(3, Utils.getTime(duration, null, false));
+				s.setLine(3, (maxPeriod > 1 ? maxPeriod + "x " : "") + Utils.getTime(duration, null, false));
 				s.update(true);
 			}
-			else
+			else// if no one is renting it, we can delete it (no sign indicating it's rentable)
 			{
-				// we want to know how much time has gone by since startDate
-				int days = Period.between(startDate.toLocalDate(), LocalDate.now()).getDays();
-				Duration hours = Duration.between(startDate.toLocalTime(), LocalTime.now());
-				if(hours.isNegative() && !hours.isZero())
-		        {
-		            hours = hours.plusHours(24);
-		            days--;
-		        }
-				if(days >= duration)// we exceeded the time limit!
-				{
-					// both functions will call update again to update the sign
-					if(autoRenew)
-						payRent();
-					else
-						unRent(true);
-				}
-				else
-				{
-					s.setLine(0, RealEstate.instance.dataStore.cfgSignsHeader);
-					s.setLine(1, ("Rented by " + Bukkit.getOfflinePlayer(buyer).getName()).substring(0, 16));
-					s.setLine(2, "Time remaining : ");
-					
-					int daysLeft = duration - days - 1;// we need to remove the current day
-					Duration timeRemaining = Duration.ofHours(24).minus(hours);
-					
-					s.setLine(3, Utils.getTime(daysLeft, timeRemaining, false));
-					s.update(true);
-				}
-				
+				RealEstate.transactionsStore.cancelTransaction(this);
 			}
 		}
-		else if(buyer == null)// if no one is renting it, we can delete it (no sign indicating it's rentable)
+		else
 		{
-			RealEstate.transactionsStore.cancelTransaction(this);
+			// we want to know how much time has gone by since startDate
+			int days = Period.between(startDate.toLocalDate(), LocalDate.now()).getDays();
+			Duration hours = Duration.between(startDate.toLocalTime(), LocalTime.now());
+			if(hours.isNegative() && !hours.isZero())
+	        {
+	            hours = hours.plusHours(24);
+	            days--;
+	        }
+			if(days >= duration)// we exceeded the time limit!
+			{
+				payRent();
+			}
+			else if(sign.getBlock().getState() instanceof Sign)
+			{
+				Sign s = (Sign) sign.getBlock().getState();
+				s.setLine(0, RealEstate.instance.config.cfgSignsHeader);
+				s.setLine(1, ("Rented by " + Bukkit.getOfflinePlayer(buyer).getName()).substring(0, 16));
+				s.setLine(2, "Time remaining : ");
+				
+				int daysLeft = duration - days - 1;// we need to remove the current day
+				Duration timeRemaining = Duration.ofHours(24).minus(hours);
+				
+				s.setLine(3, Utils.getTime(daysLeft, timeRemaining, false));
+				s.update(true);
+			}
 		}
+		
 	}
 
 	private void unRent(boolean msgBuyer)
 	{
 		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
 		claim.dropPermission(buyer.toString());
-		if(msgBuyer && Bukkit.getOfflinePlayer(buyer).isOnline() && RealEstate.instance.dataStore.cfgMessageBuyer)
+		if(msgBuyer && Bukkit.getOfflinePlayer(buyer).isOnline() && RealEstate.instance.config.cfgMessageBuyer)
 		{
-			Bukkit.getPlayer(buyer).sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.AQUA + 
+			Bukkit.getPlayer(buyer).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + 
 					"The rent for the " + (claim.parent == null ? "claim" : "subclaim") + " at " + ChatColor.BLUE + "[" + 
 					sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + 
 					sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]" + ChatColor.AQUA + " is now over, your access has been revoked.");
@@ -130,36 +136,43 @@ public class ClaimRent extends BoughtTransaction
 		
 		String claimType = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null).parent == null ? "claim" : "subclaim";
 		
-		if(Utils.makePayment(owner, this.buyer, price, false, false))
+		if((autoRenew || periodCount < maxPeriod) && Utils.makePayment(owner, this.buyer, price, false, false))
 		{
+			periodCount = (periodCount + 1) % maxPeriod;
 			startDate = LocalDateTime.now();
-			if(buyerPlayer.isOnline() && RealEstate.instance.dataStore.cfgMessageBuyer)
+			if(buyerPlayer.isOnline() && RealEstate.instance.config.cfgMessageBuyer)
 			{
-				((Player)buyerPlayer).sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.AQUA + 
+				((Player)buyerPlayer).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + 
 						"Paid rent for the " + claimType + " at " + ChatColor.BLUE + "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + 
 						", Y: " + sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]" + 
 						ChatColor.AQUA + "for the price of " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
 			}
 			
-			if(seller.isOnline() && RealEstate.instance.dataStore.cfgMessageOwner)
+			if(seller.isOnline() && RealEstate.instance.config.cfgMessageOwner)
 			{
-				((Player)seller).sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.AQUA + buyerPlayer.getName() + 
+				((Player)seller).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + buyerPlayer.getName() + 
 						" has paid rent for the " + claimType + " at " + ChatColor.BLUE + "[" + 
 						sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + 
 						sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]" + 
 						ChatColor.AQUA + "at the price of " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
 			}
 		}
-		else
+		else if (autoRenew)
 		{
-			if(buyerPlayer.isOnline() && RealEstate.instance.dataStore.cfgMessageBuyer)
+			if(buyerPlayer.isOnline() && RealEstate.instance.config.cfgMessageBuyer)
 			{
-				((Player)buyerPlayer).sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + 
+				((Player)buyerPlayer).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
 						"Couldn't pay the rent for the " + claimType + " at " + ChatColor.BLUE + "[" + sign.getWorld().getName() + ", X: " + 
 						sign.getBlockX() + ", Y: " + 
 						sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]" + ChatColor.RED + ", your access has been revoked.");
 			}
 			unRent(false);
+			return;
+		}
+		else
+		{
+			unRent(true);
+			return;
 		}
 		update();
 		RealEstate.transactionsStore.saveData();
@@ -172,7 +185,7 @@ public class ClaimRent extends BoughtTransaction
 		{
 			Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
 			if(p != null)
-				p.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + "This " + (claim.parent == null ? "claim" : "subclaim") + 
+				p.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "This " + (claim.parent == null ? "claim" : "subclaim") + 
             		" is currently rented, you can't cancel the transaction!");
             return false;
 		}
@@ -189,7 +202,7 @@ public class ClaimRent extends BoughtTransaction
 		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);// getting by id creates errors for subclaims
 		if(claim == null)
 		{
-            player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + "This claim does not exist!");
+            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "This claim does not exist!");
             RealEstate.transactionsStore.cancelTransaction(claim);
             return;
 		}
@@ -197,31 +210,31 @@ public class ClaimRent extends BoughtTransaction
 		
 		if (owner.equals(player.getUniqueId()))
         {
-            player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + "You already own this " + claimType + "!");
+            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You already own this " + claimType + "!");
             return;
         }
 		if(claim.parent == null && !owner.equals(claim.ownerID))
 		{
-            player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + Bukkit.getPlayer(owner).getDisplayName() + 
+            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + Bukkit.getPlayer(owner).getDisplayName() + 
             		" does not have the right to rent this " + claimType + "!");
             RealEstate.transactionsStore.cancelTransaction(claim);
             return;
 		}
 		if(!player.hasPermission("realestate." + claimType + ".rent"))
 		{
-            player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + "You do not have the permission to rent " + 
+            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You do not have the permission to rent " + 
             		claimType + "s!");
             return;
 		}
 		if(player.getUniqueId().equals(buyer))
 		{
-            player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + "You are already renting this " + 
+            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You are already renting this " + 
             		claimType + "!");
             return;
 		}
 		if(buyer != null)
 		{
-            player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + "Someone already rents this " + 
+            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Someone already rents this " + 
             		claimType + "!");
             return;
 		}
@@ -245,9 +258,9 @@ public class ClaimRent extends BoughtTransaction
                     "Price: " + price + " " + RealEstate.econ.currencyNamePlural());
 
 			OfflinePlayer seller = Bukkit.getOfflinePlayer(owner);
-			if(RealEstate.instance.dataStore.cfgMessageOwner && seller.isOnline())
+			if(RealEstate.instance.config.cfgMessageOwner && seller.isOnline())
 			{
-				((Player)seller).sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.GREEN + player.getName() + ChatColor.AQUA + 
+				((Player)seller).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + ChatColor.AQUA + 
 						" has just rented your " + claimType + " at " +
                         "[" + sign.getWorld().getName() + ", " +
                         "X: " + sign.getBlockX() + ", " +
@@ -256,7 +269,7 @@ public class ClaimRent extends BoughtTransaction
                         " for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
 			}
 			
-			player.sendMessage(RealEstate.instance.dataStore.chatPrefix + ChatColor.AQUA + "You have successfully rented this " + claimType + 
+			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "You have successfully rented this " + claimType + 
 					" for " + ChatColor.GREEN + price + RealEstate.econ.currencyNamePlural());
 		}
 	}
@@ -303,7 +316,7 @@ public class ClaimRent extends BoughtTransaction
 						ChatColor.GREEN + Bukkit.getOfflinePlayer(buyer).getName() + ChatColor.AQUA + " for " +
 						ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + " for another " + 
 						ChatColor.GREEN + Utils.getTime(daysLeft, timeRemaining, true) + "\n";
-				if((owner.equals(player.getUniqueId()) || buyer.equals(player.getUniqueId())) && RealEstate.instance.dataStore.cfgEnableAutoRenew)
+				if((owner.equals(player.getUniqueId()) || buyer.equals(player.getUniqueId())) && RealEstate.instance.config.cfgEnableAutoRenew)
 				{
 					msg += ChatColor.AQUA + "Automatic renew is currently " + ChatColor.LIGHT_PURPLE + (autoRenew ? "enable" : "disable") + "\n";
 				}
@@ -319,7 +332,7 @@ public class ClaimRent extends BoughtTransaction
 		}
 		else
 		{
-			msg = RealEstate.instance.dataStore.chatPrefix + ChatColor.RED + "You don't have the permission to view real estate informations!";
+			msg = RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to view real estate informations!";
 		}
 		player.sendMessage(msg);
 	}

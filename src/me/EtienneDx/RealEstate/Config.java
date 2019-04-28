@@ -10,7 +10,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 
-public class DataStore
+public class Config
 {
     public PluginDescriptionFile pdf;
 
@@ -34,6 +34,7 @@ public class DataStore
     public boolean cfgEnableLease;
 
     public boolean cfgEnableAutoRenew;
+    public boolean cfgEnableRentPeriod;
     
     public boolean cfgTransferClaimBlocks;
 
@@ -50,7 +51,7 @@ public class DataStore
     
     public int cfgLeasePayments;
     
-    public DataStore()
+    public Config()
     {
         this.pdf = RealEstate.instance.getDescription();
     }
@@ -91,6 +92,7 @@ public class DataStore
     	this.cfgEnableLease = config.getBoolean("RealEstate.Rules.Lease", true);
 
     	this.cfgEnableAutoRenew = config.getBoolean("RealEstate.Rules.AutomaticRenew", true);
+    	this.cfgEnableRentPeriod = config.getBoolean("RealEstate.Rules.RentPeriods", true);
 
     	this.cfgTransferClaimBlocks = config.getBoolean("RealEstate.Rules.TransferClaimBlocks", true);
 
@@ -133,6 +135,7 @@ public class DataStore
     	outConfig.set("RealEstate.Rules.Lease", this.cfgEnableLease);
 
     	outConfig.set("RealEstate.Rules.AutomaticRenew", this.cfgEnableAutoRenew);
+    	outConfig.set("RealEstate.Rules.RentPeriods", this.cfgEnableRentPeriod);
 
     	outConfig.set("RealEstate.Rules.TransferClaimBlocks", this.cfgTransferClaimBlocks);
 

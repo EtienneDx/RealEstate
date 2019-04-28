@@ -10,13 +10,18 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import me.EtienneDx.RealEstate.Transactions.ClaimLease;
+import me.EtienneDx.RealEstate.Transactions.ClaimRent;
+import me.EtienneDx.RealEstate.Transactions.ClaimSell;
+import me.EtienneDx.RealEstate.Transactions.ExitOffer;
+import me.EtienneDx.RealEstate.Transactions.TransactionsStore;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
 public class RealEstate extends JavaPlugin
 {
-	Logger log;
-    DataStore dataStore;
+	public Logger log;
+    public Config config;
 	public final static String pluginDirPath = "plugins" + File.separator + "RealEstate" + File.separator;
     public static boolean vaultPresent = false;
     public static Economy econ = null;
@@ -57,9 +62,9 @@ public class RealEstate extends JavaPlugin
                 return;
             }
         }
-        this.dataStore = new DataStore();
-        this.dataStore.loadConfig();// loads config or default
-        this.dataStore.saveConfig();// save eventual default
+        this.config = new Config();
+        this.config.loadConfig();// loads config or default
+        this.config.saveConfig();// save eventual default
 
         ConfigurationSerialization.registerClass(ClaimSell.class);
         ConfigurationSerialization.registerClass(ClaimRent.class);
@@ -75,7 +80,7 @@ public class RealEstate extends JavaPlugin
     {
         try
         {
-            File logFile = new File(this.dataStore.logFilePath);
+            File logFile = new File(this.config.logFilePath);
             if (!logFile.exists()) {
                 logFile.createNewFile();
             }
