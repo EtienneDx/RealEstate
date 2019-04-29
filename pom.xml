@@ -8,6 +8,7 @@
 	<name>RealEstate</name>
 	<description>A spigot plugin for selling, renting and leasing GriefPrevention claims</description>
 	<build>
+        <finalName>${project.name}</finalName>
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
 			<resource>
