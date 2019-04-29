@@ -287,7 +287,8 @@ public class ClaimRent extends BoughtTransaction
 			if(buyer == null)
 			{
 				msg += ChatColor.AQUA + "This " + claimType + " is for rent for " +
-						ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + " for a duration of " + 
+						ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + " for " + 
+						(maxPeriod > 1 ? "" + ChatColor.GREEN + maxPeriod + ChatColor.AQUA + " periods of " : "") +
 						ChatColor.GREEN + Utils.getTime(duration, null, true) + "\n";
 				
 				if(claimType.equalsIgnoreCase("claim"))
@@ -314,11 +315,13 @@ public class ClaimRent extends BoughtTransaction
 				
 				msg += ChatColor.AQUA + "This " + claimType + " is currently rented by " + 
 						ChatColor.GREEN + Bukkit.getOfflinePlayer(buyer).getName() + ChatColor.AQUA + " for " +
-						ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + " for another " + 
+						ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + " for " + 
+						(maxPeriod - periodCount > 1 ? "" + ChatColor.GREEN + (maxPeriod - periodCount) + ChatColor.AQUA + " periods of " + 
+						ChatColor.GREEN + Utils.getTime(duration, null, false) + ChatColor.AQUA + ". The current period will end in " : "another ") +
 						ChatColor.GREEN + Utils.getTime(daysLeft, timeRemaining, true) + "\n";
 				if((owner.equals(player.getUniqueId()) || buyer.equals(player.getUniqueId())) && RealEstate.instance.config.cfgEnableAutoRenew)
 				{
-					msg += ChatColor.AQUA + "Automatic renew is currently " + ChatColor.LIGHT_PURPLE + (autoRenew ? "enable" : "disable") + "\n";
+					msg += ChatColor.AQUA + "Automatic renew is currently " + ChatColor.LIGHT_PURPLE + (autoRenew ? "enabled" : "disabled") + "\n";
 				}
 				if(claimType.equalsIgnoreCase("claim"))
 				{

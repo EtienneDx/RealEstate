@@ -10,11 +10,17 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import co.aikar.commands.BukkitCommandManager;
+import co.aikar.commands.ConditionFailedException;
+import me.EtienneDx.RealEstate.Transactions.BoughtTransaction;
 import me.EtienneDx.RealEstate.Transactions.ClaimLease;
 import me.EtienneDx.RealEstate.Transactions.ClaimRent;
 import me.EtienneDx.RealEstate.Transactions.ClaimSell;
 import me.EtienneDx.RealEstate.Transactions.ExitOffer;
+import me.EtienneDx.RealEstate.Transactions.Transaction;
 import me.EtienneDx.RealEstate.Transactions.TransactionsStore;
+import me.ryanhamshire.GriefPrevention.Claim;
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
@@ -22,6 +28,7 @@ public class RealEstate extends JavaPlugin
 {
 	public Logger log;
     public Config config;
+    BukkitCommandManager manager;
 	public final static String pluginDirPath = "plugins" + File.separator + "RealEstate" + File.separator;
     public static boolean vaultPresent = false;
     public static Economy econ = null;
@@ -31,6 +38,7 @@ public class RealEstate extends JavaPlugin
     
     public static TransactionsStore transactionsStore = null;
 	
+	@SuppressWarnings("deprecation")
 	public void onEnable()
 	{
 		RealEstate.instance = this;
@@ -74,9 +82,98 @@ public class RealEstate extends JavaPlugin
         RealEstate.transactionsStore = new TransactionsStore();
         
         new REListener().registerEvents();
+        
+        manager = new BukkitCommandManager(this);
+        manager.enableUnstableAPI("help");
+        registerConditions();
+        manager.registerCommand(new RECommand());
 	}
 
-    public void addLogEntry(String entry)
+    private void registerConditions()
+    {
+        manager.getCommandConditions().addCondition("inClaim", (context) -> {
+        	if(context.getIssuer().isPlayer() && 
+        			GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null) != null)
+        	{
+        		return;
+        	}
+        	throw new ConditionFailedException("You must stand inside of a claim to use this command!");
+        });
+        manager.getCommandConditions().addCondition("inBoughtClaim", (context) -> {
+        	if(!context.getIssuer().isPlayer())
+        	{
+        		throw new ConditionFailedException("Only Players can perform this command!");
+        	}
+        	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
+        	if(c == null)
+        	{
+        		throw new ConditionFailedException("You must stand inside of a claim to use this command!");
+        	}
+        	Transaction tr = transactionsStore.getTransaction(c);
+        	if(tr == null || !(tr instanceof BoughtTransaction))
+        	{
+        		throw new ConditionFailedException("This claim is neither to rent or to lease!");
+        	}
+        });
+        manager.getCommandConditions().addCondition("partOfBoughtTransaction", context -> {
+        	if(!context.getIssuer().isPlayer())
+        	{
+        		throw new ConditionFailedException("Only Players can perform this command!");
+        	}
+        	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
+        	if(c == null)
+        	{
+        		throw new ConditionFailedException("You must stand inside of a claim to use this command!");
+        	}
+        	Transaction tr = transactionsStore.getTransaction(c);
+        	if(tr == null)
+        	{
+        		throw new ConditionFailedException("This claim is neither to sell, rent or lease!");
+        	}
+        	if(!(tr instanceof BoughtTransaction))
+        	{
+            	throw new ConditionFailedException("This command only applies to rented or leased claims!");
+        	}
+        	if((((BoughtTransaction)tr).buyer != null&& ((BoughtTransaction)tr).buyer.equals(context.getIssuer().getPlayer().getUniqueId())) || 
+        			tr.getOwner().equals(context.getIssuer().getPlayer().getUniqueId()))
+        	{
+        		return;
+        	}
+        	throw new ConditionFailedException("You are not part of this transaction!");
+        });
+        manager.getCommandConditions().addCondition("partOfRent", context -> {
+        	if(!context.getIssuer().isPlayer())
+        	{
+        		throw new ConditionFailedException("Only Players can perform this command!");
+        	}
+        	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
+        	if(c == null)
+        	{
+        		throw new ConditionFailedException("You must stand inside of a claim to use this command!");
+        	}
+        	Transaction tr = transactionsStore.getTransaction(c);
+        	if(tr == null)
+        	{
+        		throw new ConditionFailedException("This claim is neither to sell, rent or lease!");
+        	}
+        	if(!(tr instanceof ClaimRent))
+        	{
+            	throw new ConditionFailedException("This command only applies to rented claims!");
+        	}
+        	if((((ClaimRent)tr).buyer != null && ((ClaimRent)tr).buyer.equals(context.getIssuer().getPlayer().getUniqueId())) || 
+        			tr.getOwner().equals(context.getIssuer().getPlayer().getUniqueId()))
+        	{
+        		return;
+        	}
+        	throw new ConditionFailedException("You are not part of this transaction!");
+        });
+        manager.getCommandConditions().addCondition(Double.class, "positiveDouble", (c, exec, value) -> {
+        	if(value > 0) return;
+        	throw new ConditionFailedException("The value must be greater than zero!");
+        });
+	}
+
+	public void addLogEntry(String entry)
     {
         try
         {

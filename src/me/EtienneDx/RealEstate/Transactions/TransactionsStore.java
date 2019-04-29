@@ -17,6 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import me.EtienneDx.RealEstate.RealEstate;
 import me.ryanhamshire.GriefPrevention.Claim;
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import net.md_5.bungee.api.ChatColor;
 
 public class TransactionsStore
@@ -261,5 +262,12 @@ public class TransactionsStore
 				}
 			}
 		}
+	}
+
+	public Transaction getTransaction(Player player)
+	{
+		if(player == null) return null;
+		Claim c = GriefPrevention.instance.dataStore.getClaimAt(player.getLocation(), false, null);
+		return getTransaction(c);
 	}
 }
