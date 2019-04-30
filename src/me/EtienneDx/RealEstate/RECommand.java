@@ -203,6 +203,7 @@ public class RECommand extends BaseCommand
 	        	}
 				bt.exitOffer = null;
 				claim.dropPermission(bt.buyer.toString());
+				GriefPrevention.instance.dataStore.saveClaim(claim);
 				bt.buyer = null;
 				bt.update();// eventual cancel is contained in here
 			}

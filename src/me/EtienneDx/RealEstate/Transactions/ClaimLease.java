@@ -297,6 +297,7 @@ public class ClaimLease extends BoughtTransaction
 			lastPayment = LocalDateTime.now();
 			paymentsLeft--;
 			claim.setPermission(buyer.toString(), ClaimPermission.Build);
+			GriefPrevention.instance.dataStore.saveClaim(claim);
 			getHolder().breakNaturally();// leases don't have signs indicating the remaining time
 			update();
 			RealEstate.transactionsStore.saveData();
@@ -334,8 +335,6 @@ public class ClaimLease extends BoughtTransaction
 			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "You have successfully paid lease for this " + claimType + 
 					" for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + ", " +
                     ChatColor.GREEN + paymentsLeft + ChatColor.AQUA + " payments left");
-			
-			destroySign();
 		}
 	}
 
