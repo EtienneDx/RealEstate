@@ -35,12 +35,15 @@ public class Config
 
     public boolean cfgEnableAutoRenew;
     public boolean cfgEnableRentPeriod;
+    public boolean cfgDestroyRentSigns;
+    public boolean cfgDestroyLeaseSigns;
     
     public boolean cfgTransferClaimBlocks;
 
     public boolean cfgMessageOwner;
     public boolean cfgMessageBuyer;
     public boolean cfgBroadcastSell;
+    public boolean cfgMailOffline;
 
     public double cfgPriceSellPerBlock;
     public double cfgPriceRentPerBlock;
@@ -93,11 +96,14 @@ public class Config
 
     	this.cfgEnableAutoRenew = config.getBoolean("RealEstate.Rules.AutomaticRenew", true);
     	this.cfgEnableRentPeriod = config.getBoolean("RealEstate.Rules.RentPeriods", true);
+    	this.cfgDestroyRentSigns = config.getBoolean("RealEstate.Rules.DestroySigns.Rent", false);
+    	this.cfgDestroyLeaseSigns = config.getBoolean("RealEstate.Rules.DestroySigns.Lease", false);
 
     	this.cfgTransferClaimBlocks = config.getBoolean("RealEstate.Rules.TransferClaimBlocks", true);
 
         this.cfgMessageOwner = config.getBoolean("RealEstate.Messaging.MessageOwner", true);
         this.cfgMessageBuyer = config.getBoolean("RealEstate.Messaging.MessageBuyer", true);
+        this.cfgMailOffline = config.getBoolean("RealEstate.Messaging.MailOffline", true);
         this.cfgBroadcastSell = config.getBoolean("RealEstate.Messaging.BroadcastSell", true);
 
         this.cfgPriceSellPerBlock = config.getDouble("RealEstate.Default.PricesPerBlock.Sell", 5.0);
@@ -136,11 +142,14 @@ public class Config
 
     	outConfig.set("RealEstate.Rules.AutomaticRenew", this.cfgEnableAutoRenew);
     	outConfig.set("RealEstate.Rules.RentPeriods", this.cfgEnableRentPeriod);
+    	outConfig.set("RealEstate.Rules.DestroySigns.Rent", this.cfgDestroyRentSigns);
+    	outConfig.set("RealEstate.Rules.DestroySigns.Lease", this.cfgDestroyLeaseSigns);
 
     	outConfig.set("RealEstate.Rules.TransferClaimBlocks", this.cfgTransferClaimBlocks);
 
     	outConfig.set("RealEstate.Messaging.MessageOwner", this.cfgMessageOwner);
     	outConfig.set("RealEstate.Messaging.MessageBuyer", this.cfgMessageBuyer);
+    	outConfig.set("RealEstate.Messaging.MailOffline", this.cfgMailOffline);
     	outConfig.set("RealEstate.Messaging.BroadcastSell", this.cfgBroadcastSell);
 
     	outConfig.set("RealEstate.Default.PricePerBlock.Sell", this.cfgPriceSellPerBlock);

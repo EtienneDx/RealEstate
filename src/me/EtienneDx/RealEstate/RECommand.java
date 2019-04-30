@@ -9,6 +9,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.earth2me.essentials.User;
+
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.CommandAlias;
@@ -141,15 +143,23 @@ public class RECommand extends BaseCommand
 					"The proposition has been successfully created!");
 			UUID other = player.getUniqueId().equals(bt.owner) ? bt.buyer : bt.owner;
 			OfflinePlayer otherP = Bukkit.getOfflinePlayer(other);
+			Location loc = player.getLocation();
+			String claimType = GriefPrevention.instance.dataStore.getClaimAt(loc, false, null).parent == null ? "claim" : "subclaim";
 			if(otherP.isOnline())
 			{
-				Location loc = player.getLocation();
-				String claimType = GriefPrevention.instance.dataStore.getClaimAt(loc, false, null).parent == null ? "claim" : "subclaim";
 				((Player)otherP).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
 						ChatColor.AQUA + " has created an offer to exit the rent/lease contract for the " + claimType + " at " + 
 						ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
 						+ loc.getBlockZ() + "]" + ChatColor.AQUA + " for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
 			}
+			else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
+        	{
+        		User u = RealEstate.ess.getUser(other);
+        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
+						ChatColor.AQUA + " has created an offer to exit the rent/lease contract for the " + claimType + " at " + 
+						ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
+						+ loc.getBlockZ() + "]" + ChatColor.AQUA + " for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
+        	}
 		}
 		
 		@Subcommand("accept")
@@ -183,6 +193,14 @@ public class RECommand extends BaseCommand
 							ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
 							", Z: " + loc.getBlockZ() + "]. It is no longer rented or leased.");
 				}
+				else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
+	        	{
+	        		User u = RealEstate.ess.getUser(other);
+	        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
+							ChatColor.AQUA + " has accepted your offer to exit the rent/lease contract for the " + claimType + " at " + 
+							ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
+							", Z: " + loc.getBlockZ() + "]. It is no longer rented or leased.");
+	        	}
 				bt.exitOffer = null;
 				claim.dropPermission(bt.buyer.toString());
 				bt.buyer = null;
@@ -223,6 +241,14 @@ public class RECommand extends BaseCommand
 							ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
 							", Z: " + loc.getBlockZ() + "]");
 				}
+				else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
+	        	{
+	        		User u = RealEstate.ess.getUser(other);
+	        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
+							ChatColor.AQUA + " has refused your offer to exit the rent/lease contract for the " + claimType + " at " + 
+							ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
+							", Z: " + loc.getBlockZ() + "]");
+	        	}
 			}
 		}
 		
@@ -248,6 +274,14 @@ public class RECommand extends BaseCommand
 							ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
 							+ loc.getBlockZ() + "]");
 				}
+				else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
+	        	{
+	        		User u = RealEstate.ess.getUser(other);
+	        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
+							ChatColor.AQUA + " has cancelled his offer to exit the rent/lease contract for the " + claimType + " at " + 
+							ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
+							+ loc.getBlockZ() + "]");
+	        	}
 			}
 			else
 			{
