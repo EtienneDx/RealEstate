@@ -40,6 +40,9 @@ public class Config
     
     public boolean cfgTransferClaimBlocks;
 
+    public boolean cfgUseCurrencySymbol;
+    public String cfgCurrencySymbol;
+    
     public boolean cfgMessageOwner;
     public boolean cfgMessageBuyer;
     public boolean cfgBroadcastSell;
@@ -101,6 +104,9 @@ public class Config
 
     	this.cfgTransferClaimBlocks = config.getBoolean("RealEstate.Rules.TransferClaimBlocks", true);
 
+        this.cfgUseCurrencySymbol = config.getBoolean("RealEstate.Rules.UseCurrencySymbol", false);
+        this.cfgCurrencySymbol = config.getString("RealEstate.Rules.CurrencySymbol", "$");
+
         this.cfgMessageOwner = config.getBoolean("RealEstate.Messaging.MessageOwner", true);
         this.cfgMessageBuyer = config.getBoolean("RealEstate.Messaging.MessageBuyer", true);
         this.cfgMailOffline = config.getBoolean("RealEstate.Messaging.MailOffline", true);
@@ -146,6 +152,9 @@ public class Config
     	outConfig.set("RealEstate.Rules.DestroySigns.Lease", this.cfgDestroyLeaseSigns);
 
     	outConfig.set("RealEstate.Rules.TransferClaimBlocks", this.cfgTransferClaimBlocks);
+
+    	outConfig.set("RealEstate.Rules.UseCurrencySymbol", this.cfgUseCurrencySymbol);
+    	outConfig.set("RealEstate.Rules.CurrencySymbol", this.cfgCurrencySymbol);
 
     	outConfig.set("RealEstate.Messaging.MessageOwner", this.cfgMessageOwner);
     	outConfig.set("RealEstate.Messaging.MessageBuyer", this.cfgMessageBuyer);
