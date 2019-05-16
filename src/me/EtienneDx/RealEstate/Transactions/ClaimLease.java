@@ -71,7 +71,15 @@ public class ClaimLease extends BoughtTransaction
 				s.setLine(0, RealEstate.instance.config.cfgSignsHeader);
 				s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceLease);
 				//s.setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
-				s.setLine(2, paymentsLeft + "x " + price + " " + RealEstate.econ.currencyNamePlural());
+				//s.setLine(2, paymentsLeft + "x " + price + " " + RealEstate.econ.currencyNamePlural());
+				if(RealEstate.instance.config.cfgUseCurrencySymbol)
+				{
+					s.setLine(2, paymentsLeft + "x " + RealEstate.instance.config.cfgCurrencySymbol + " " + price);
+				}
+				else
+				{
+					s.setLine(2, paymentsLeft + "x " + price + " " + RealEstate.econ.currencyNamePlural());
+				}
 				s.setLine(3, Utils.getTime(frequency, null, false));
 				s.update(true);
 			}
