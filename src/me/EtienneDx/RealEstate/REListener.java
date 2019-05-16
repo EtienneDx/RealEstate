@@ -357,7 +357,7 @@ public class REListener implements Listener
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event)
 	{
-		if(event.getHand().equals(EquipmentSlot.HAND) && event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && 
+		if(event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && event.getHand().equals(EquipmentSlot.HAND) &&
 				event.getClickedBlock().getState() instanceof Sign)
 		{
 			Sign sign = (Sign)event.getClickedBlock().getState();
