@@ -94,6 +94,8 @@ public class RealEstate extends JavaPlugin
         manager.enableUnstableAPI("help");
         registerConditions();
         manager.registerCommand(new RECommand());
+        
+        GriefPrevention.realEstate = new GP_RealEstateHook();
 	}
 
     private void registerConditions()

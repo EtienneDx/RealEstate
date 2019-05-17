@@ -94,12 +94,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.github.TechFortress</groupId>
-			<artifactId>GriefPrevention</artifactId>
-			<version>16.11.6</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 	        <groupId>co.aikar</groupId>
 	        <artifactId>acf-bukkit</artifactId>
 	        <version>0.5.0-SNAPSHOT</version>
@@ -110,5 +104,11 @@
 	        <version>2.16.1</version>
 	        <scope>provided</scope>
 	    </dependency>
+	    <dependency>
+		    <groupId>com.github.EtienneDx</groupId>
+		    <artifactId>GriefPrevention</artifactId>
+		    <version>master-SNAPSHOT</version>
+		    <scope>provided</scope>
+		</dependency>
 	</dependencies>
 </project>
