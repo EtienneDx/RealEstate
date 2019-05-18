@@ -4,3 +4,5 @@
 bin/*
 target/*
 build.bat
+/bin/
+/target/

@@ -40,6 +40,10 @@
                             <pattern>co.aikar.commands</pattern>
                             <shadedPattern>me.EtienneDx.RealEstate.acf</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>me.EtienneDx.AttributeConfig</pattern>
+                            <shadedPattern>me.EtienneDx.RealEstate.AttributeConfig</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
@@ -109,6 +113,11 @@
 		    <artifactId>GriefPrevention</artifactId>
 		    <version>master-SNAPSHOT</version>
 		    <scope>provided</scope>
+		</dependency>
+	    <dependency>
+		    <groupId>com.github.EtienneDx</groupId>
+		    <artifactId>AnnotationConfig</artifactId>
+		    <version>2c9f016</version>
 		</dependency>
 	</dependencies>
 </project>

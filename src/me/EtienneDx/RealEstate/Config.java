@@ -1,16 +1,18 @@
 package me.EtienneDx.RealEstate;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 
-public class Config
+import me.EtienneDx.AnnotationConfig.AnnotationConfig;
+import me.EtienneDx.AnnotationConfig.ConfigField;
+import me.EtienneDx.AnnotationConfig.ConfigFile;
+
+@ConfigFile(header = "RealEstate wiki and newest versions are available at http://www.github.com/EtienneDx/RealEstate")
+public class Config extends AnnotationConfig
 {
     public PluginDescriptionFile pdf;
 
@@ -18,44 +20,71 @@ public class Config
     public final String logFilePath = RealEstate.pluginDirPath + "GriefProtection_RealEstate.log";
     public final String chatPrefix = "[" + ChatColor.GOLD + "RealEstate" + ChatColor.WHITE + "] ";
     
-    public String cfgSignsHeader;
+    @ConfigField(name="RealEstate.Keywords.SignsHeader", comment = "What is displayed in top of the signs")
+    public String cfgSignsHeader = ChatColor.GOLD + "[RealEstate]";
     //public List<String> cfgSigns;
 
-    public List<String> cfgSellKeywords;
-    public List<String> cfgRentKeywords;
-    public List<String> cfgLeaseKeywords;
+    @ConfigField(name="RealEstate.Keywords.Sell", comment = "List of all possible possible signs headers to sell a claim")
+    public List<String> cfgSellKeywords = Arrays.asList("[sell]", "[sell claim]", "[sc]", "[re]", "[realestate]");
+    @ConfigField(name="RealEstate.Keywords.Rent", comment = "List of all possible possible signs headers to rent a claim")
+    public List<String> cfgRentKeywords = Arrays.asList("[rent]", "[rent claim]", "[rc]");
+    @ConfigField(name="RealEstate.Keywords.Lease", comment = "List of all possible possible signs headers to lease a claim")
+    public List<String> cfgLeaseKeywords = Arrays.asList("[lease]", "[lease claim]", "[lc]");
 
-    public String cfgReplaceSell;
-    public String cfgReplaceRent;
-    public String cfgReplaceLease;
-    
-    public boolean cfgEnableSell;
-    public boolean cfgEnableRent;
-    public boolean cfgEnableLease;
+    @ConfigField(name="RealEstate.Keywords.Replace.Sell", comment = "What is displayed on signs for preoperties to sell")
+    public String cfgReplaceSell = "FOR SALE";
+    @ConfigField(name="RealEstate.Keywords.Replace.Rent", comment = "What is displayed on signs for preoperties to rent")
+    public String cfgReplaceRent = "FOR RENT";
+    @ConfigField(name="RealEstate.Keywords.Replace.Lease", comment = "What is displayed on signs for preoperties to lease")
+    public String cfgReplaceLease = "FOR LEASE";
 
-    public boolean cfgEnableAutoRenew;
-    public boolean cfgEnableRentPeriod;
-    public boolean cfgDestroyRentSigns;
-    public boolean cfgDestroyLeaseSigns;
-    
-    public boolean cfgTransferClaimBlocks;
+    @ConfigField(name="RealEstate.Rules.Sell", comment = "Is selling claims enabled?")
+    public boolean cfgEnableSell = true;
+    @ConfigField(name="RealEstate.Rules.Rent", comment = "Is renting claims enabled?")
+    public boolean cfgEnableRent = true;
+    @ConfigField(name="RealEstate.Rules.Lease", comment = "Is leasing claims enabled?")
+    public boolean cfgEnableLease = true;
 
-    public boolean cfgUseCurrencySymbol;
-    public String cfgCurrencySymbol;
-    
-    public boolean cfgMessageOwner;
-    public boolean cfgMessageBuyer;
-    public boolean cfgBroadcastSell;
-    public boolean cfgMailOffline;
+    @ConfigField(name="RealEstate.Rules.AutomaticRenew", comment = "Can players renting claims enable automatic renew of their contracts?")
+    public boolean cfgEnableAutoRenew = true;
+    @ConfigField(name="RealEstate.Rules.RentPeriods", comment = "Can a rent contract last multiple periods?")
+    public boolean cfgEnableRentPeriod = true;
+    @ConfigField(name="RealEstate.Rules.DestroySigns.Rent", comment = "Should the rent signs get destroyed once the claim is rented?")
+    public boolean cfgDestroyRentSigns = false;
+    @ConfigField(name="RealEstate.Rules.DestroySigns.Lease", comment = "Should the lease signs get destroyed once the claim is leased?")
+    public boolean cfgDestroyLeaseSigns = true;
 
-    public double cfgPriceSellPerBlock;
-    public double cfgPriceRentPerBlock;
-    public double cfgPriceLeasePerBlock;
+    @ConfigField(name="RealEstate.Rules.TransferClaimBlocks", comment = "Are the claim blocks transfered to the new owner on purchase or should the buyer provide them?")
+    public boolean cfgTransferClaimBlocks = true;
 
-    public String cfgRentTime;
-    public String cfgLeaseTime;
-    
-    public int cfgLeasePayments;
+    @ConfigField(name="RealEstate.Rules.UseCurrencySymbol", comment = "Should the signs display the prices with a currency symbol instead of the full currency name?")
+    public boolean cfgUseCurrencySymbol = false;
+    @ConfigField(name="RealEstate.Rules.CurrencySymbol", comment = "In case UseCurrencySymbol is true, what symbol should be used?")
+    public String cfgCurrencySymbol = "$";
+
+    @ConfigField(name="RealEstate.Messaging.MessageOwner", comment = "Should the owner get messaged once one of his claim is rented/leased/bought and on end of contracts?")
+    public boolean cfgMessageOwner = true;
+    @ConfigField(name="RealEstate.Messaging.MessageBuyer", comment = "Should the buyer get messaged once one of his claim is rented/leased/bought and on end of contracts?")
+    public boolean cfgMessageBuyer = true;
+    @ConfigField(name="RealEstate.Messaging.BroadcastSell", comment = "Should a message get broadcasted when a player put a claim for rent/lease/sell?")
+    public boolean cfgBroadcastSell = true;
+    @ConfigField(name="RealEstate.Messaging.MailOffline", comment = "Should offline owner/buyers receive mails (using the Essentials plugin) when they're offline?")
+    public boolean cfgMailOffline = true;
+
+    @ConfigField(name="RealEstate.Default.PricesPerBlock.Sell", comment = "Chat is the default price per block when selling a claim")
+    public double cfgPriceSellPerBlock = 5.0;
+    @ConfigField(name="RealEstate.Default.PricesPerBlock.Rent", comment = "Chat is the default price per block when renting a claim")
+    public double cfgPriceRentPerBlock = 2.0;
+    @ConfigField(name="RealEstate.Default.PricesPerBlock.Lease", comment = "Chat is the default price per block when leasing a claim")
+    public double cfgPriceLeasePerBlock = 2.0;
+
+    @ConfigField(name="RealEstate.Default.Duration.Rent", comment = "How long is a rent period by default")
+    public String cfgRentTime = "7D";
+    @ConfigField(name="RealEstate.Default.Duration.Lease", comment = "How long is a lease period by default")
+    public String cfgLeaseTime = "7D";
+
+    @ConfigField(name="RealEstate.Default.LeasePaymentsCount", comment = "How many lease periods are required before the buyer gets the claim's ownership by default")
+    public int cfgLeasePayments = 5;
     
     public Config()
     {
@@ -80,7 +109,7 @@ public class Config
     	return ret;
     }
     
-    public void loadConfig(YamlConfiguration config)
+    /*public void loadConfig(YamlConfiguration config)
     {
     	this.cfgSignsHeader = config.getString("RealEstate.Keywords.SignsHeader", ChatColor.GOLD + "[RealEstate]");
     	//this.cfgSigns = getConfigList(config, "RealEstate.Keywords.Signs", Arrays.asList("[re]", "[realestate]"));
@@ -120,15 +149,16 @@ public class Config
         this.cfgLeaseTime = config.getString("RealEstate.Default.Duration.Lease", "7D");
         
         this.cfgLeasePayments = config.getInt("RealEstate.Default.PaymentsCount.Lease", 5);
-    }
+    }*/
     
+    @Override
     public void loadConfig()
     {
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(this.configFilePath));
-        this.loadConfig(config);
+        //YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(this.configFilePath));
+        this.loadConfig(this.configFilePath);
     }
     
-    public void saveConfig()
+    /*public void saveConfig()
     {
     	FileConfiguration outConfig = new YamlConfiguration();
     	outConfig.set("RealEstate.Keywords.SignsHeader", this.cfgSignsHeader);
@@ -178,5 +208,5 @@ public class Config
         {
             RealEstate.instance.log.info("Unable to write to the configuration file at \"" + this.configFilePath + "\"");
         }
-    }
+    }*/
 }
