@@ -144,4 +144,11 @@ public class Utils
 		GriefPrevention.instance.dataStore.saveClaim(claim);
 					
 	}
+	
+	public static String getSignString(String str)
+	{
+		if(str.length() > 16)
+			str = str.substring(0, 16);
+		return str;
+	}
 }

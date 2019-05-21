@@ -107,7 +107,7 @@ public class ClaimRent extends BoughtTransaction
 			{
 				Sign s = (Sign) sign.getBlock().getState();
 				s.setLine(0, RealEstate.instance.config.cfgSignsHeader);
-				s.setLine(1, ("Rented by " + Bukkit.getOfflinePlayer(buyer).getName()).substring(0, 16));
+				s.setLine(1, Utils.getSignString("Rented by " + Bukkit.getOfflinePlayer(buyer).getName()));
 				s.setLine(2, "Time remaining : ");
 				
 				int daysLeft = duration - days - 1;// we need to remove the current day
