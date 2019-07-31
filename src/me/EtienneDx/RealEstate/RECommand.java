@@ -87,6 +87,55 @@ public class RECommand extends BaseCommand
 		}
 	}
 	
+	@Subcommand("seller")
+	@Description("Displays or changes the seller of a claim (admin only)")
+	@Conditions("inPendingTransactionClaim")
+	public static void setSeller(Player player, @Optional String newSeller)
+	{
+		Location loc = player.getLocation();
+		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(loc, false, null);
+		Transaction tr = RealEstate.transactionsStore.getTransaction(claim);
+		if(!claim.isAdminClaim())
+		{
+			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "This is not an admin claim");
+		}
+		else if(newSeller == null)
+		{
+			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "The seller of this claim is " + 
+					ChatColor.GREEN + (tr.getOwner() == null ? "the server" : Bukkit.getPlayer(tr.getOwner()).getDisplayName()));
+		}
+		else if(!RealEstate.perms.has(player, "realestate.admin"))
+		{
+			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to change the seller");
+		}
+		else if(newSeller.equalsIgnoreCase("server"))
+		{
+			tr.setOwner(null);
+			tr.update();
+			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "Changed the seller to the server");
+		}
+		else
+		{
+			Player newOwner = Bukkit.getPlayer(newSeller);
+			if(newOwner == null)
+			{
+				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Couldn't find this player (he may be offline)");
+			}
+			else if(!RealEstate.perms.has(newOwner, "realestate.admin"))
+			{
+				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
+						"This player doesn't have the right to lease/rent/sell admin claims");
+			}
+			else
+			{
+				tr.setOwner(newOwner.getUniqueId());
+				tr.update();
+				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "Changed the seller to " + 
+						ChatColor.GREEN + newOwner.getDisplayName());
+			}
+		}
+	}
+	
 	@Subcommand("exitoffer")
 	@Conditions("partOfBoughtTransaction")
 	public class ExitOfferCommand extends BaseCommand

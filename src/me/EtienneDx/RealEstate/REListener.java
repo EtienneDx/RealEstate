@@ -181,7 +181,7 @@ public class REListener implements Listener
 				if(duration == 0)
 				{
 					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Couldn't read the date!\n" + 
-							"Date must be formatted as follow" + ChatColor.GREEN + "10 weeks" + ChatColor.RED + " or " + 
+							"Date must be formatted as follow : " + ChatColor.GREEN + "10 weeks" + ChatColor.RED + " or " + 
 							ChatColor.GREEN + "3 days" + ChatColor.RED + " or " +  ChatColor.GREEN + "1 week 3 days");
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
@@ -370,7 +370,7 @@ public class REListener implements Listener
 				if(!RealEstate.transactionsStore.anyTransaction(claim))
 				{
 					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
-							"This claim is no longer for rent or for sell, sorry...");
+							"This claim is no longer for rent, sell or lease, sorry...");
 					event.getClickedBlock().breakNaturally();
 					event.setCancelled(true);
 					return;
@@ -396,11 +396,18 @@ public class REListener implements Listener
 				Transaction tr = RealEstate.transactionsStore.getTransaction(claim);
 				if(tr != null && event.getBlock().equals(tr.getHolder()))
 				{
-					if(event.getPlayer() != null && !tr.getOwner().equals(event.getPlayer().getUniqueId()) && 
+					if(event.getPlayer() != null && tr.getOwner() != null  && !event.getPlayer().getUniqueId().equals(tr.getOwner()) && 
 							!RealEstate.perms.has(event.getPlayer(), "realestate.destroysigns"))
 					{
 						event.getPlayer().sendMessage(RealEstate.instance.config.chatPrefix + 
-								ChatColor.RED + "Only the author of the sell/rent sign is allowed to destroy it");
+								ChatColor.RED + "Only the author of the sell/rent/lease sign is allowed to destroy it");
+						event.setCancelled(true);
+						return;
+					}
+					else if(event.getPlayer() != null && tr.getOwner() == null && !RealEstate.perms.has(event.getPlayer(), "realestate.admin"))
+					{
+						event.getPlayer().sendMessage(RealEstate.instance.config.chatPrefix + 
+								ChatColor.RED + "Only an admin is allowed to destroy this sign");
 						event.setCancelled(true);
 						return;
 					}

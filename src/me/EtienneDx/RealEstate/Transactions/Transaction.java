@@ -9,6 +9,7 @@ public interface Transaction
 {
 	public Block getHolder();
 	public UUID getOwner();
+	public void setOwner(UUID newOwner);
 	public void interact(Player player);
 	public void preview(Player player);
 	public void update();

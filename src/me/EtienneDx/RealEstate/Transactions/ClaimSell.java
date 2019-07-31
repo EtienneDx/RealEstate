@@ -10,6 +10,8 @@ import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import net.md_5.bungee.api.ChatColor;
 
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -66,12 +68,12 @@ public class ClaimSell extends ClaimTransaction
 		}
 		String claimType = claim.parent == null ? "claim" : "subclaim";
 		
-		if (owner.equals(player.getUniqueId()))
+		if (player.getUniqueId().equals(owner))
         {
             player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You already own this " + claimType + "!");
             return;
         }
-		if(claim.parent == null && !owner.equals(claim.ownerID))
+		if(claim.parent == null && owner != null && !owner.equals(claim.ownerID))
 		{
             player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + Bukkit.getPlayer(owner).getDisplayName() + 
             		" does not have the right to sell this " + claimType + "!");
@@ -175,5 +177,11 @@ public class ClaimSell extends ClaimTransaction
 			msg = RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to view real estate informations!";
 		}
 		player.sendMessage(msg);
+	}
+
+	@Override
+	public void setOwner(UUID newOwner)
+	{
+		this.owner = newOwner;
 	}
 }
