@@ -10,6 +10,7 @@ import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import net.md_5.bungee.api.ChatColor;
 
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -22,6 +23,11 @@ public class ClaimSell extends ClaimTransaction
 	public ClaimSell(Claim claim, Player player, double price, Location sign)
 	{
 		super(claim, player, price, sign);
+	}
+	
+	public ClaimSell(Map<String, Object> map)
+	{
+		super(map);
 	}
 
 	@Override
