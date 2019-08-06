@@ -1,5 +1,8 @@
 package me.EtienneDx.RealEstate;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -22,6 +25,7 @@ import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.HelpCommand;
 import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.Syntax;
 import me.EtienneDx.RealEstate.Transactions.BoughtTransaction;
 import me.EtienneDx.RealEstate.Transactions.ClaimRent;
 import me.EtienneDx.RealEstate.Transactions.ExitOffer;
@@ -50,10 +54,82 @@ public class RECommand extends BaseCommand
 		}
 	}
 	
+	@Subcommand("list")
+	@Description("Displays the list of all real estate offers currently existing")
+	@CommandCompletion("all|sell|rent|lease")
+	@Syntax("[all|sell|rent|lease] <page>")
+	public static void list(Player player, @Optional String type, @Default("1") int page)
+	{
+		if(page <= 0)
+		{
+			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Page must be a positive option!");
+			return;
+		}
+		int count = 0;
+		int start = (page - 1) * RealEstate.instance.config.cfgPageSize;
+		String typeMsg;
+		if(type == null || type.equalsIgnoreCase("all"))
+		{
+			count = RealEstate.transactionsStore.claimSell.values().size() + RealEstate.transactionsStore.claimRent.values().size() +
+					RealEstate.transactionsStore.claimLease.values().size();
+			typeMsg = "Real Estate offers";
+		}
+		else if(type.equalsIgnoreCase("sell"))
+		{
+			count = RealEstate.transactionsStore.claimSell.values().size();
+			typeMsg = "Sell offers";
+		}
+		else if(type.equalsIgnoreCase("rent"))
+		{
+			count = RealEstate.transactionsStore.claimRent.values().size();
+			typeMsg = "Rent offers";
+		}
+		else if(type.equalsIgnoreCase("lease"))
+		{
+			count = RealEstate.transactionsStore.claimLease.values().size();
+			typeMsg = "Lease offers";
+		}
+		else
+		{
+			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Invalid option provided!");
+			return;
+		}
+		player.sendMessage(ChatColor.DARK_BLUE + "----= " + ChatColor.WHITE + "[ " + ChatColor.GOLD + typeMsg + ChatColor.DARK_GREEN + " " +
+				page + ChatColor.GOLD + " / " + ChatColor.DARK_GREEN + (int)Math.ceil(count / (double)RealEstate.instance.config.cfgPageSize) +
+				ChatColor.WHITE + " ]" + ChatColor.DARK_BLUE + " =----");
+		ArrayList<Transaction> transactions = new ArrayList<Transaction>(count);
+		if(type == null || type.equalsIgnoreCase("all"))
+		{
+			transactions.addAll(RealEstate.transactionsStore.claimSell.values());
+			transactions.addAll(RealEstate.transactionsStore.claimRent.values());
+			transactions.addAll(RealEstate.transactionsStore.claimLease.values());
+		}
+		else if(type.equalsIgnoreCase("sell"))
+		{
+			transactions.addAll(RealEstate.transactionsStore.claimSell.values());
+		}
+		else if(type.equalsIgnoreCase("rent"))
+		{
+			transactions.addAll(RealEstate.transactionsStore.claimRent.values());
+		}
+		else if(type.equalsIgnoreCase("lease"))
+		{
+			transactions.addAll(RealEstate.transactionsStore.claimLease.values());
+		}
+		
+		int max = Math.min(start + RealEstate.instance.config.cfgPageSize, count);
+		for(int i = start; i < max; i++)
+		{
+			RealEstate.instance.log.info("transaction " + i);
+			transactions.get(i).msgInfo(player);
+		}
+	}
+	
 	@Subcommand("renewrent")
 	@Description("Allows the player renting a claim or subclaim to enable or disable the automatic renew of his rent")
 	@Conditions("partOfRent")
     @CommandCompletion("enable|disable")
+	@Syntax("[enable|disable]")
 	public static void renewRent(Player player, @Optional String newStatus)
 	{
 		Location loc = player.getLocation();
@@ -173,6 +249,7 @@ public class RECommand extends BaseCommand
 		
 		@Subcommand("create")
 		@Description("Creates an offer to break an ongoing transaction")
+		@Syntax("<price>")
 		public void create(Player player, @Conditions("positiveDouble") Double price)
 		{
 			BoughtTransaction bt = (BoughtTransaction)RealEstate.transactionsStore.getTransaction(player);

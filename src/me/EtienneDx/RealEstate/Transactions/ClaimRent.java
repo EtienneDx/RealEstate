@@ -389,4 +389,17 @@ public class ClaimRent extends BoughtTransaction
 		player.sendMessage(msg);
 	}
 
+	@Override
+	public void msgInfo(Player player)
+	{
+		player.sendMessage(ChatColor.DARK_GREEN + "" + GriefPrevention.instance.dataStore.getClaim(claimId).getArea() + 
+				ChatColor.AQUA + " blocks to " + ChatColor.DARK_GREEN + "Rent " + ChatColor.AQUA + "at " + ChatColor.DARK_GREEN + 
+				"[" + GriefPrevention.instance.dataStore.getClaim(claimId).getLesserBoundaryCorner().getWorld().getName() + ", " +
+                "X: " + GriefPrevention.instance.dataStore.getClaim(claimId).getLesserBoundaryCorner().getBlockX() + ", " +
+                "Y: " + GriefPrevention.instance.dataStore.getClaim(claimId).getLesserBoundaryCorner().getBlockY() + ", " +
+                "Z: " + GriefPrevention.instance.dataStore.getClaim(claimId).getLesserBoundaryCorner().getBlockZ() + "] " + ChatColor.AQUA + "for " + 
+                ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + " per period of " + ChatColor.GREEN + 
+                Utils.getTime(duration, Duration.ZERO, false));
+	}
+
 }

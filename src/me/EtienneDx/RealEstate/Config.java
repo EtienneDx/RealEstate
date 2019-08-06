@@ -86,6 +86,9 @@ public class Config extends AnnotationConfig
     @ConfigField(name="RealEstate.Default.LeasePaymentsCount", comment = "How many lease periods are required before the buyer gets the claim's ownership by default")
     public int cfgLeasePayments = 5;
     
+    @ConfigField(name="RealEstate.Settings.PageSize", comment = "How many Real Estate offer should be shown by page using the '/re list' command")
+    public int cfgPageSize = 20;
+    
     public Config()
     {
         this.pdf = RealEstate.instance.getDescription();
