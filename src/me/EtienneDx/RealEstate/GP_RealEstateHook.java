@@ -14,7 +14,7 @@ public class GP_RealEstateHook implements IRealEstate
 	public String allowEdit(Claim claim, Player player)
 	{
 		Transaction b = RealEstate.transactionsStore.getTransaction(claim);
-		if(b != null && b.getOwner().equals(player.getUniqueId()) && b instanceof BoughtTransaction)
+		if(b != null && player.getUniqueId().equals(b.getOwner()) && b instanceof BoughtTransaction)
 		{
 			if(((BoughtTransaction)b).getBuyer() != null)
 				return "This claim is currently involved in a transaction, you can't edit it!";
@@ -26,7 +26,7 @@ public class GP_RealEstateHook implements IRealEstate
 	public String allowBuild(Claim claim, Player player, Material material)
 	{
 		Transaction b = RealEstate.transactionsStore.getTransaction(claim);
-		if(b != null && b.getOwner().equals(player.getUniqueId()) && b instanceof BoughtTransaction)
+		if(b != null && player.getUniqueId().equals(b.getOwner()) && b instanceof BoughtTransaction)// ??
 		{
 			if(((BoughtTransaction)b).getBuyer() != null)
 				return "This claim is currently involved in a transaction, you can't build on it!";
@@ -38,7 +38,7 @@ public class GP_RealEstateHook implements IRealEstate
 	public String allowAccess(Claim claim, Player player)
 	{
 		Transaction b = RealEstate.transactionsStore.getTransaction(claim);
-		if(b != null && b.getOwner().equals(player.getUniqueId()) && b instanceof BoughtTransaction)
+		if(b != null && player.getUniqueId().equals(b.getOwner()) && b instanceof BoughtTransaction)
 		{
 			if(((BoughtTransaction)b).getBuyer() != null)
 				return "This claim is currently involved in a transaction, you can't access it!";
@@ -50,7 +50,7 @@ public class GP_RealEstateHook implements IRealEstate
 	public String allowContainers(Claim claim, Player player)
 	{
 		Transaction b = RealEstate.transactionsStore.getTransaction(claim);
-		if(b != null && b.getOwner().equals(player.getUniqueId()) && b instanceof BoughtTransaction)
+		if(b != null && player.getUniqueId().equals(b.getOwner()) && b instanceof BoughtTransaction)
 		{
 			if(((BoughtTransaction)b).getBuyer() != null)
 				return "This claim is currently involved in a transaction, you can't access it's containers!";

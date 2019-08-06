@@ -87,7 +87,7 @@ public class RECommand extends BaseCommand
 		}
 	}
 	
-	@Subcommand("seller")
+	/*@Subcommand("seller")
 	@Description("Displays or changes the seller of a claim (admin only)")
 	@Conditions("inPendingTransactionClaim")
 	public static void setSeller(Player player, @Optional String newSeller)
@@ -112,6 +112,7 @@ public class RECommand extends BaseCommand
 		{
 			tr.setOwner(null);
 			tr.update();
+			RealEstate.transactionsStore.saveData();
 			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "Changed the seller to the server");
 		}
 		else
@@ -130,11 +131,12 @@ public class RECommand extends BaseCommand
 			{
 				tr.setOwner(newOwner.getUniqueId());
 				tr.update();
+				RealEstate.transactionsStore.saveData();
 				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "Changed the seller to " + 
 						ChatColor.GREEN + newOwner.getDisplayName());
 			}
 		}
-	}
+	}*/
 	
 	@Subcommand("exitoffer")
 	@Conditions("partOfBoughtTransaction")

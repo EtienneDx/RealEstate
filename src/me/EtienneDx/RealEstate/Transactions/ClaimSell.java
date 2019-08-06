@@ -115,7 +115,7 @@ public class ClaimSell extends ClaimTransaction
                                 "Z: " + player.getLocation().getBlockZ() + "] " +
                                 "Price: " + price + " " + RealEstate.econ.currencyNamePlural());
                 
-                if(RealEstate.instance.config.cfgMessageOwner)
+                if(RealEstate.instance.config.cfgMessageOwner && owner != null)
                 {
                 	OfflinePlayer oldOwner = Bukkit.getOfflinePlayer(owner);
                 	if(oldOwner.isOnline())

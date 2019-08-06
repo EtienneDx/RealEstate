@@ -104,15 +104,18 @@ public class Utils
 		if(claim.parent == null && RealEstate.instance.config.cfgTransferClaimBlocks)
 		{
 			PlayerData buyerData = GriefPrevention.instance.dataStore.getPlayerData(buyer);
-			PlayerData sellerData = GriefPrevention.instance.dataStore.getPlayerData(seller);
-			
-			// the seller has to provide the blocks
-			sellerData.setBonusClaimBlocks(sellerData.getBonusClaimBlocks() - claim.getArea());
-			if (sellerData.getBonusClaimBlocks() < 0)// can't have negative bonus claim blocks, so if need be, we take into the accrued 
-	        {
-	            sellerData.setAccruedClaimBlocks(sellerData.getAccruedClaimBlocks() + sellerData.getBonusClaimBlocks());
-	            sellerData.setBonusClaimBlocks(0);
-	        }
+			if(seller != null)
+			{
+				PlayerData sellerData = GriefPrevention.instance.dataStore.getPlayerData(seller);
+				
+				// the seller has to provide the blocks
+				sellerData.setBonusClaimBlocks(sellerData.getBonusClaimBlocks() - claim.getArea());
+				if (sellerData.getBonusClaimBlocks() < 0)// can't have negative bonus claim blocks, so if need be, we take into the accrued 
+		        {
+		            sellerData.setAccruedClaimBlocks(sellerData.getAccruedClaimBlocks() + sellerData.getBonusClaimBlocks());
+		            sellerData.setBonusClaimBlocks(0);
+		        }
+			}
 			
 			// the buyer receive them
 			buyerData.setBonusClaimBlocks(buyerData.getBonusClaimBlocks() + claim.getArea());

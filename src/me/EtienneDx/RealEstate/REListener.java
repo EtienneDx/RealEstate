@@ -114,13 +114,16 @@ public class REListener implements Listener
 					event.getBlock().breakNaturally();
 					return;
 				}
-
-				if(claim.isAdminClaim() && !RealEstate.perms.has(player, "realestate.admin"))// admin may sell admin claims
+				
+				if(claim.isAdminClaim())
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to sell admin claims!");
-					event.setCancelled(true);
-					event.getBlock().breakNaturally();
-					return;
+					if(!RealEstate.perms.has(player, "realestate.admin"))// admin may sell admin claims
+					{
+						player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to sell admin claims!");
+						event.setCancelled(true);
+						event.getBlock().breakNaturally();
+						return;
+					}
 				}
 				else if(type.equals("claim") && !player.getUniqueId().equals(claim.ownerID))// only the owner may sell his claim
 				{
@@ -132,7 +135,7 @@ public class REListener implements Listener
 
 				// we should be good to sell it now
 				event.setCancelled(true);// need to cancel the event, so we can update the sign elsewhere
-				RealEstate.transactionsStore.sell(claim, player, price, event.getBlock().getLocation());
+				RealEstate.transactionsStore.sell(claim, claim.isAdminClaim() ? null : player, price, event.getBlock().getLocation());
 			}
 			else if(RealEstate.instance.config.cfgRentKeywords.contains(event.getLine(0).toLowerCase()))// we want to rent it
 			{
@@ -216,12 +219,15 @@ public class REListener implements Listener
 					}
 				}
 
-				if(claim.isAdminClaim() && !RealEstate.perms.has(player, "realestate.admin"))// admin may rent admin claims
+				if(claim.isAdminClaim())
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to rent admin claims!");
-					event.setCancelled(true);
-					event.getBlock().breakNaturally();
-					return;
+					if(!RealEstate.perms.has(player, "realestate.admin"))// admin may sell admin claims
+					{
+						player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to rent admin claims!");
+						event.setCancelled(true);
+						event.getBlock().breakNaturally();
+						return;
+					}
 				}
 				else if(type.equals("claim") && !player.getUniqueId().equals(claim.ownerID))// only the owner may sell his claim
 				{
@@ -307,12 +313,15 @@ public class REListener implements Listener
 					return;
 				}
 
-				if(claim.isAdminClaim() && !RealEstate.perms.has(player, "realestate.admin"))// admin may rent admin claims
+				if(claim.isAdminClaim())
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to lease admin claims!");
-					event.setCancelled(true);
-					event.getBlock().breakNaturally();
-					return;
+					if(!RealEstate.perms.has(player, "realestate.admin"))// admin may sell admin claims
+					{
+						player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to lease admin claims!");
+						event.setCancelled(true);
+						event.getBlock().breakNaturally();
+						return;
+					}
 				}
 				else if(type.equals("claim") && !player.getUniqueId().equals(claim.ownerID))// only the owner may sell his claim
 				{
