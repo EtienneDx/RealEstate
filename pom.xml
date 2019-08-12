@@ -41,8 +41,8 @@
                             <shadedPattern>me.EtienneDx.RealEstate.acf</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>me.EtienneDx.AttributeConfig</pattern>
-                            <shadedPattern>me.EtienneDx.RealEstate.AttributeConfig</shadedPattern>
+                            <pattern>me.EtienneDx.AnnotationConfig</pattern>
+                            <shadedPattern>me.EtienneDx.RealEstate.AnnotationConfig</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
