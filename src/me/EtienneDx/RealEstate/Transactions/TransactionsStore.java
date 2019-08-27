@@ -2,15 +2,13 @@ package me.EtienneDx.RealEstate.Transactions;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -19,8 +17,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.FileUtil;
-
 import me.EtienneDx.RealEstate.RealEstate;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -45,16 +41,30 @@ public class TransactionsStore
 			@Override
 			public void run()
 			{
-				Collection<ClaimRent> col = claimRent.values();// need intermediate since some may get removed in the process
-				for(ClaimRent cr : col)
+				//Collection<ClaimRent> col = claimRent.values();// need intermediate since some may get removed in the process
+				Iterator<ClaimRent> ite = claimRent.values().iterator();
+				int i = 0;
+				while(ite.hasNext())
+				{
+					if(ite.next().update())
+						ite.remove();
+				}
+				/*for(ClaimRent cr : col)
 				{
 					cr.update();
-				}
-				Collection<ClaimLease> co = claimLease.values();// need intermediate since some may get removed in the process
+				}*/
+				/*Collection<ClaimLease> co = claimLease.values();// need intermediate since some may get removed in the process
 				for(ClaimLease cl : co)
 				{
 					cl.update();
+				}*/
+				Iterator<ClaimLease> it = claimLease.values().iterator();
+				while(it.hasNext())
+				{
+					if(it.next().update())
+						it.remove();
 				}
+				saveData();
 			}
 		}.runTaskTimer(RealEstate.instance, 0, 1200L);// run every 60 seconds
     }
@@ -176,7 +186,7 @@ public class TransactionsStore
 
 	public void sell(Claim claim, Player player, double price, Location sign)
 	{
-		ClaimSell cs = new ClaimSell(claim, player, price, sign);
+		ClaimSell cs = new ClaimSell(claim, claim.isAdminClaim() ? null : player, price, sign);
 		claimSell.put(claim.getID().toString(), cs);
 		cs.update();
 		saveData();
@@ -212,7 +222,7 @@ public class TransactionsStore
 
 	public void rent(Claim claim, Player player, double price, Location sign, int duration, int rentPeriods)
 	{
-		ClaimRent cr = new ClaimRent(claim, player, price, sign, duration, rentPeriods);
+		ClaimRent cr = new ClaimRent(claim, claim.isAdminClaim() ? null : player, price, sign, duration, rentPeriods);
 		claimRent.put(claim.getID().toString(), cr);
 		cr.update();
 		saveData();
@@ -248,7 +258,7 @@ public class TransactionsStore
 
 	public void lease(Claim claim, Player player, double price, Location sign, int frequency, int paymentsCount)
 	{
-		ClaimLease cl = new ClaimLease(claim, player, price, sign, frequency, paymentsCount);
+		ClaimLease cl = new ClaimLease(claim, claim.isAdminClaim() ? null : player, price, sign, frequency, paymentsCount);
 		claimLease.put(claim.getID().toString(), cl);
 		cl.update();
 		saveData();

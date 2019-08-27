@@ -12,7 +12,7 @@ public interface Transaction
 	public void setOwner(UUID newOwner);
 	public void interact(Player player);
 	public void preview(Player player);
-	public void update();
+	public boolean update();
 	public boolean tryCancelTransaction(Player p);
 	public void msgInfo(Player player);
 }

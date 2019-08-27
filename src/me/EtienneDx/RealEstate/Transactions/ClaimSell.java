@@ -31,7 +31,7 @@ public class ClaimSell extends ClaimTransaction
 	}
 
 	@Override
-	public void update()
+	public boolean update()
 	{
 		if(sign.getBlock().getState() instanceof Sign)
 		{
@@ -53,6 +53,7 @@ public class ClaimSell extends ClaimTransaction
 		{
 			RealEstate.transactionsStore.cancelTransaction(this);
 		}
+		return false;
 	}
 	
 	@Override

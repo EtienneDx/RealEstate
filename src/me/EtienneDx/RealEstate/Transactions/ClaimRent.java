@@ -63,15 +63,11 @@ public class ClaimRent extends BoughtTransaction
 	}
 
 	@Override
-	public void update()
+	public boolean update()
 	{
 		if(buyer == null)
 		{
-			if(destroyedSign)
-			{
-				RealEstate.transactionsStore.cancelTransaction(this);
-			}
-			else if(sign.getBlock().getState() instanceof Sign)
+			if(sign.getBlock().getState() instanceof Sign)
 			{
 				Sign s = (Sign) sign.getBlock().getState();
 				s.setLine(0, RealEstate.instance.config.cfgSignsHeader);
@@ -87,6 +83,10 @@ public class ClaimRent extends BoughtTransaction
 				}
 				s.setLine(3, (maxPeriod > 1 ? maxPeriod + "x " : "") + Utils.getTime(duration, null, false));
 				s.update(true);
+			}
+			else
+			{
+				return true;
 			}
 		}
 		else
@@ -117,6 +117,7 @@ public class ClaimRent extends BoughtTransaction
 				s.update(true);
 			}
 		}
+		return false;
 		
 	}
 
@@ -247,12 +248,12 @@ public class ClaimRent extends BoughtTransaction
 		}
 		String claimType = claim.parent == null ? "claim" : "subclaim";
 		
-		if (owner.equals(player.getUniqueId()))
+		if (owner != null && owner.equals(player.getUniqueId()))
         {
             player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You already own this " + claimType + "!");
             return;
         }
-		if(claim.parent == null && !owner.equals(claim.ownerID))
+		if(claim.parent == null && owner != null && !owner.equals(claim.ownerID))
 		{
             player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + Bukkit.getPlayer(owner).getDisplayName() + 
             		" does not have the right to rent this " + claimType + "!");
@@ -298,24 +299,28 @@ public class ClaimRent extends BoughtTransaction
                     "Z: " + player.getLocation().getBlockZ() + "] " +
                     "Price: " + price + " " + RealEstate.econ.currencyNamePlural());
 
-			OfflinePlayer seller = Bukkit.getOfflinePlayer(owner);
-			if(RealEstate.instance.config.cfgMessageOwner && seller.isOnline())
+			if(owner != null)
 			{
-				((Player)seller).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + ChatColor.AQUA + 
-						" has just rented your " + claimType + " at " +
-						ChatColor.BLUE + "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + sign.getBlockY() + ", Z: "
-						+ sign.getBlockZ() + "]" + ChatColor.AQUA +
-                        " for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
+				OfflinePlayer seller = Bukkit.getOfflinePlayer(owner);
+			
+				if(RealEstate.instance.config.cfgMessageOwner && seller.isOnline())
+				{
+					((Player)seller).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + ChatColor.AQUA + 
+							" has just rented your " + claimType + " at " +
+							ChatColor.BLUE + "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + sign.getBlockY() + ", Z: "
+							+ sign.getBlockZ() + "]" + ChatColor.AQUA +
+	                        " for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
+				}
+				else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
+	        	{
+	        		User u = RealEstate.ess.getUser(this.owner);
+	        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + ChatColor.AQUA + 
+							" has just rented your " + claimType + " at " +
+							ChatColor.BLUE + "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + sign.getBlockY() + ", Z: "
+							+ sign.getBlockZ() + "]" + ChatColor.AQUA +
+	                        " for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
+	        	}
 			}
-			else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
-        	{
-        		User u = RealEstate.ess.getUser(this.owner);
-        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + ChatColor.AQUA + 
-						" has just rented your " + claimType + " at " +
-						ChatColor.BLUE + "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + sign.getBlockY() + ", Z: "
-						+ sign.getBlockZ() + "]" + ChatColor.AQUA +
-                        " for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
-        	}
 			
 			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "You have successfully rented this " + claimType + 
 					" for " + ChatColor.GREEN + price + RealEstate.econ.currencyNamePlural());
@@ -369,7 +374,7 @@ public class ClaimRent extends BoughtTransaction
 						(maxPeriod - periodCount > 1 ? "" + ChatColor.GREEN + (maxPeriod - periodCount) + ChatColor.AQUA + " periods of " + 
 						ChatColor.GREEN + Utils.getTime(duration, null, false) + ChatColor.AQUA + ". The current period will end in " : "another ") +
 						ChatColor.GREEN + Utils.getTime(daysLeft, timeRemaining, true) + "\n";
-				if((owner.equals(player.getUniqueId()) || buyer.equals(player.getUniqueId())) && RealEstate.instance.config.cfgEnableAutoRenew)
+				if((owner != null && owner.equals(player.getUniqueId()) || buyer.equals(player.getUniqueId())) && RealEstate.instance.config.cfgEnableAutoRenew)
 				{
 					msg += ChatColor.AQUA + "Automatic renew is currently " + ChatColor.LIGHT_PURPLE + (autoRenew ? "enabled" : "disabled") + "\n";
 				}

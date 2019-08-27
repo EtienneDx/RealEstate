@@ -47,8 +47,8 @@ public abstract class BoughtTransaction extends ClaimTransaction
 	
 	public void destroySign()
 	{
-		if((this instanceof ClaimRent &&RealEstate.instance.config.cfgDestroyRentSigns) || 
-				(this instanceof ClaimLease &&RealEstate.instance.config.cfgDestroyLeaseSigns))
+		if((this instanceof ClaimRent && RealEstate.instance.config.cfgDestroyRentSigns) || 
+				(this instanceof ClaimLease && RealEstate.instance.config.cfgDestroyLeaseSigns))
 		{
 			if(!destroyedSign && getHolder().getState() instanceof Sign)
 				getHolder().breakNaturally();
