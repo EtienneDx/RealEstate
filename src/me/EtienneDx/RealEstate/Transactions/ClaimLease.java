@@ -308,6 +308,7 @@ public class ClaimLease extends BoughtTransaction
 			lastPayment = LocalDateTime.now();
 			paymentsLeft--;
 			claim.setPermission(buyer.toString(), ClaimPermission.Build);
+			claim.allowGrantPermission(player);
 			GriefPrevention.instance.dataStore.saveClaim(claim);
 			getHolder().breakNaturally();// leases don't have signs indicating the remaining time
 			update();

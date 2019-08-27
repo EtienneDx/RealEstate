@@ -64,7 +64,7 @@ public class GP_RealEstateHook implements IRealEstate
 		Transaction b = RealEstate.transactionsStore.getTransaction(claim);
 		if(b != null && b instanceof BoughtTransaction)
 		{
-			if(((BoughtTransaction)b).getBuyer() != null)
+			if(((BoughtTransaction)b).getBuyer() != null && !((BoughtTransaction)b).getBuyer().equals(player.getUniqueId()))
 				return "This claim is currently involved in a transaction, you can't change any permission!";
 		}
 		return null;

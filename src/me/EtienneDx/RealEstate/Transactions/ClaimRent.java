@@ -284,6 +284,7 @@ public class ClaimRent extends BoughtTransaction
 			startDate = LocalDateTime.now();
 			autoRenew = false;
 			claim.setPermission(buyer.toString(), ClaimPermission.Build);
+			claim.allowGrantPermission(player);
 			GriefPrevention.instance.dataStore.saveClaim(claim);
 			update();
 			RealEstate.transactionsStore.saveData();
