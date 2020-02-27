@@ -3,6 +3,7 @@ package me.EtienneDx.RealEstate.Transactions;
 import java.util.UUID;
 
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public interface Transaction
@@ -14,5 +15,5 @@ public interface Transaction
 	public void preview(Player player);
 	public boolean update();
 	public boolean tryCancelTransaction(Player p);
-	public void msgInfo(Player player);
+	public void msgInfo(CommandSender cs);
 }

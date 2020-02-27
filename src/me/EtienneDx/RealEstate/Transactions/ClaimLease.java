@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Sign;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.earth2me.essentials.User;
@@ -417,9 +418,9 @@ public class ClaimLease extends BoughtTransaction
 	}
 
 	@Override
-	public void msgInfo(Player player)
+	public void msgInfo(CommandSender cs)
 	{
-		player.sendMessage(ChatColor.DARK_GREEN + "" + GriefPrevention.instance.dataStore.getClaim(claimId).getArea() + 
+		cs.sendMessage(ChatColor.DARK_GREEN + "" + GriefPrevention.instance.dataStore.getClaim(claimId).getArea() + 
 				ChatColor.AQUA + " blocks to " + ChatColor.DARK_GREEN + "Lease " + ChatColor.AQUA + "at " + ChatColor.DARK_GREEN + 
 				"[" + GriefPrevention.instance.dataStore.getClaim(claimId).getLesserBoundaryCorner().getWorld().getName() + ", " +
                 "X: " + GriefPrevention.instance.dataStore.getClaim(claimId).getLesserBoundaryCorner().getBlockX() + ", " +

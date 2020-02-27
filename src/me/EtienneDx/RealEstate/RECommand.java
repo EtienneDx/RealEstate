@@ -58,7 +58,7 @@ public class RECommand extends BaseCommand
 	@Description("Displays the list of all real estate offers currently existing")
 	@CommandCompletion("all|sell|rent|lease")
 	@Syntax("[all|sell|rent|lease] <page>")
-	public static void list(Player player, @Optional String type, @Default("1") int page)
+	public static void list(CommandSender player, @Optional String type, @Default("1") int page)
 	{
 		if(page <= 0)
 		{
@@ -94,34 +94,52 @@ public class RECommand extends BaseCommand
 			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Invalid option provided!");
 			return;
 		}
-		player.sendMessage(ChatColor.DARK_BLUE + "----= " + ChatColor.WHITE + "[ " + ChatColor.GOLD + typeMsg + ChatColor.DARK_GREEN + " " +
-				page + ChatColor.GOLD + " / " + ChatColor.DARK_GREEN + (int)Math.ceil(count / (double)RealEstate.instance.config.cfgPageSize) +
-				ChatColor.WHITE + " ]" + ChatColor.DARK_BLUE + " =----");
-		ArrayList<Transaction> transactions = new ArrayList<Transaction>(count);
-		if(type == null || type.equalsIgnoreCase("all"))
+		if(count == 0)
 		{
-			transactions.addAll(RealEstate.transactionsStore.claimSell.values());
-			transactions.addAll(RealEstate.transactionsStore.claimRent.values());
-			transactions.addAll(RealEstate.transactionsStore.claimLease.values());
+			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "No transaction have been found!");
 		}
-		else if(type.equalsIgnoreCase("sell"))
+		else
 		{
-			transactions.addAll(RealEstate.transactionsStore.claimSell.values());
-		}
-		else if(type.equalsIgnoreCase("rent"))
-		{
-			transactions.addAll(RealEstate.transactionsStore.claimRent.values());
-		}
-		else if(type.equalsIgnoreCase("lease"))
-		{
-			transactions.addAll(RealEstate.transactionsStore.claimLease.values());
-		}
-		
-		int max = Math.min(start + RealEstate.instance.config.cfgPageSize, count);
-		for(int i = start; i < max; i++)
-		{
-			RealEstate.instance.log.info("transaction " + i);
-			transactions.get(i).msgInfo(player);
+			ArrayList<Transaction> transactions = new ArrayList<Transaction>(count);
+			if(type == null || type.equalsIgnoreCase("all"))
+			{
+				transactions.addAll(RealEstate.transactionsStore.claimSell.values());
+				transactions.addAll(RealEstate.transactionsStore.claimRent.values());
+				transactions.addAll(RealEstate.transactionsStore.claimLease.values());
+			}
+			else if(type.equalsIgnoreCase("sell"))
+			{
+				transactions.addAll(RealEstate.transactionsStore.claimSell.values());
+			}
+			else if(type.equalsIgnoreCase("rent"))
+			{
+				transactions.addAll(RealEstate.transactionsStore.claimRent.values());
+			}
+			else if(type.equalsIgnoreCase("lease"))
+			{
+				transactions.addAll(RealEstate.transactionsStore.claimLease.values());
+			}
+			
+			int max = Math.min(start + RealEstate.instance.config.cfgPageSize, count);
+			if(start <= max)
+			{
+				player.sendMessage(ChatColor.DARK_BLUE + "----= " + ChatColor.WHITE + "[ " + ChatColor.GOLD + typeMsg + " page " + ChatColor.DARK_GREEN + " " +
+						page + ChatColor.GOLD + " / " + ChatColor.DARK_GREEN + (int)Math.ceil(count / (double)RealEstate.instance.config.cfgPageSize) +
+						ChatColor.WHITE + " ]" + ChatColor.DARK_BLUE + " =----");
+				for(int i = start; i < max; i++)
+				{
+					RealEstate.instance.log.info("transaction " + i);
+					transactions.get(i).msgInfo(player);
+				}
+				if(page < (int)Math.ceil(count / (double)RealEstate.instance.config.cfgPageSize))
+				{
+					player.sendMessage(ChatColor.GOLD + "To see the next page, type " + ChatColor.GREEN + "/re list " + (type != null ? type : "all") + " " + (page + 1));
+				}
+			}
+			else
+			{
+				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "This page does not exist!");
+			}
 		}
 	}
 	
@@ -270,24 +288,27 @@ public class RECommand extends BaseCommand
 			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + 
 					"The proposition has been successfully created!");
 			UUID other = player.getUniqueId().equals(bt.owner) ? bt.buyer : bt.owner;
-			OfflinePlayer otherP = Bukkit.getOfflinePlayer(other);
-			Location loc = player.getLocation();
-			String claimType = GriefPrevention.instance.dataStore.getClaimAt(loc, false, null).parent == null ? "claim" : "subclaim";
-			if(otherP.isOnline())
+			if(other != null)// not an admin claim
 			{
-				((Player)otherP).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
-						ChatColor.AQUA + " has created an offer to exit the rent/lease contract for the " + claimType + " at " + 
-						ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
-						+ loc.getBlockZ() + "]" + ChatColor.AQUA + " for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
+				OfflinePlayer otherP = Bukkit.getOfflinePlayer(other);
+				Location loc = player.getLocation();
+				String claimType = GriefPrevention.instance.dataStore.getClaimAt(loc, false, null).parent == null ? "claim" : "subclaim";
+				if(otherP.isOnline())
+				{
+					((Player)otherP).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
+							ChatColor.AQUA + " has created an offer to exit the rent/lease contract for the " + claimType + " at " + 
+							ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
+							+ loc.getBlockZ() + "]" + ChatColor.AQUA + " for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
+				}
+				else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
+	        	{
+	        		User u = RealEstate.ess.getUser(other);
+	        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
+							ChatColor.AQUA + " has created an offer to exit the rent/lease contract for the " + claimType + " at " + 
+							ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
+							+ loc.getBlockZ() + "]" + ChatColor.AQUA + " for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
+	        	}
 			}
-			else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
-        	{
-        		User u = RealEstate.ess.getUser(other);
-        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
-						ChatColor.AQUA + " has created an offer to exit the rent/lease contract for the " + claimType + " at " + 
-						ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
-						+ loc.getBlockZ() + "]" + ChatColor.AQUA + " for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
-        	}
 		}
 		
 		@Subcommand("accept")
@@ -313,22 +334,25 @@ public class RECommand extends BaseCommand
 				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + 
 						"This exit offer has been accepted, the " + claimType + " is no longer rented or leased!");
 				UUID other = player.getUniqueId().equals(bt.owner) ? bt.buyer : bt.owner;
-				OfflinePlayer otherP = Bukkit.getOfflinePlayer(other);
-				if(otherP.isOnline())
+				if(other != null)
 				{
-					((Player)otherP).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
-							ChatColor.AQUA + " has accepted your offer to exit the rent/lease contract for the " + claimType + " at " + 
-							ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
-							", Z: " + loc.getBlockZ() + "]. It is no longer rented or leased.");
+					OfflinePlayer otherP = Bukkit.getOfflinePlayer(other);
+					if(otherP.isOnline())
+					{
+						((Player)otherP).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
+								ChatColor.AQUA + " has accepted your offer to exit the rent/lease contract for the " + claimType + " at " + 
+								ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
+								", Z: " + loc.getBlockZ() + "]. It is no longer rented or leased.");
+					}
+					else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
+		        	{
+		        		User u = RealEstate.ess.getUser(other);
+		        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
+								ChatColor.AQUA + " has accepted your offer to exit the rent/lease contract for the " + claimType + " at " + 
+								ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
+								", Z: " + loc.getBlockZ() + "]. It is no longer rented or leased.");
+		        	}
 				}
-				else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
-	        	{
-	        		User u = RealEstate.ess.getUser(other);
-	        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
-							ChatColor.AQUA + " has accepted your offer to exit the rent/lease contract for the " + claimType + " at " + 
-							ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
-							", Z: " + loc.getBlockZ() + "]. It is no longer rented or leased.");
-	        	}
 				bt.exitOffer = null;
 				claim.dropPermission(bt.buyer.toString());
 				GriefPrevention.instance.dataStore.saveClaim(claim);
@@ -362,22 +386,25 @@ public class RECommand extends BaseCommand
 				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + 
 						"This exit offer has been refused");
 				UUID other = player.getUniqueId().equals(bt.owner) ? bt.buyer : bt.owner;
-				OfflinePlayer otherP = Bukkit.getOfflinePlayer(other);
-				if(otherP.isOnline())
+				if(other != null)
 				{
-					((Player)otherP).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
-							ChatColor.AQUA + " has refused your offer to exit the rent/lease contract for the " + claimType + " at " + 
-							ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
-							", Z: " + loc.getBlockZ() + "]");
+					OfflinePlayer otherP = Bukkit.getOfflinePlayer(other);
+					if(otherP.isOnline())
+					{
+						((Player)otherP).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
+								ChatColor.AQUA + " has refused your offer to exit the rent/lease contract for the " + claimType + " at " + 
+								ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
+								", Z: " + loc.getBlockZ() + "]");
+					}
+					else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
+		        	{
+		        		User u = RealEstate.ess.getUser(other);
+		        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
+								ChatColor.AQUA + " has refused your offer to exit the rent/lease contract for the " + claimType + " at " + 
+								ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
+								", Z: " + loc.getBlockZ() + "]");
+		        	}
 				}
-				else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
-	        	{
-	        		User u = RealEstate.ess.getUser(other);
-	        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
-							ChatColor.AQUA + " has refused your offer to exit the rent/lease contract for the " + claimType + " at " + 
-							ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
-							", Z: " + loc.getBlockZ() + "]");
-	        	}
 			}
 		}
 		
@@ -395,22 +422,25 @@ public class RECommand extends BaseCommand
 				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + 
 						"This exit offer has been cancelled");
 				UUID other = player.getUniqueId().equals(bt.owner) ? bt.buyer : bt.owner;
-				OfflinePlayer otherP = Bukkit.getOfflinePlayer(other);
-				if(otherP.isOnline())
+				if(other != null)
 				{
-					((Player)otherP).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
-							ChatColor.AQUA + " has cancelled his offer to exit the rent/lease contract for the " + claimType + " at " + 
-							ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
-							+ loc.getBlockZ() + "]");
+					OfflinePlayer otherP = Bukkit.getOfflinePlayer(other);
+					if(otherP.isOnline())
+					{
+						((Player)otherP).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
+								ChatColor.AQUA + " has cancelled his offer to exit the rent/lease contract for the " + claimType + " at " + 
+								ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
+								+ loc.getBlockZ() + "]");
+					}
+					else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
+		        	{
+		        		User u = RealEstate.ess.getUser(other);
+		        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
+								ChatColor.AQUA + " has cancelled his offer to exit the rent/lease contract for the " + claimType + " at " + 
+								ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
+								+ loc.getBlockZ() + "]");
+		        	}
 				}
-				else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
-	        	{
-	        		User u = RealEstate.ess.getUser(other);
-	        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
-							ChatColor.AQUA + " has cancelled his offer to exit the rent/lease contract for the " + claimType + " at " + 
-							ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
-							+ loc.getBlockZ() + "]");
-	        	}
 			}
 			else
 			{

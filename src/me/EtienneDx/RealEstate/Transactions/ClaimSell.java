@@ -17,6 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Sign;
+import org.bukkit.command.CommandSender;
 
 public class ClaimSell extends ClaimTransaction
 {
@@ -193,9 +194,9 @@ public class ClaimSell extends ClaimTransaction
 	}
 
 	@Override
-	public void msgInfo(Player player)
+	public void msgInfo(CommandSender cs)
 	{
-		player.sendMessage(ChatColor.DARK_GREEN + "" + GriefPrevention.instance.dataStore.getClaim(claimId).getArea() + 
+		cs.sendMessage(ChatColor.DARK_GREEN + "" + GriefPrevention.instance.dataStore.getClaim(claimId).getArea() + 
 				ChatColor.AQUA + " blocks to " + ChatColor.DARK_GREEN + "Sell " + ChatColor.AQUA + "at " + ChatColor.DARK_GREEN + 
 				"[" + GriefPrevention.instance.dataStore.getClaim(claimId).getLesserBoundaryCorner().getWorld().getName() + ", " +
                 "X: " + GriefPrevention.instance.dataStore.getClaim(claimId).getLesserBoundaryCorner().getBlockX() + ", " +
