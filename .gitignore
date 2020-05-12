@@ -1,6 +1,7 @@
 .classpath
 .project
 .settings/*
+.idea
 bin/*
 target/*
 build.bat

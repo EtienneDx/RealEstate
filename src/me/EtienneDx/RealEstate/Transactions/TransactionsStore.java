@@ -22,6 +22,8 @@ import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import net.md_5.bungee.api.ChatColor;
 
+import static com.google.common.io.Files.touch;
+
 public class TransactionsStore
 {
     public final String dataFilePath = RealEstate.pluginDirPath + "transactions.data";
@@ -122,7 +124,12 @@ public class TransactionsStore
             config.set("Lease." + cl.claimId, cl);
         try
         {
-			config.save(new File(this.dataFilePath));
+			File cfgFile = new File(this.dataFilePath);
+			if(!cfgFile.exists())
+			{
+				com.google.common.io.Files.touch(cfgFile);
+			}
+			config.save(cfgFile);
 		}
         catch (IOException e)
         {
