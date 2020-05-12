@@ -41,7 +41,6 @@ public class TransactionsStore
 			@Override
 			public void run()
 			{
-				//Collection<ClaimRent> col = claimRent.values();// need intermediate since some may get removed in the process
 				Iterator<ClaimRent> ite = claimRent.values().iterator();
 				int i = 0;
 				while(ite.hasNext())
@@ -49,15 +48,7 @@ public class TransactionsStore
 					if(ite.next().update())
 						ite.remove();
 				}
-				/*for(ClaimRent cr : col)
-				{
-					cr.update();
-				}*/
-				/*Collection<ClaimLease> co = claimLease.values();// need intermediate since some may get removed in the process
-				for(ClaimLease cl : co)
-				{
-					cl.update();
-				}*/
+
 				Iterator<ClaimLease> it = claimLease.values().iterator();
 				while(it.hasNext())
 				{
