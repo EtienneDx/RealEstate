@@ -68,38 +68,45 @@ public class TransactionsStore
     	
     	File file = new File(this.dataFilePath);
     	
-    	FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-    	try {
-			RealEstate.instance.addLogEntry(new String(Files.readAllBytes(FileSystems.getDefault().getPath(this.dataFilePath))));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	ConfigurationSection sell = config.getConfigurationSection("Sell");
-    	ConfigurationSection rent = config.getConfigurationSection("Rent");
-    	ConfigurationSection lease = config.getConfigurationSection("Lease");
-    	if(sell != null)
+    	if(file.exists())
     	{
-    		RealEstate.instance.addLogEntry(sell.toString());
-    		RealEstate.instance.addLogEntry(sell.getKeys(false).size() + "");
-	    	for(String key : sell.getKeys(false))
-			{
-				ClaimSell cs = (ClaimSell)sell.get(key);
-				claimSell.put(key, cs);
+	    	FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+	    	try {
+				RealEstate.instance.addLogEntry(new String(Files.readAllBytes(FileSystems.getDefault().getPath(this.dataFilePath))));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    	ConfigurationSection sell = config.getConfigurationSection("Sell");
+	    	ConfigurationSection rent = config.getConfigurationSection("Rent");
+	    	ConfigurationSection lease = config.getConfigurationSection("Lease");
+	    	if(sell != null)
+	    	{
+	    		RealEstate.instance.addLogEntry(sell.toString());
+	    		RealEstate.instance.addLogEntry(sell.getKeys(false).size() + "");
+		    	for(String key : sell.getKeys(false))
+				{
+					ClaimSell cs = (ClaimSell)sell.get(key);
+					claimSell.put(key, cs);
+				}
+	    	}
+	    	if(rent != null)
+	    	{
+				for(String key : rent.getKeys(false))
+				{
+					ClaimRent cr = (ClaimRent)rent.get(key);
+					claimRent.put(key, cr);
+				}
+			}
+	    	if(lease != null)
+	    	{
+				for(String key : lease.getKeys(false))
+				{
+					ClaimLease cl = (ClaimLease)lease.get(key);
+					claimLease.put(key, cl);
+		    	}
 			}
     	}
-    	if(rent != null)
-	    	for(String key : rent.getKeys(false))
-			{
-				ClaimRent cr = (ClaimRent)rent.get(key);
-				claimRent.put(key, cr);
-			}
-    	if(lease != null)
-	    	for(String key : lease.getKeys(false))
-			{
-				ClaimLease cl = (ClaimLease)lease.get(key);
-				claimLease.put(key, cl);
-	    	}
     }
     
     public void saveData()
