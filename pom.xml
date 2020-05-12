@@ -111,7 +111,7 @@
 	    <dependency>
 		    <groupId>com.github.EtienneDx</groupId>
 		    <artifactId>GriefPrevention</artifactId>
-		    <version>master-SNAPSHOT</version>
+		    <version>f895138697e0d3ed35c0dff77c533155a1154e37</version>
 		    <scope>provided</scope>
 		</dependency>
 	    <dependency>

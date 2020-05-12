@@ -95,7 +95,7 @@ public class RealEstate extends JavaPlugin
         registerConditions();
         manager.registerCommand(new RECommand());
         
-        GriefPrevention.realEstate = new GP_RealEstateHook();
+        GriefPrevention.addonPlugins.add(new GP_RealEstateHook());
 	}
 
     private void registerConditions()
