@@ -1,10 +1,15 @@
 package me.EtienneDx.RealEstate;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import me.EtienneDx.AnnotationConfig.AnnotationConfig;
@@ -18,6 +23,7 @@ public class Config extends AnnotationConfig
 
     public final String configFilePath = RealEstate.pluginDirPath + "config.yml";
     public final String logFilePath = RealEstate.pluginDirPath + "GriefProtection_RealEstate.log";
+    final static String messagesFilePath = RealEstate.pluginDirPath + File.separator + "messages.yml";
     public final String chatPrefix = "[" + ChatColor.GOLD + "RealEstate" + ChatColor.WHITE + "] ";
     
     @ConfigField(name="RealEstate.Keywords.SignsHeader", comment = "What is displayed in top of the signs")
@@ -88,7 +94,9 @@ public class Config extends AnnotationConfig
     
     @ConfigField(name="RealEstate.Settings.PageSize", comment = "How many Real Estate offer should be shown by page using the '/re list' command")
     public int cfgPageSize = 20;
-    
+
+    private String[] messages;
+
     public Config()
     {
         this.pdf = RealEstate.instance.getDescription();
@@ -118,4 +126,105 @@ public class Config extends AnnotationConfig
         //YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(this.configFilePath));
         this.loadConfig(this.configFilePath);
     }
+
+    public void loadMessages() {
+        Messages[] messageIDs = Messages.values();
+        this.messages = new String[Messages.values().length];
+
+        HashMap<String, CustomizableMessage> defaults = new HashMap<String, CustomizableMessage>();
+        // initialize defaults
+        this.addDefault(defaults, Messages.NoTransactionFound, "No transaction found at your location!", null);
+        this.addDefault(defaults, Messages.PageMustBePositive, "Page must be a positive option!", null);
+        this.addDefault(defaults, Messages.PageNotExists, "This page does not exist!", null);
+        this.addDefault(defaults, Messages.RenewRentNow, "Automatic renew is now $a{0} $bfor this {1}", "0: the status; 1: a claim type");
+        this.addDefault(defaults, Messages.RenewRentCurrently, "Automatic renew is currently $a{0} $bfor this {1}", "0: the status; 1: a claim type");
+
+
+        // load the config file
+        FileConfiguration config = YamlConfiguration.loadConfiguration(new File(messagesFilePath));
+
+        // for each message ID
+        for (Messages messageID : messageIDs) {
+            //get default for this message
+            CustomizableMessage messageData = defaults.get(messageID.name());
+
+            // if default is missing, log an error and use some fake data for now so that the plugin can run
+            if (messageData == null) {
+                RealEstate.instance.log.info("Missing message for " + messageID.name() + ".  Please contact the developer.");
+                messageData = new CustomizableMessage(messageID, "Missing message!  ID: " + messageID.name() + ".  Please contact a server admin.", null);
+            }
+
+            // read the message from the file, use default if necessary
+            this.messages[messageID.ordinal()] = config.getString("Messages." + messageID.name() + ".Text", messageData.text);
+            config.set("Messages." + messageID.name() + ".Text", this.messages[messageID.ordinal()]);
+
+            this.messages[messageID.ordinal()] = this.messages[messageID.ordinal()].replace('$', (char) 0x00A7);
+
+            if (messageData.notes != null) {
+                messageData.notes = config.getString("Messages." + messageID.name() + ".Notes", messageData.notes);
+                config.set("Messages." + messageID.name() + ".Notes", messageData.notes);
+            }
+        }
+
+        //save any changes
+        try {
+            config.options().header("Use a YAML editor like NotepadPlusPlus to edit this file.  \nAfter editing, back up your changes before reloading the server in case you made a syntax error.  \nUse dollar signs ($) for formatting codes, which are documented here: http://minecraft.gamepedia.com/Formatting_codes");
+            config.save(messagesFilePath);
+        } catch (IOException exception) {
+            RealEstate.instance.log.info("Unable to write to the configuration file at \"" + messagesFilePath + "\"");
+        }
+
+        defaults.clear();
+        RealEstate.instance.log.info("Customizable messages loaded.");
+        System.gc();
+    }
+
+    private void addDefault(HashMap<String, CustomizableMessage> defaults,
+                            Messages id, String text, String notes) {
+        CustomizableMessage message = new CustomizableMessage(id, text, notes);
+        defaults.put(id.name(), message);
+    }
+
+    synchronized public String getMessage(Messages messageID, String... args) {
+        String message = messages[messageID.ordinal()];
+
+        for (int i = 0; i < args.length; i++) {
+            String param = args[i];
+            message = message.replace("{" + i + "}", param);
+        }
+
+        return message;
+    }
+    //sends a color-coded message to a player
+    public static void sendMessage(Player player, ChatColor color, Messages messageID, String... args) {
+        sendMessage(player, color, messageID, 0, args);
+    }
+
+    //sends a color-coded message to a player
+    public static void sendMessage(Player player, ChatColor color, Messages messageID, long delayInTicks, String... args) {
+        String message = RealEstate.instance.config.getMessage(messageID, args);
+        sendMessage(player, color, message, delayInTicks);
+    }
+
+    //sends a color-coded message to a player
+    public static void sendMessage(Player player, ChatColor color, String message) {
+        if (message == null || message.length() == 0) return;
+
+        if (player == null) {
+            RealEstate.instance.log.info(color + message);
+        } else {
+            player.sendMessage(RealEstate.instance.config.chatPrefix + color + message);
+        }
+    }
+
+    public static void sendMessage(Player player, ChatColor color, String message, long delayInTicks) {
+        SendPlayerMessageTask task = new SendPlayerMessageTask(player, color, message);
+
+        if (delayInTicks > 0) {
+            RealEstate.instance.getServer().getScheduler().runTaskLater(RealEstate.instance, task, delayInTicks);
+        } else {
+            task.run();
+        }
+    }
+
 }

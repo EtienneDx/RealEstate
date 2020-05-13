@@ -1,5 +1,6 @@
 package me.EtienneDx.RealEstate;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,19 +51,24 @@ public class RECommand extends BaseCommand
 		}
 		else
 		{
-			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "No transaction found at your location!");
+			Config.sendMessage(player, ChatColor.RED, Messages.NoTransactionFound);
 		}
+
 	}
 	
 	@Subcommand("list")
 	@Description("Displays the list of all real estate offers currently existing")
 	@CommandCompletion("all|sell|rent|lease")
 	@Syntax("[all|sell|rent|lease] <page>")
-	public static void list(CommandSender player, @Optional String type, @Default("1") int page)
+	public static void list(CommandSender sender, @Optional String type, @Default("1") int page)
 	{
+		Player player = null;
+		if (sender instanceof Player) {
+			player = (Player) sender;
+		}
 		if(page <= 0)
 		{
-			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Page must be a positive option!");
+			Config.sendMessage(player, ChatColor.RED, Messages.PageMustBePositive);
 			return;
 		}
 		int count = 0;
@@ -91,12 +97,12 @@ public class RECommand extends BaseCommand
 		}
 		else
 		{
-			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Invalid option provided!");
+			sender.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Invalid option provided!");
 			return;
 		}
 		if(count == 0)
 		{
-			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "No transaction have been found!");
+			sender.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "No transaction have been found!");
 		}
 		else
 		{
@@ -123,22 +129,22 @@ public class RECommand extends BaseCommand
 			int max = Math.min(start + RealEstate.instance.config.cfgPageSize, count);
 			if(start <= max)
 			{
-				player.sendMessage(ChatColor.DARK_BLUE + "----= " + ChatColor.WHITE + "[ " + ChatColor.GOLD + typeMsg + " page " + ChatColor.DARK_GREEN + " " +
+				sender.sendMessage(ChatColor.DARK_BLUE + "----= " + ChatColor.WHITE + "[ " + ChatColor.GOLD + typeMsg + " page " + ChatColor.DARK_GREEN + " " +
 						page + ChatColor.GOLD + " / " + ChatColor.DARK_GREEN + (int)Math.ceil(count / (double)RealEstate.instance.config.cfgPageSize) +
 						ChatColor.WHITE + " ]" + ChatColor.DARK_BLUE + " =----");
 				for(int i = start; i < max; i++)
 				{
 					RealEstate.instance.log.info("transaction " + i);
-					transactions.get(i).msgInfo(player);
+					transactions.get(i).msgInfo(sender);
 				}
 				if(page < (int)Math.ceil(count / (double)RealEstate.instance.config.cfgPageSize))
 				{
-					player.sendMessage(ChatColor.GOLD + "To see the next page, type " + ChatColor.GREEN + "/re list " + (type != null ? type : "all") + " " + (page + 1));
+					sender.sendMessage(ChatColor.GOLD + "To see the next page, type " + ChatColor.GREEN + "/re list " + (type != null ? type : "all") + " " + (page + 1));
 				}
 			}
 			else
 			{
-				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "This page does not exist!");
+				Config.sendMessage(player, ChatColor.RED, Messages.PageNotExists);
 			}
 		}
 	}
@@ -161,8 +167,7 @@ public class RECommand extends BaseCommand
 		}
 		if(newStatus == null)
 		{
-			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "Automatic renew is currently " + 
-					ChatColor.GREEN + (cr.autoRenew ? "enabled" : "disabled") + ChatColor.AQUA + " for this " + claimType + "!");
+			Config.sendMessage(player, ChatColor.AQUA, Messages.RenewRentCurrently, cr.autoRenew ? "enabled" : "disabled", claimType);
 		}
 		else if(!newStatus.equalsIgnoreCase("enable") && !newStatus.equalsIgnoreCase("disable"))
 		{
@@ -172,8 +177,7 @@ public class RECommand extends BaseCommand
 		{
 			cr.autoRenew = newStatus.equalsIgnoreCase("enable");
 			RealEstate.transactionsStore.saveData();
-			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "Automatic renew is now " + 
-					ChatColor.GREEN + (cr.autoRenew ? "enabled" : "disabled") + ChatColor.AQUA + " for this " + claimType + "!");
+			Config.sendMessage(player, ChatColor.AQUA, Messages.RenewRentNow, cr.autoRenew ? "enabled" : "disabled", claimType);
 		}
 		else
 		{

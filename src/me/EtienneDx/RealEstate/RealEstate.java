@@ -79,6 +79,7 @@ public class RealEstate extends JavaPlugin
         }
         this.config = new Config();
         this.config.loadConfig();// loads config or default
+        this.config.loadMessages();// loads messages
         this.config.saveConfig();// save eventual default
 
         ConfigurationSerialization.registerClass(ClaimSell.class);
