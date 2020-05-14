@@ -126,6 +126,8 @@ public class ClaimRent extends BoughtTransaction
 	{
 		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
 		claim.dropPermission(buyer.toString());
+		claim.managers.remove(buyer.toString());
+		claim.setSubclaimRestrictions(false);
 		GriefPrevention.instance.dataStore.saveClaim(claim);
 		if(msgBuyer && Bukkit.getOfflinePlayer(buyer).isOnline() && RealEstate.instance.config.cfgMessageBuyer)
 		{
@@ -287,6 +289,8 @@ public class ClaimRent extends BoughtTransaction
 			autoRenew = false;
 			claim.setPermission(buyer.toString(), ClaimPermission.Build);
 			claim.allowGrantPermission(player);
+			claim.managers.add(player.getUniqueId().toString());
+			claim.setSubclaimRestrictions(true);
 			GriefPrevention.instance.dataStore.saveClaim(claim);
 			update();
 			RealEstate.transactionsStore.saveData();
