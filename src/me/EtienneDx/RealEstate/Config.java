@@ -178,7 +178,6 @@ public class Config extends AnnotationConfig
 
         defaults.clear();
         RealEstate.instance.log.info("Customizable messages loaded.");
-        System.gc();
     }
 
     private void addDefault(HashMap<String, CustomizableMessage> defaults,
