@@ -23,7 +23,8 @@ public class Config extends AnnotationConfig
 
     public final String configFilePath = RealEstate.pluginDirPath + "config.yml";
     public final String logFilePath = RealEstate.pluginDirPath + "GriefProtection_RealEstate.log";
-    final static String messagesFilePath = RealEstate.pluginDirPath + File.separator + "messages.yml";
+    final static String messagesFilePath = RealEstate.pluginDirPath + "messages.yml";
+
     public final String chatPrefix = "[" + ChatColor.GOLD + "RealEstate" + ChatColor.WHITE + "] ";
     
     @ConfigField(name="RealEstate.Keywords.SignsHeader", comment = "What is displayed in top of the signs")
