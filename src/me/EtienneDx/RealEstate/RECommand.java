@@ -1,9 +1,6 @@
 package me.EtienneDx.RealEstate;
 
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -51,7 +48,7 @@ public class RECommand extends BaseCommand
 		}
 		else
 		{
-			Config.sendMessage(player, ChatColor.RED, Messages.NoTransactionFound);
+			Config.sendMessage(player, Messages.NoTransactionFound);
 		}
 
 	}
@@ -68,7 +65,7 @@ public class RECommand extends BaseCommand
 		}
 		if(page <= 0)
 		{
-			Config.sendMessage(player, ChatColor.RED, Messages.PageMustBePositive);
+			Config.sendMessage(player, Messages.PageMustBePositive);
 			return;
 		}
 		int count = 0;
@@ -144,7 +141,7 @@ public class RECommand extends BaseCommand
 			}
 			else
 			{
-				Config.sendMessage(player, ChatColor.RED, Messages.PageNotExists);
+				Config.sendMessage(player, Messages.PageNotExists);
 			}
 		}
 	}
@@ -167,7 +164,7 @@ public class RECommand extends BaseCommand
 		}
 		if(newStatus == null)
 		{
-			Config.sendMessage(player, ChatColor.AQUA, Messages.RenewRentCurrently, cr.autoRenew ? "enabled" : "disabled", claimType);
+			Config.sendMessage(player, Messages.RenewRentCurrently, cr.autoRenew ? "enabled" : "disabled", claimType);
 		}
 		else if(!newStatus.equalsIgnoreCase("enable") && !newStatus.equalsIgnoreCase("disable"))
 		{
@@ -177,7 +174,7 @@ public class RECommand extends BaseCommand
 		{
 			cr.autoRenew = newStatus.equalsIgnoreCase("enable");
 			RealEstate.transactionsStore.saveData();
-			Config.sendMessage(player, ChatColor.AQUA, Messages.RenewRentNow, cr.autoRenew ? "enabled" : "disabled", claimType);
+			Config.sendMessage(player, Messages.RenewRentNow, cr.autoRenew ? "enabled" : "disabled", claimType);
 		}
 		else
 		{

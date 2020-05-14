@@ -197,29 +197,29 @@ public class Config extends AnnotationConfig
         return message;
     }
     //sends a color-coded message to a player
-    public static void sendMessage(Player player, ChatColor color, Messages messageID, String... args) {
-        sendMessage(player, color, messageID, 0, args);
+    public static void sendMessage(Player player, Messages messageID, String... args) {
+        sendMessage(player, messageID, 0, args);
     }
 
     //sends a color-coded message to a player
-    public static void sendMessage(Player player, ChatColor color, Messages messageID, long delayInTicks, String... args) {
+    public static void sendMessage(Player player, Messages messageID, long delayInTicks, String... args) {
         String message = RealEstate.instance.config.getMessage(messageID, args);
-        sendMessage(player, color, message, delayInTicks);
+        sendMessage(player, message, delayInTicks);
     }
 
     //sends a color-coded message to a player
-    public static void sendMessage(Player player, ChatColor color, String message) {
+    public static void sendMessage(Player player, String message) {
         if (message == null || message.length() == 0) return;
 
         if (player == null) {
-            RealEstate.instance.log.info(color + message);
+            RealEstate.instance.log.info(message);
         } else {
-            player.sendMessage(RealEstate.instance.config.chatPrefix + color + message);
+            player.sendMessage(RealEstate.instance.config.chatPrefix + message);
         }
     }
 
-    public static void sendMessage(Player player, ChatColor color, String message, long delayInTicks) {
-        SendPlayerMessageTask task = new SendPlayerMessageTask(player, color, message);
+    public static void sendMessage(Player player, String message, long delayInTicks) {
+        SendPlayerMessageTask task = new SendPlayerMessageTask(player, message);
 
         if (delayInTicks > 0) {
             RealEstate.instance.getServer().getScheduler().runTaskLater(RealEstate.instance, task, delayInTicks);
