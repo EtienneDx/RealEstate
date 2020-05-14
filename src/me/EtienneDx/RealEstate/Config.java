@@ -134,11 +134,12 @@ public class Config extends AnnotationConfig
 
         HashMap<String, CustomizableMessage> defaults = new HashMap<String, CustomizableMessage>();
         // initialize defaults
-        this.addDefault(defaults, Messages.NoTransactionFound, "No transaction found at your location!", null);
-        this.addDefault(defaults, Messages.PageMustBePositive, "Page must be a positive option!", null);
-        this.addDefault(defaults, Messages.PageNotExists, "This page does not exist!", null);
-        this.addDefault(defaults, Messages.RenewRentNow, "Automatic renew is now $a{0} $bfor this {1}", "0: the status; 1: a claim type");
-        this.addDefault(defaults, Messages.RenewRentCurrently, "Automatic renew is currently $a{0} $bfor this {1}", "0: the status; 1: a claim type");
+        this.addDefault(defaults, Messages.NoTransactionFound, "$cNo transaction found at your location!", null);
+        this.addDefault(defaults, Messages.PageMustBePositive, "$cPage must be a positive option!", null);
+        this.addDefault(defaults, Messages.PageNotExists, "$cThis page does not exist!", null);
+        this.addDefault(defaults, Messages.RenewRentNow, "$bAutomatic renew is now $a{0} $bfor this {1}", "0: the status; 1: a claim type");
+        this.addDefault(defaults, Messages.RenewRentCurrently, "$bAutomatic renew is currently $a{0} $bfor this {1}", "0: the status; 1: a claim type");
+
 
 
         // load the config file
