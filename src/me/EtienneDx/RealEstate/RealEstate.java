@@ -108,6 +108,22 @@ public class RealEstate extends JavaPlugin
         	}
         	throw new ConditionFailedException("You must stand inside of a claim to use this command!");
         });
+        manager.getCommandConditions().addCondition("claimHasTransaction", (context) -> {
+        	if(!context.getIssuer().isPlayer())
+        	{
+        		throw new ConditionFailedException("Only Players can perform this command!");
+        	}
+        	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
+        	if(c == null)
+        	{
+        		throw new ConditionFailedException("You must stand inside of a claim to use this command!");
+        	}
+        	Transaction tr = transactionsStore.getTransaction(c);
+        	if(tr == null)
+        	{
+        		throw new ConditionFailedException("This claim has no ongoing transactions!");
+        	}
+        });
         manager.getCommandConditions().addCondition("inPendingTransactionClaim", (context) -> {
         	if(!context.getIssuer().isPlayer())
         	{

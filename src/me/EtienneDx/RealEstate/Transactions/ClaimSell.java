@@ -58,8 +58,9 @@ public class ClaimSell extends ClaimTransaction
 	}
 	
 	@Override
-	public boolean tryCancelTransaction(Player p)
+	public boolean tryCancelTransaction(Player p, boolean force)
 	{
+		// nothing special here, this transaction can only be waiting for a buyer
 		RealEstate.transactionsStore.cancelTransaction(this);
 		return true;
 	}

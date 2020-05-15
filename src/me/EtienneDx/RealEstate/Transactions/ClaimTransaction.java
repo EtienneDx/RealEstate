@@ -68,4 +68,10 @@ public abstract class ClaimTransaction implements ConfigurationSerializable, Tra
 	{
 		return owner;
 	}
+	
+	@Override
+	public boolean tryCancelTransaction(Player p)
+	{
+		return this.tryCancelTransaction(p, false);
+	}
 }

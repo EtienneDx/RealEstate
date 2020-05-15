@@ -222,15 +222,24 @@ public class ClaimRent extends BoughtTransaction
 	}
 	
 	@Override
-	public boolean tryCancelTransaction(Player p)
+	public boolean tryCancelTransaction(Player p, boolean force)
 	{
 		if(buyer != null)
 		{
-			Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
-			if(p != null)
-				p.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "This " + (claim.parent == null ? "claim" : "subclaim") + 
-            		" is currently rented, you can't cancel the transaction!");
-            return false;
+			if(p.hasPermission("realestate.admin") && force == true)
+			{
+				this.unRent(true);
+				RealEstate.transactionsStore.cancelTransaction(this);
+				return true;
+			}
+			else
+			{
+				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
+				if(p != null)
+					p.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "This " + (claim.parent == null ? "claim" : "subclaim") + 
+	            		" is currently rented, you can't cancel the transaction!");
+	            return false;
+			}
 		}
 		else
 		{

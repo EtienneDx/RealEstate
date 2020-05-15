@@ -304,6 +304,7 @@ public class RECommand extends BaseCommand
 				}
 				bt.exitOffer = null;
 				claim.dropPermission(bt.buyer.toString());
+				claim.managers.remove(bt.buyer.toString());
 				GriefPrevention.instance.dataStore.saveClaim(claim);
 				bt.buyer = null;
 				bt.update();// eventual cancel is contained in here
@@ -397,6 +398,17 @@ public class RECommand extends BaseCommand
 						"Only the player who created this exit proposition may cancel it");
 			}
 		}
+	}
+	
+	@Subcommand("cancel")
+	@Conditions("claimHasTransaction")
+	@CommandPermission("realestate.admin")
+	public static void cancelTransaction(Player player)
+	{
+		Location loc = player.getLocation();
+		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(loc, false, null);
+		Transaction t = RealEstate.transactionsStore.getTransaction(claim);
+		t.tryCancelTransaction(player, true);
 	}
 	
 	@HelpCommand

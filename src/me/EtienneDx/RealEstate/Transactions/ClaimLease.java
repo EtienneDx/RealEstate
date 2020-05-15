@@ -206,6 +206,23 @@ public class ClaimLease extends BoughtTransaction
 		}
 		else
 		{
+			this.exitLease();
+		}
+		// no need to re update, since there's no sign 
+		RealEstate.transactionsStore.saveData();
+	}
+	
+	private void exitLease()
+	{
+		if(buyer != null)
+		{
+			OfflinePlayer buyerPlayer = Bukkit.getOfflinePlayer(buyer);
+			OfflinePlayer seller = owner == null ? null : Bukkit.getOfflinePlayer(owner);
+			
+			Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
+			
+			String claimType = claim.parent == null ? "claim" : "subclaim";
+			
 			if(buyerPlayer.isOnline() && RealEstate.instance.config.cfgMessageBuyer)
 			{
 				((Player)buyerPlayer).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
@@ -214,13 +231,13 @@ public class ClaimLease extends BoughtTransaction
 						sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]" + ChatColor.RED + ", the transaction has been cancelled.");
 			}
 			else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
-        	{
-        		User u = RealEstate.ess.getUser(this.buyer);
-        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
+	    	{
+	    		User u = RealEstate.ess.getUser(this.buyer);
+	    		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
 						"Couldn't pay the lease for the " + claimType + " at " + ChatColor.BLUE + "[" + sign.getWorld().getName() + ", X: " + 
 						sign.getBlockX() + ", Y: " + 
 						sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]" + ChatColor.RED + ", the transaction has been cancelled.");
-        	}
+	    	}
 			if(seller.isOnline() && RealEstate.instance.config.cfgMessageOwner)
 			{
 				((Player)seller).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + buyerPlayer.getName() + 
@@ -230,30 +247,43 @@ public class ClaimLease extends BoughtTransaction
 						ChatColor.AQUA + ", the transaction has been cancelled");
 			}
 			else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
-        	{
-        		User u = RealEstate.ess.getUser(this.owner);
-        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + buyerPlayer.getName() + 
+	    	{
+	    		User u = RealEstate.ess.getUser(this.owner);
+	    		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + buyerPlayer.getName() + 
 						ChatColor.AQUA + " couldn't pay lease for the " + claimType + " at " + ChatColor.BLUE + "[" + 
 						sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + 
 						sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]" + 
 						ChatColor.AQUA + ", the transaction has been cancelled");
-        	}
-			RealEstate.transactionsStore.cancelTransaction(this);
+	    	}
+			
+			claim.managers.remove(buyer.toString());
+			claim.dropPermission(buyer.toString());
 		}
-		// no need to re update, since there's no sign 
-		RealEstate.transactionsStore.saveData();
+		else
+		{
+			getHolder().breakNaturally();// the sign should still be there since the lease has netver begun
+		}
+		RealEstate.transactionsStore.cancelTransaction(this);
 	}
 
 	@Override
-	public boolean tryCancelTransaction(Player p)
+	public boolean tryCancelTransaction(Player p, boolean force)
 	{
 		if(buyer != null)
 		{
-			Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
-			if(p != null)
-				p.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "This " + (claim.parent == null ? "claim" : "subclaim") + 
-            		" is currently rented, you can't cancel the transaction!");
-            return false;
+			if(p.hasPermission("realestate.admin") && force == true)
+			{
+				this.exitLease();
+				return true;
+			}
+			else
+			{
+				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
+				if(p != null)
+					p.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "This " + (claim.parent == null ? "claim" : "subclaim") + 
+	            		" is currently leased, you can't cancel the transaction!");
+	            return false;
+			}
 		}
 		else
 		{

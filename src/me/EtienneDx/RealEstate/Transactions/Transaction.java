@@ -15,5 +15,6 @@ public interface Transaction
 	public void preview(Player player);
 	public boolean update();
 	public boolean tryCancelTransaction(Player p);
+	public boolean tryCancelTransaction(Player p, boolean force);
 	public void msgInfo(CommandSender cs);
 }
