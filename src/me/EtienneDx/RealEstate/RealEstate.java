@@ -30,8 +30,10 @@ public class RealEstate extends JavaPlugin
 {
 	public Logger log;
     public Config config;
+	public Messages messages;
     BukkitCommandManager manager;
 	public final static String pluginDirPath = "plugins" + File.separator + "RealEstate" + File.separator;
+	final static String messagesFilePath = RealEstate.pluginDirPath + "messages.yml";
     public static boolean vaultPresent = false;
     public static Economy econ = null;
     public static Permission perms = null;
@@ -79,8 +81,12 @@ public class RealEstate extends JavaPlugin
         }
         this.config = new Config();
         this.config.loadConfig();// loads config or default
-        this.config.loadMessages();// loads messages
         this.config.saveConfig();// save eventual default
+
+		this.messages = new Messages();
+		this.messages.loadConfig(this.messagesFilePath);// loads customizable messages or defaults
+		this.messages.saveConfig(this.messagesFilePath);// save eventual default
+		this.log.info("Customizable messages loaded.");
 
         ConfigurationSerialization.registerClass(ClaimSell.class);
         ConfigurationSerialization.registerClass(ClaimRent.class);

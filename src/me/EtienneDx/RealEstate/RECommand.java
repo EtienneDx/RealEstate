@@ -48,7 +48,7 @@ public class RECommand extends BaseCommand
 		}
 		else
 		{
-			Config.sendMessage(player, Messages.NoTransactionFound);
+			Messages.sendMessage(player, RealEstate.instance.messages.msgNoTransactionFound);
 		}
 
 	}
@@ -65,7 +65,7 @@ public class RECommand extends BaseCommand
 		}
 		if(page <= 0)
 		{
-			Config.sendMessage(player, Messages.PageMustBePositive);
+			Messages.sendMessage(player, RealEstate.instance.messages.msgPageMustBePositive);
 			return;
 		}
 		int count = 0;
@@ -141,7 +141,7 @@ public class RECommand extends BaseCommand
 			}
 			else
 			{
-				Config.sendMessage(player, Messages.PageNotExists);
+				Messages.sendMessage(player, RealEstate.instance.messages.msgPageNotExists);
 			}
 		}
 	}
@@ -164,7 +164,7 @@ public class RECommand extends BaseCommand
 		}
 		if(newStatus == null)
 		{
-			Config.sendMessage(player, Messages.RenewRentCurrently, cr.autoRenew ? "enabled" : "disabled", claimType);
+			Messages.sendMessage(player, RealEstate.instance.messages.msgRenewRentCurrently, cr.autoRenew ? "enabled" : "disabled", claimType);
 		}
 		else if(!newStatus.equalsIgnoreCase("enable") && !newStatus.equalsIgnoreCase("disable"))
 		{
@@ -174,7 +174,7 @@ public class RECommand extends BaseCommand
 		{
 			cr.autoRenew = newStatus.equalsIgnoreCase("enable");
 			RealEstate.transactionsStore.saveData();
-			Config.sendMessage(player, Messages.RenewRentNow, cr.autoRenew ? "enabled" : "disabled", claimType);
+			Messages.sendMessage(player, RealEstate.instance.messages.msgRenewRentNow, cr.autoRenew ? "enabled" : "disabled", claimType);
 		}
 		else
 		{

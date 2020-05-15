@@ -22,6 +22,6 @@ class SendPlayerMessageTask implements Runnable
 			RealEstate.instance.log.info(message);
 		    return;
 		}
-		Config.sendMessage(this.player, this.message);
+		Messages.sendMessage(this.player, this.message);
 	}
 }
