@@ -214,7 +214,8 @@ public class RealEstate extends JavaPlugin
             	throw new ConditionFailedException("This command only applies to rented claims!");
         	}
         	if((((ClaimRent)tr).buyer != null && ((ClaimRent)tr).buyer.equals(context.getIssuer().getPlayer().getUniqueId())) || 
-        			tr.getOwner().equals(context.getIssuer().getPlayer().getUniqueId()))
+        			(tr.getOwner() != null && (tr.getOwner().equals(context.getIssuer().getPlayer().getUniqueId()))) || 
+        			(c.isAdminClaim() && RealEstate.perms.has(context.getIssuer().getPlayer(), "realestate.admin")))
         	{
         		return;
         	}

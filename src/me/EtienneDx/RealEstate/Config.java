@@ -87,7 +87,7 @@ public class Config extends AnnotationConfig
     public int cfgLeasePayments = 5;
     
     @ConfigField(name="RealEstate.Settings.PageSize", comment = "How many Real Estate offer should be shown by page using the '/re list' command")
-    public int cfgPageSize = 20;
+    public int cfgPageSize = 8;
     
     public Config()
     {
