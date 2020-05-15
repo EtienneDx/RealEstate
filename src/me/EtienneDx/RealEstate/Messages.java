@@ -15,19 +15,19 @@ public class Messages extends AnnotationConfig
 {
     public PluginDescriptionFile pdf;
 
-    @ConfigField(name="RealEstate.Messages.NoTransactionFound")
+    @ConfigField(name="RealEstate.NoTransactionFound")
     public String msgNoTransactionFound = "$cNo transaction found at your location!";
 
-    @ConfigField(name="RealEstate.Messages.PageMustBePositive")
+    @ConfigField(name="RealEstate.PageMustBePositive")
     public String msgPageMustBePositive = "$cPage must be a positive option";
 
-    @ConfigField(name="RealEstate.Messages.PageNotExists")
+    @ConfigField(name="RealEstate.PageNotExists")
     public String msgPageNotExists = "$cThis page does not exist!";
 
-    @ConfigField(name="RealEstate.Messages.RenewRentNow", comment = "0: enabled/disabled; 1: type of claim")
+    @ConfigField(name="RealEstate.RenewRentNow", comment = "0: enabled/disabled; 1: type of claim")
     public String msgRenewRentNow = "$bAutomatic renew is now $a{0} $bfor this {1}";
 
-    @ConfigField(name="RealEstate.Messages.RenewRentCurrently", comment = "0: enabled/disabled; 1: type of claim")
+    @ConfigField(name="RealEstate.RenewRentCurrently", comment = "0: enabled/disabled; 1: type of claim")
     public String msgRenewRentCurrently = "$bAutomatic renew is currently $a{0} $bfor this {1}";
 
     public Messages()
