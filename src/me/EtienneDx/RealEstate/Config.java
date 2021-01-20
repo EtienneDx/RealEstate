@@ -89,6 +89,9 @@ public class Config extends AnnotationConfig
     @ConfigField(name="RealEstate.Settings.PageSize", comment = "How many Real Estate offer should be shown by page using the '/re list' command")
     public int cfgPageSize = 8;
     
+    @ConfigField(name="RealEstate.Settings.MessagesFiles", comment="Language file to be used. You can see all languages files in the languages directory. If the language file does not exist, it will be created and you'll be able to modify it later on.")
+    public String languageFile = "en.yml";
+    
     public Config()
     {
         this.pdf = RealEstate.instance.getDescription();

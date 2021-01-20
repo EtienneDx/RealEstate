@@ -33,7 +33,7 @@ public class RealEstate extends JavaPlugin
 	public Messages messages;
     BukkitCommandManager manager;
 	public final static String pluginDirPath = "plugins" + File.separator + "RealEstate" + File.separator;
-	final static String messagesFilePath = RealEstate.pluginDirPath + "messages.yml";
+	final static String languagesDirectory = RealEstate.pluginDirPath + "languages";
     public static boolean vaultPresent = false;
     public static Economy econ = null;
     public static Permission perms = null;
@@ -84,8 +84,8 @@ public class RealEstate extends JavaPlugin
         this.config.saveConfig();// save eventual default
 
 		this.messages = new Messages();
-		this.messages.loadConfig(this.messagesFilePath);// loads customizable messages or defaults
-		this.messages.saveConfig(this.messagesFilePath);// save eventual default
+		this.messages.loadConfig();// loads customizable messages or defaults
+		this.messages.saveConfig();// save eventual default
 		this.log.info("Customizable messages loaded.");
 
         ConfigurationSerialization.registerClass(ClaimSell.class);
@@ -113,78 +113,78 @@ public class RealEstate extends JavaPlugin
         	{
         		return;
         	}
-        	throw new ConditionFailedException("You must stand inside of a claim to use this command!");
+        	throw new ConditionFailedException(config.chatPrefix + messages.msgErrorOutOfClaim);
         });
         manager.getCommandConditions().addCondition("claimHasTransaction", (context) -> {
         	if(!context.getIssuer().isPlayer())
         	{
-        		throw new ConditionFailedException("Only Players can perform this command!");
+        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorPlayerOnly);
         	}
         	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
         	if(c == null)
         	{
-        		throw new ConditionFailedException("You must stand inside of a claim to use this command!");
+        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorOutOfClaim);
         	}
         	Transaction tr = transactionsStore.getTransaction(c);
         	if(tr == null)
         	{
-        		throw new ConditionFailedException("This claim has no ongoing transactions!");
+        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorNoOngoingTransaction);
         	}
         });
         manager.getCommandConditions().addCondition("inPendingTransactionClaim", (context) -> {
         	if(!context.getIssuer().isPlayer())
         	{
-        		throw new ConditionFailedException("Only Players can perform this command!");
+        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorPlayerOnly);
         	}
         	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
         	if(c == null)
         	{
-        		throw new ConditionFailedException("You must stand inside of a claim to use this command!");
+        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorOutOfClaim);
         	}
         	Transaction tr = transactionsStore.getTransaction(c);
         	if(tr == null)
         	{
-        		throw new ConditionFailedException("This claim is neither to rent or to lease!");
+        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorNotRentNorLease);
         	}
         	else if(tr instanceof BoughtTransaction && ((BoughtTransaction)tr).getBuyer() != null)
         	{
-        		throw new ConditionFailedException("This claim already has a buyer!");
+        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorAlreadyBought);
         	}
         });
         manager.getCommandConditions().addCondition("inBoughtClaim", (context) -> {
         	if(!context.getIssuer().isPlayer())
         	{
-        		throw new ConditionFailedException("Only Players can perform this command!");
+        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorPlayerOnly);
         	}
         	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
         	if(c == null)
         	{
-        		throw new ConditionFailedException("You must stand inside of a claim to use this command!");
+        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorOutOfClaim);
         	}
         	Transaction tr = transactionsStore.getTransaction(c);
         	if(tr == null || !(tr instanceof BoughtTransaction))
         	{
-        		throw new ConditionFailedException("This claim is neither to rent or to lease!");
+        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorNotRentNorLease);
         	}
         });
         manager.getCommandConditions().addCondition("partOfBoughtTransaction", context -> {
         	if(!context.getIssuer().isPlayer())
         	{
-        		throw new ConditionFailedException("Only Players can perform this command!");
+        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorPlayerOnly);
         	}
         	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
         	if(c == null)
         	{
-        		throw new ConditionFailedException("You must stand inside of a claim to use this command!");
+        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorOutOfClaim);
         	}
         	Transaction tr = transactionsStore.getTransaction(c);
         	if(tr == null)
         	{
-        		throw new ConditionFailedException("This claim is neither to sell, rent or lease!");
+        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorNoOngoingTransaction);
         	}
         	if(!(tr instanceof BoughtTransaction))
         	{
-            	throw new ConditionFailedException("This command only applies to rented or leased claims!");
+            	throw new ConditionFailedException(config.chatPrefix + messages.msgErrorNotRentNorLease);
         	}
         	if((((BoughtTransaction)tr).buyer != null && ((BoughtTransaction)tr).buyer.equals(context.getIssuer().getPlayer().getUniqueId())) || 
         			(tr.getOwner() != null && (tr.getOwner().equals(context.getIssuer().getPlayer().getUniqueId()))) || 
@@ -192,26 +192,26 @@ public class RealEstate extends JavaPlugin
         	{
         		return;
         	}
-        	throw new ConditionFailedException("You are not part of this transaction!");
+        	throw new ConditionFailedException(config.chatPrefix + messages.msgErrorNotPartOfTransaction);
         });
         manager.getCommandConditions().addCondition("partOfRent", context -> {
         	if(!context.getIssuer().isPlayer())
         	{
-        		throw new ConditionFailedException("Only Players can perform this command!");
+        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorPlayerOnly);
         	}
         	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
         	if(c == null)
         	{
-        		throw new ConditionFailedException("You must stand inside of a claim to use this command!");
+        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorOutOfClaim);
         	}
         	Transaction tr = transactionsStore.getTransaction(c);
         	if(tr == null)
         	{
-        		throw new ConditionFailedException("This claim is neither to sell, rent or lease!");
+        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorNoOngoingTransaction);
         	}
         	if(!(tr instanceof ClaimRent))
         	{
-            	throw new ConditionFailedException("This command only applies to rented claims!");
+            	throw new ConditionFailedException(config.chatPrefix + messages.msgErrorRentOnly);
         	}
         	if((((ClaimRent)tr).buyer != null && ((ClaimRent)tr).buyer.equals(context.getIssuer().getPlayer().getUniqueId())) || 
         			(tr.getOwner() != null && (tr.getOwner().equals(context.getIssuer().getPlayer().getUniqueId()))) || 
@@ -219,11 +219,11 @@ public class RealEstate extends JavaPlugin
         	{
         		return;
         	}
-        	throw new ConditionFailedException("You are not part of this transaction!");
+        	throw new ConditionFailedException(config.chatPrefix + messages.msgErrorNotPartOfTransaction);
         });
         manager.getCommandConditions().addCondition(Double.class, "positiveDouble", (c, exec, value) -> {
         	if(value > 0) return;
-        	throw new ConditionFailedException("The value must be greater than zero!");
+        	throw new ConditionFailedException(config.chatPrefix + messages.msgErrorValueGreaterThanZero);
         });
 	}
 

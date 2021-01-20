@@ -1,14 +1,14 @@
 package me.EtienneDx.RealEstate;
 
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 
 class SendPlayerMessageTask implements Runnable
 {
-	private Player player;
+	private CommandSender player;
 	private String message;
 
 
-	public SendPlayerMessageTask(Player player, String message)
+	public SendPlayerMessageTask(CommandSender player, String message)
 	{
 		this.player = player;
 		this.message = message;

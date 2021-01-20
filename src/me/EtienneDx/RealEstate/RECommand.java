@@ -94,12 +94,12 @@ public class RECommand extends BaseCommand
 		}
 		else
 		{
-			sender.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Invalid option provided!");
+			Messages.sendMessage(sender, RealEstate.instance.messages.msgErrorInvalidOption);
 			return;
 		}
 		if(count == 0)
 		{
-			sender.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "No transaction have been found!");
+			Messages.sendMessage(sender, RealEstate.instance.messages.msgNoTransactionFound);
 		}
 		else
 		{
@@ -126,22 +126,22 @@ public class RECommand extends BaseCommand
 			int max = Math.min(start + RealEstate.instance.config.cfgPageSize, count);
 			if(start <= max)
 			{
-				sender.sendMessage(ChatColor.DARK_BLUE + "----= " + ChatColor.WHITE + "[ " + ChatColor.GOLD + typeMsg + " page " + ChatColor.DARK_GREEN + " " +
-						page + ChatColor.GOLD + " / " + ChatColor.DARK_GREEN + (int)Math.ceil(count / (double)RealEstate.instance.config.cfgPageSize) +
-						ChatColor.WHITE + " ]" + ChatColor.DARK_BLUE + " =----");
+				int pageCount = (int)Math.ceil(count / (double)RealEstate.instance.config.cfgPageSize);
+				Messages.sendMessage(sender, RealEstate.instance.messages.msgListTransactionsHeader, 
+						typeMsg, String.valueOf(page), String.valueOf(pageCount));
 				for(int i = start; i < max; i++)
 				{
 					RealEstate.instance.log.info("transaction " + i);
 					transactions.get(i).msgInfo(sender);
 				}
-				if(page < (int)Math.ceil(count / (double)RealEstate.instance.config.cfgPageSize))
+				if(page < pageCount)
 				{
-					sender.sendMessage(ChatColor.GOLD + "To see the next page, type " + ChatColor.GREEN + "/re list " + (type != null ? type : "all") + " " + (page + 1));
+					Messages.sendMessage(sender, RealEstate.instance.messages.msgListNextPage, (type != null ? type : "all"), String.valueOf(page + 1));
 				}
 			}
 			else
 			{
-				Messages.sendMessage(player, RealEstate.instance.messages.msgPageNotExists);
+				Messages.sendMessage(sender, RealEstate.instance.messages.msgPageNotExists);
 			}
 		}
 	}
