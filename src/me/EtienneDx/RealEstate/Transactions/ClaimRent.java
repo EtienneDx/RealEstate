@@ -76,11 +76,26 @@ public class ClaimRent extends BoughtTransaction
 				//s.setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
 				if(RealEstate.instance.config.cfgUseCurrencySymbol)
 				{
-					s.setLine(2, RealEstate.instance.config.cfgCurrencySymbol + " " + price);
+					if(RealEstate.instance.config.cfgUseDecimalCurrency == false)
+					{
+						s.setLine(2, RealEstate.instance.config.cfgCurrencySymbol + " " + (int)Math.round(price));
+					}
+					else
+					{
+						s.setLine(2, RealEstate.instance.config.cfgCurrencySymbol + " " + price);
+					}
+
 				}
 				else
 				{
-					s.setLine(2, price + " " + RealEstate.econ.currencyNamePlural());
+					if(RealEstate.instance.config.cfgUseDecimalCurrency == false)
+					{
+						s.setLine(2, (int)Math.round(price) + " " + RealEstate.econ.currencyNamePlural());
+					}
+					else
+					{
+						s.setLine(2, price + " " + RealEstate.econ.currencyNamePlural());
+					}
 				}
 				s.setLine(3, (maxPeriod > 1 ? maxPeriod + "x " : "") + Utils.getTime(duration, null, false));
 				s.update(true);

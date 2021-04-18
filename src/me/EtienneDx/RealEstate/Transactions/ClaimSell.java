@@ -42,11 +42,25 @@ public class ClaimSell extends ClaimTransaction
 			s.setLine(2, owner != null ? Utils.getSignString(Bukkit.getOfflinePlayer(owner).getName()) : "SERVER");
 			if(RealEstate.instance.config.cfgUseCurrencySymbol)
 			{
-				s.setLine(3, RealEstate.instance.config.cfgCurrencySymbol + " " + price);
+				if(RealEstate.instance.config.cfgUseDecimalCurrency == false)
+				{
+					s.setLine(3, RealEstate.instance.config.cfgCurrencySymbol + " " + (int)Math.round(price));
+				}
+				else
+				{
+					s.setLine(3, RealEstate.instance.config.cfgCurrencySymbol + " " + price);
+				}
 			}
 			else
 			{
-				s.setLine(3, price + " " + RealEstate.econ.currencyNamePlural());
+				if(RealEstate.instance.config.cfgUseDecimalCurrency == false)
+				{
+					s.setLine(3, (int)Math.round(price) + " " + RealEstate.econ.currencyNamePlural());
+				}
+				else
+				{
+					s.setLine(3, price + " " + RealEstate.econ.currencyNamePlural());
+				}
 			}
 			s.update(true);
 		}

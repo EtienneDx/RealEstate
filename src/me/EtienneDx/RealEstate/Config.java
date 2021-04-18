@@ -61,6 +61,8 @@ public class Config extends AnnotationConfig
     public boolean cfgUseCurrencySymbol = false;
     @ConfigField(name="RealEstate.Rules.CurrencySymbol", comment = "In case UseCurrencySymbol is true, what symbol should be used?")
     public String cfgCurrencySymbol = "$";
+    @ConfigField(name="RealEstate.Rules.UseDecimalCurrency", comment = "Allow players to use decimal currency e.g. $10.15")
+    public boolean cfgUseDecimalCurrency = true;
 
     @ConfigField(name="RealEstate.Messaging.MessageOwner", comment = "Should the owner get messaged once one of his claim is rented/leased/bought and on end of contracts?")
     public boolean cfgMessageOwner = true;
