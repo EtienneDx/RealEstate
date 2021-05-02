@@ -122,7 +122,7 @@ public class ClaimRent extends BoughtTransaction
 			else if(sign.getBlock().getState() instanceof Sign)
 			{
 				Sign s = (Sign) sign.getBlock().getState();
-				s.setLine(0, ChatColor.GOLD + "[Rented]"); //Changed the header to "[Rented]" so that it won't waste space on the next line and allow the name of the player to show underneath.
+				s.setLine(0, ChatColor.GOLD + RealEstate.instance.config.cfgReplaceOngoingRent); //Changed the header to "[Rented]" so that it won't waste space on the next line and allow the name of the player to show underneath.
 				s.setLine(1, Utils.getSignString(Bukkit.getOfflinePlayer(buyer).getName()));//remove "Rented by"
 				s.setLine(2, "Time remaining : ");
 				

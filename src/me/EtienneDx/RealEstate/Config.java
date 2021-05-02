@@ -37,6 +37,8 @@ public class Config extends AnnotationConfig
     public String cfgReplaceRent = "FOR RENT";
     @ConfigField(name="RealEstate.Keywords.Replace.Lease", comment = "What is displayed on signs for preoperties to lease")
     public String cfgReplaceLease = "FOR LEASE";
+    @ConfigField(name="RealEstate.Keywords.Replace.Ongoing.Rent", comment = "What is displayed on the first line of the sign once someone rents a claim.")
+    public String cfgReplaceOngoingRent = "[Rented]";
 
     @ConfigField(name="RealEstate.Rules.Sell", comment = "Is selling claims enabled?")
     public boolean cfgEnableSell = true;
