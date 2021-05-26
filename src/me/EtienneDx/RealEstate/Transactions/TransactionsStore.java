@@ -218,15 +218,15 @@ public class TransactionsStore
 		}
 	}
 
-	public void rent(Claim claim, Player player, double price, Location sign, int duration, int rentPeriods)
+	public void rent(Claim claim, Player player, double price, Location sign, int duration, int rentPeriods, boolean buildTrust)
 	{
-		ClaimRent cr = new ClaimRent(claim, claim.isAdminClaim() ? null : player, price, sign, duration, rentPeriods);
+		ClaimRent cr = new ClaimRent(claim, claim.isAdminClaim() ? null : player, price, sign, duration, rentPeriods, buildTrust);
 		claimRent.put(claim.getID().toString(), cr);
 		cr.update();
 		saveData();
 		
 		RealEstate.instance.addLogEntry("[" + this.dateFormat.format(this.date) + "] " + (player == null ? "The Server" : player.getName()) + 
-				" has made " + (claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.parent == null ? "claim" : "subclaim") + " for rent at " +
+				" has made " + (claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.parent == null ? "claim" : "subclaim") + " for" + (buildTrust ? "" : " container") + " rent at " +
 				"[" + claim.getLesserBoundaryCorner().getWorld() + ", " +
                 "X: " + claim.getLesserBoundaryCorner().getBlockX() + ", " +
                 "Y: " + claim.getLesserBoundaryCorner().getBlockY() + ", " +
@@ -236,7 +236,7 @@ public class TransactionsStore
 		if(player != null)
 		{
 			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "You have successfully put " + 
-					(claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.parent == null ? "claim" : "subclaim") + " for rent for " + 
+					(claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.parent == null ? "claim" : "subclaim") + " for" + (buildTrust ? "" : " container") + " rent for " + 
 					ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
 		}
 		if(RealEstate.instance.config.cfgBroadcastSell)
@@ -247,7 +247,7 @@ public class TransactionsStore
 				{
 					p.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.DARK_GREEN + (player == null ? "The Server" : player.getDisplayName()) + 
 							ChatColor.AQUA + " has put " + 
-							(claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.parent == null ? "claim" : "subclaim") + " for rent for " + 
+							(claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.parent == null ? "claim" : "subclaim") + " for" + (buildTrust ? "" : " container") + " rent for " + 
 							ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
 				}
 			}

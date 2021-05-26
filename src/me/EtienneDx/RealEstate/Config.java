@@ -28,6 +28,8 @@ public class Config extends AnnotationConfig
     public List<String> cfgSellKeywords = Arrays.asList("[sell]", "[sell claim]", "[sc]", "[re]", "[realestate]");
     @ConfigField(name="RealEstate.Keywords.Rent", comment = "List of all possible possible signs headers to rent a claim")
     public List<String> cfgRentKeywords = Arrays.asList("[rent]", "[rent claim]", "[rc]");
+    @ConfigField(name="RealEstate.Keywords.ContainerRent", comment = "List of all possible possible signs headers to rent a claim")
+    public List<String> cfgContainerRentKeywords = Arrays.asList("[container rent]", "[crent]");
     @ConfigField(name="RealEstate.Keywords.Lease", comment = "List of all possible possible signs headers to lease a claim")
     public List<String> cfgLeaseKeywords = Arrays.asList("[lease]", "[lease claim]", "[lc]");
 
@@ -39,6 +41,8 @@ public class Config extends AnnotationConfig
     public String cfgReplaceLease = "FOR LEASE";
     @ConfigField(name="RealEstate.Keywords.Replace.Ongoing.Rent", comment = "What is displayed on the first line of the sign once someone rents a claim.")
     public String cfgReplaceOngoingRent = "[Rented]";
+    @ConfigField(name="RealEstate.Keywords.Replace.ContainerRent", comment = "What is displayed on the third line of the sign when renting container access only.")
+    public String cfgContainerRentLine = ChatColor.BLUE + "Containers only";
 
     @ConfigField(name="RealEstate.Rules.Sell", comment = "Is selling claims enabled?")
     public boolean cfgEnableSell = true;

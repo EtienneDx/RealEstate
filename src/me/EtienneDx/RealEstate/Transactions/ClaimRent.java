@@ -28,6 +28,7 @@ public class ClaimRent extends BoughtTransaction
 	LocalDateTime startDate = null;
 	int duration;
 	public boolean autoRenew = false;
+	public boolean buildTrust = true;
 	public int periodCount = 0;
 	public int maxPeriod;
 	
@@ -40,13 +41,20 @@ public class ClaimRent extends BoughtTransaction
 		autoRenew = (boolean) map.get("autoRenew");
 		periodCount = (int) map.get("periodCount");
 		maxPeriod = (int) map.get("maxPeriod");
+		try {
+			buildTrust = (boolean) map.get("buildTrust");
+		}
+		catch (Exception e) {
+			buildTrust = true;
+		}
 	}
 	
-	public ClaimRent(Claim claim, Player player, double price, Location sign, int duration, int rentPeriods)
+	public ClaimRent(Claim claim, Player player, double price, Location sign, int duration, int rentPeriods, boolean buildTrust)
 	{
 		super(claim, player, price, sign);
 		this.duration = duration;
 		this.maxPeriod = RealEstate.instance.config.cfgEnableRentPeriod ? rentPeriods : 1;
+		this.buildTrust = buildTrust;
 	}
 
 	@Override
@@ -59,6 +67,7 @@ public class ClaimRent extends BoughtTransaction
 		map.put("autoRenew",  autoRenew);
 		map.put("periodCount", periodCount);
 		map.put("maxPeriod", maxPeriod);
+		map.put("buildTrust", buildTrust);
 		
 		return map;
 	}
@@ -74,15 +83,16 @@ public class ClaimRent extends BoughtTransaction
 				s.setLine(0, RealEstate.instance.config.cfgSignsHeader);
 				s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceRent);
 				//s.setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
+				String price_line = "";
 				if(RealEstate.instance.config.cfgUseCurrencySymbol)
 				{
 					if(RealEstate.instance.config.cfgUseDecimalCurrency == false)
 					{
-						s.setLine(2, RealEstate.instance.config.cfgCurrencySymbol + " " + (int)Math.round(price));
+						price_line = RealEstate.instance.config.cfgCurrencySymbol + " " + (int)Math.round(price);
 					}
 					else
 					{
-						s.setLine(2, RealEstate.instance.config.cfgCurrencySymbol + " " + price);
+						price_line = RealEstate.instance.config.cfgCurrencySymbol + " " + price;
 					}
 
 				}
@@ -90,14 +100,21 @@ public class ClaimRent extends BoughtTransaction
 				{
 					if(RealEstate.instance.config.cfgUseDecimalCurrency == false)
 					{
-						s.setLine(2, (int)Math.round(price) + " " + RealEstate.econ.currencyNamePlural());
+						price_line = (int)Math.round(price) + " " + RealEstate.econ.currencyNamePlural();
 					}
 					else
 					{
-						s.setLine(2, price + " " + RealEstate.econ.currencyNamePlural());
+						price_line = price + " " + RealEstate.econ.currencyNamePlural();
 					}
 				}
-				s.setLine(3, (maxPeriod > 1 ? maxPeriod + "x " : "") + Utils.getTime(duration, null, false));
+				String period = (maxPeriod > 1 ? maxPeriod + "x " : "") + Utils.getTime(duration, null, false);
+				if(this.buildTrust) {
+					s.setLine(2, price_line);
+					s.setLine(3, period);
+				} else {
+					s.setLine(2, RealEstate.instance.config.cfgContainerRentLine);
+					s.setLine(3, price_line + " - " + period);
+				}
 				s.update(true);
 			}
 			else
@@ -311,7 +328,7 @@ public class ClaimRent extends BoughtTransaction
 			buyer = player.getUniqueId();
 			startDate = LocalDateTime.now();
 			autoRenew = false;
-			claim.setPermission(buyer.toString(), ClaimPermission.Build);
+			claim.setPermission(buyer.toString(), buildTrust ? ClaimPermission.Build : ClaimPermission.Inventory);
 			claim.allowGrantPermission(player);
 			claim.managers.add(player.getUniqueId().toString());
 			claim.setSubclaimRestrictions(true);

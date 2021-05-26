@@ -35,7 +35,8 @@ public class REListener implements Listener
 	{
 		if(RealEstate.instance.config.cfgSellKeywords.contains(event.getLine(0).toLowerCase()) || 
 				RealEstate.instance.config.cfgLeaseKeywords.contains(event.getLine(0).toLowerCase()) || 
-				RealEstate.instance.config.cfgRentKeywords.contains(event.getLine(0).toLowerCase()))
+				RealEstate.instance.config.cfgRentKeywords.contains(event.getLine(0).toLowerCase()) || 
+				RealEstate.instance.config.cfgContainerRentKeywords.contains(event.getLine(0).toLowerCase()))
 		{
 			Player player = event.getPlayer();
 			Location loc = event.getBlock().getLocation();
@@ -144,7 +145,8 @@ public class REListener implements Listener
 				event.setCancelled(true);// need to cancel the event, so we can update the sign elsewhere
 				RealEstate.transactionsStore.sell(claim, claim.isAdminClaim() ? null : player, price, event.getBlock().getLocation());
 			}
-			else if(RealEstate.instance.config.cfgRentKeywords.contains(event.getLine(0).toLowerCase()))// we want to rent it
+			else if(RealEstate.instance.config.cfgRentKeywords.contains(event.getLine(0).toLowerCase()) ||
+					RealEstate.instance.config.cfgContainerRentKeywords.contains(event.getLine(0).toLowerCase()))// we want to rent it
 			{
 				if(!RealEstate.instance.config.cfgEnableRent)
 				{
@@ -253,7 +255,8 @@ public class REListener implements Listener
 
 				// all should be good, we can create the rent
 				event.setCancelled(true);
-				RealEstate.transactionsStore.rent(claim, player, price, event.getBlock().getLocation(), duration, rentPeriods);
+				RealEstate.transactionsStore.rent(claim, player, price, event.getBlock().getLocation(), duration, rentPeriods,
+						RealEstate.instance.config.cfgRentKeywords.contains(event.getLine(0).toLowerCase()));
 			}
 			else if(RealEstate.instance.config.cfgLeaseKeywords.contains(event.getLine(0).toLowerCase()))// we want to rent it
 			{
