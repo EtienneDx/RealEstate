@@ -57,7 +57,7 @@ public class TransactionsStore
 				}
 				saveData();
 			}
-		}.runTaskTimer(RealEstate.instance, 0, 1200L);// run every 60 seconds
+		}.runTaskTimer(RealEstate.instance, 1200L, 1200L);// run every 60 seconds
     }
     
     public void loadData()
