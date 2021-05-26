@@ -76,11 +76,26 @@ public class ClaimRent extends BoughtTransaction
 				//s.setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
 				if(RealEstate.instance.config.cfgUseCurrencySymbol)
 				{
-					s.setLine(2, RealEstate.instance.config.cfgCurrencySymbol + " " + price);
+					if(RealEstate.instance.config.cfgUseDecimalCurrency == false)
+					{
+						s.setLine(2, RealEstate.instance.config.cfgCurrencySymbol + " " + (int)Math.round(price));
+					}
+					else
+					{
+						s.setLine(2, RealEstate.instance.config.cfgCurrencySymbol + " " + price);
+					}
+
 				}
 				else
 				{
-					s.setLine(2, price + " " + RealEstate.econ.currencyNamePlural());
+					if(RealEstate.instance.config.cfgUseDecimalCurrency == false)
+					{
+						s.setLine(2, (int)Math.round(price) + " " + RealEstate.econ.currencyNamePlural());
+					}
+					else
+					{
+						s.setLine(2, price + " " + RealEstate.econ.currencyNamePlural());
+					}
 				}
 				s.setLine(3, (maxPeriod > 1 ? maxPeriod + "x " : "") + Utils.getTime(duration, null, false));
 				s.update(true);
@@ -107,8 +122,8 @@ public class ClaimRent extends BoughtTransaction
 			else if(sign.getBlock().getState() instanceof Sign)
 			{
 				Sign s = (Sign) sign.getBlock().getState();
-				s.setLine(0, RealEstate.instance.config.cfgSignsHeader);
-				s.setLine(1, Utils.getSignString("Rented by " + Bukkit.getOfflinePlayer(buyer).getName()));
+				s.setLine(0, ChatColor.GOLD + RealEstate.instance.config.cfgReplaceOngoingRent); //Changed the header to "[Rented]" so that it won't waste space on the next line and allow the name of the player to show underneath.
+				s.setLine(1, Utils.getSignString(Bukkit.getOfflinePlayer(buyer).getName()));//remove "Rented by"
 				s.setLine(2, "Time remaining : ");
 				
 				int daysLeft = duration - days - 1;// we need to remove the current day

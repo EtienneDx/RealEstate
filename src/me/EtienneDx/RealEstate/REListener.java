@@ -114,6 +114,13 @@ public class REListener implements Listener
 					event.getBlock().breakNaturally();
 					return;
 				}
+				if((price%1)!=0 && !RealEstate.instance.config.cfgUseDecimalCurrency) //if the price has a decimal number AND Decimal currency is disabled
+				{
+					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "The price cannot have a decimal number!");
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
 				
 				if(claim.isAdminClaim())
 				{
@@ -171,6 +178,13 @@ public class REListener implements Listener
 				if(price <= 0)
 				{
 					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "The price must be greater than 0!");
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+				if((price%1)!=0 && !RealEstate.instance.config.cfgUseDecimalCurrency) //if the price has a decimal number AND Decimal currency is disabled
+				{
+					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "The price cannot have a decimal number!");
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
@@ -275,6 +289,13 @@ public class REListener implements Listener
 				if(price <= 0)
 				{
 					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "The price must be greater than 0!");
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+				if((price%1)!=0 && !RealEstate.instance.config.cfgUseDecimalCurrency) //if the price has a decimal number AND Decimal currency is disabled
+				{
+					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "The price cannot have a decimal number!");
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
