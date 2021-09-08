@@ -42,7 +42,6 @@ public class TransactionsStore
 			public void run()
 			{
 				Iterator<ClaimRent> ite = claimRent.values().iterator();
-				int i = 0;
 				while(ite.hasNext())
 				{
 					if(ite.next().update())
@@ -74,7 +73,6 @@ public class TransactionsStore
 	    	try {
 				RealEstate.instance.addLogEntry(new String(Files.readAllBytes(FileSystems.getDefault().getPath(this.dataFilePath))));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 	    	ConfigurationSection sell = config.getConfigurationSection("Sell");

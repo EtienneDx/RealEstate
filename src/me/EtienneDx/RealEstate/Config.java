@@ -21,7 +21,7 @@ public class Config extends AnnotationConfig
     public final String chatPrefix = "[" + ChatColor.GOLD + "RealEstate" + ChatColor.WHITE + "] ";
     
     @ConfigField(name="RealEstate.Keywords.SignsHeader", comment = "What is displayed in top of the signs")
-    public String cfgSignsHeader = ChatColor.GOLD + "[RealEstate]";
+    public String cfgSignsHeader = "$6[RealEstate]";
     //public List<String> cfgSigns;
 
     @ConfigField(name="RealEstate.Keywords.Sell", comment = "List of all possible possible signs headers to sell a claim")

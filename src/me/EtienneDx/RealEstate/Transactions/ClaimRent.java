@@ -80,7 +80,7 @@ public class ClaimRent extends BoughtTransaction
 			if(sign.getBlock().getState() instanceof Sign)
 			{
 				Sign s = (Sign) sign.getBlock().getState();
-				s.setLine(0, RealEstate.instance.config.cfgSignsHeader);
+				s.setLine(0, RealEstate.instance.messages.getMessage(RealEstate.instance.config.cfgSignsHeader));
 				s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceRent);
 				//s.setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
 				String price_line = "";

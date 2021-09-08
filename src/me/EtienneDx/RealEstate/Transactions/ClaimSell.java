@@ -37,7 +37,7 @@ public class ClaimSell extends ClaimTransaction
 		if(sign.getBlock().getState() instanceof Sign)
 		{
 			Sign s = (Sign) sign.getBlock().getState();
-			s.setLine(0, RealEstate.instance.config.cfgSignsHeader);
+			s.setLine(0, RealEstate.instance.messages.getMessage(RealEstate.instance.config.cfgSignsHeader));
 			s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceSell);
 			s.setLine(2, owner != null ? Utils.getSignString(Bukkit.getOfflinePlayer(owner).getName()) : "SERVER");
 			if(RealEstate.instance.config.cfgUseCurrencySymbol)
