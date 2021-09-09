@@ -6,6 +6,7 @@
 * Readme and changelog files
 * Error messages to *messages.yml*
 * List messages to *messages.yml*
+* Fixed build pipeline to build with GP
 
 ### Modified
 * Changed java version to java 16
