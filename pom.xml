@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>Me.EtienneDx</groupId>
-	<artifactId>RealEstate</artifactId>
+	<artifactId>real-estate</artifactId>
 	<version>1.4.0-pre1</version>
 	<name>RealEstate</name>
 	<description>A spigot plugin for selling, renting and leasing GriefPrevention claims</description>
