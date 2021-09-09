@@ -35,6 +35,14 @@
                 <version>3.3.0-SNAPSHOT</version>
                 <configuration>
 					<createDependencyReducedPom>false</createDependencyReducedPom>
+					<filters>
+						<filter>
+							<artifact>*:*</artifact>
+							<excludes>
+								<exclude>META-INF/MANIFEST.MF</exclude>
+							</excludes>
+						</filter>
+					</filters>
                     <relocations>
                         <relocation>
                             <pattern>co.aikar.commands</pattern>
@@ -43,10 +51,6 @@
                         <relocation>
                             <pattern>me.EtienneDx.AnnotationConfig</pattern>
                             <shadedPattern>me.EtienneDx.RealEstate.AnnotationConfig</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>me.ryanhamshire.GriefPrevention</pattern>
-                            <shadedPattern>me.EtienneDx.RealEstate.GriefPrevention</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -59,15 +63,33 @@
                     </execution>
                 </executions>
             </plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<finalName>${project.name}-${project.version}</finalName>
+    				<appendAssemblyId>false</appendAssemblyId>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>sampler.Main</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase> 
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-	<distributionManagement>
-		<repository>
-			<id>github</id>
-			<name>GitHub Packages</name>
-			<url>https://maven.pkg.github.com/EtienneDx/RealEstate</url>
-		</repository>
-	</distributionManagement>
 	<repositories>
 		<repository>
 			<id>spigot-repo</id>
@@ -129,7 +151,7 @@
 		    <groupId>com.github.EtienneDx</groupId>
 		    <artifactId>GriefPrevention</artifactId>
 		    <version>1a4b2ea0b639c90f3858316fc4655478b5f0cdbc</version>
-		    <!-- <scope>provided</scope> -->
+		    <scope>provided</scope>
 		</dependency>
 	    <dependency>
 		    <groupId>com.github.EtienneDx</groupId>
