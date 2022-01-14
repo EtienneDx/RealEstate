@@ -329,7 +329,7 @@ public class ClaimRent extends BoughtTransaction
 			startDate = LocalDateTime.now();
 			autoRenew = false;
 			claim.setPermission(buyer.toString(), buildTrust ? ClaimPermission.Build : ClaimPermission.Inventory);
-			claim.allowGrantPermission(player);
+			claim.setPermission(player.getUniqueId().toString(), ClaimPermission.Manage);
 			claim.managers.add(player.getUniqueId().toString());
 			claim.setSubclaimRestrictions(true);
 			GriefPrevention.instance.dataStore.saveClaim(claim);

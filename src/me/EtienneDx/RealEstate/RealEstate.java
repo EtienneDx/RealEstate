@@ -96,13 +96,12 @@ public class RealEstate extends JavaPlugin
         RealEstate.transactionsStore = new TransactionsStore();
         
         new REListener().registerEvents();
+        new ClaimPermissionListener().registerEvents();
         
         manager = new BukkitCommandManager(this);
         manager.enableUnstableAPI("help");
         registerConditions();
         manager.registerCommand(new RECommand());
-        
-        GriefPrevention.addonPlugins.add(new GP_RealEstateHook());
 	}
 
     private void registerConditions()

@@ -60,6 +60,21 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.List.NextPage", comment="0: all|sell|rent|lease; 1: next page number")
     public String msgListNextPage = "$6To see the next page, type $a/re list {0} {1}";
 
+    @ConfigField(name="RealEstate.Errors.ClaimInTransaction.CantEdit")
+    public String msgErrorClaimInTransactionCantEdit = "$cThis claim is currently involved in a transaction, you can't edit it!";
+
+    @ConfigField(name="RealEstate.Errors.ClaimInTransaction.CantAccess")
+    public String msgErrorClaimInTransactionCantAccess = "$cThis claim is currently involved in a transaction, you can't access it!";
+
+    @ConfigField(name="RealEstate.Errors.ClaimInTransaction.CantBuild")
+    public String msgErrorClaimInTransactionCantBuild = "$cThis claim is currently involved in a transaction, you can't build on it!";
+
+    @ConfigField(name="RealEstate.Errors.ClaimInTransaction.CantInventory")
+    public String msgErrorClaimInTransactionCantInventory = "$cThis claim is currently involved in a transaction, you can't access its containers!";
+
+    @ConfigField(name="RealEstate.Errors.ClaimInTransaction.CantManage")
+    public String msgErrorClaimInTransactionCantManage = "$cThis claim is currently involved in a transaction, you can't manage it!";
+
     public Messages()
     {
         this.pdf = RealEstate.instance.getDescription();

@@ -127,7 +127,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.17.1-R0.1-SNAPSHOT</version>
+			<version>1.18.1-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -148,9 +148,9 @@
 	        <scope>provided</scope>
 	    </dependency>
 	    <dependency>
-		    <groupId>com.github.EtienneDx</groupId>
+		    <groupId>com.github.TechFortress</groupId>
 		    <artifactId>GriefPrevention</artifactId>
-		    <version>1a4b2ea0b639c90f3858316fc4655478b5f0cdbc</version>
+		    <version>16.18-RC1</version>
 		    <scope>provided</scope>
 		</dependency>
 	    <dependency>
