@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 
 import com.earth2me.essentials.User;
 
+import me.EtienneDx.RealEstate.Messages;
 import me.EtienneDx.RealEstate.RealEstate;
 import me.EtienneDx.RealEstate.Utils;
 import me.ryanhamshire.GriefPrevention.Claim;
@@ -80,7 +81,7 @@ public class ClaimRent extends BoughtTransaction
 			if(sign.getBlock().getState() instanceof Sign)
 			{
 				Sign s = (Sign) sign.getBlock().getState();
-				s.setLine(0, RealEstate.instance.messages.getMessage(RealEstate.instance.config.cfgSignsHeader));
+				s.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader));
 				s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceRent);
 				//s.setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
 				String price_line = "";

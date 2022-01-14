@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 
 import com.earth2me.essentials.User;
 
+import me.EtienneDx.RealEstate.Messages;
 import me.EtienneDx.RealEstate.RealEstate;
 import me.EtienneDx.RealEstate.Utils;
 import me.ryanhamshire.GriefPrevention.Claim;
@@ -65,7 +66,7 @@ public class ClaimLease extends BoughtTransaction
 			if(sign.getBlock().getState() instanceof Sign)
 			{
 				Sign s = (Sign)sign.getBlock().getState();
-				s.setLine(0, RealEstate.instance.messages.getMessage(RealEstate.instance.config.cfgSignsHeader));
+				s.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader));
 				s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceLease);
 				//s.setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
 				//s.setLine(2, paymentsLeft + "x " + price + " " + RealEstate.econ.currencyNamePlural());
@@ -312,40 +313,34 @@ public class ClaimLease extends BoughtTransaction
 		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);// getting by id creates errors for subclaims
 		if(claim == null)
 		{
-            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "This claim does not exist!");
+			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimDoesNotExist);
             RealEstate.transactionsStore.cancelTransaction(claim);
             return;
 		}
 		String claimType = claim.parent == null ? "claim" : "subclaim";
+		String claimTypeDisplay = claim.parent == null ? 
+			RealEstate.instance.messages.keywordClaim :
+			RealEstate.instance.messages.keywordSubclaim;
 		
 		if (owner != null && owner.equals(player.getUniqueId()))
         {
-            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You already own this " + claimType + "!");
+			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimAlreadyOwner, claimTypeDisplay);
             return;
         }
 		if(claim.parent == null && owner != null && !owner.equals(claim.ownerID))
 		{
-            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + Bukkit.getPlayer(owner).getDisplayName() + 
-            		" does not have the right to put this " + claimType + " for lease!");
+			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimNotLeasedByOwner, claimTypeDisplay);
             RealEstate.transactionsStore.cancelTransaction(claim);
             return;
 		}
 		if(!player.hasPermission("realestate." + claimType + ".lease"))
 		{
-            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You do not have the permission to lease " + 
-            		claimType + "s!");
+			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimNoLeasePermission, claimTypeDisplay);
             return;
 		}
-		if(player.getUniqueId().equals(buyer))
+		if(player.getUniqueId().equals(buyer) || buyer != null)
 		{
-            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You are already leasing this " + 
-            		claimType + "!");
-            return;
-		}
-		if(buyer != null)
-		{
-            player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Someone already leases this " + 
-            		claimType + "!");
+			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimAlreadyLeased, claimTypeDisplay);
             return;
 		}
 		
@@ -360,43 +355,47 @@ public class ClaimLease extends BoughtTransaction
 			getHolder().breakNaturally();// leases don't have signs indicating the remaining time
 			update();
 			RealEstate.transactionsStore.saveData();
+
+			String location = "[" + player.getLocation().getWorld() + ", " +
+				"X: " + player.getLocation().getBlockX() + ", " +
+				"Y: " + player.getLocation().getBlockY() + ", " +
+				"Z: " + player.getLocation().getBlockZ() + "]";
 			
 			RealEstate.instance.addLogEntry(
                     "[" + RealEstate.transactionsStore.dateFormat.format(RealEstate.transactionsStore.date) + "] " + player.getName() + 
                     " has started leasing a " + claimType + " at " +
-                    "[" + player.getLocation().getWorld() + ", " +
-                    "X: " + player.getLocation().getBlockX() + ", " +
-                    "Y: " + player.getLocation().getBlockY() + ", " +
-                    "Z: " + player.getLocation().getBlockZ() + "] " +
-                    "Price: " + price + " " + RealEstate.econ.currencyNamePlural());
+                    location +
+                    " Price: " + price + " " + RealEstate.econ.currencyNamePlural());
 
 			if(owner != null)
 			{
 				OfflinePlayer seller = Bukkit.getOfflinePlayer(owner);
 				if(RealEstate.instance.config.cfgMessageOwner && seller.isOnline())
 				{
-					((Player)seller).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + ChatColor.AQUA + 
-							" has just paid for your lease for the " + claimType + " at " +
-							ChatColor.BLUE + "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + sign.getBlockY() + ", Z: "
-							+ sign.getBlockZ() + "]" + ChatColor.AQUA +
-	                        " for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + ", " +
-	                        ChatColor.GREEN + paymentsLeft + ChatColor.AQUA + " payments left");
+					Messages.sendMessage(seller.getPlayer(), RealEstate.instance.messages.msgInfoClaimOwnerLeaseStarted,
+						player.getName(),
+						claimTypeDisplay,
+						RealEstate.econ.format(price),
+						location,
+						paymentsLeft + "");
 				}
 				else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
 	        	{
 	        		User u = RealEstate.ess.getUser(this.owner);
-	        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + ChatColor.AQUA + 
-							" has just paid for your lease for the " + claimType + " at " +
-							ChatColor.BLUE + "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + sign.getBlockY() + ", Z: "
-							+ sign.getBlockZ() + "]" + ChatColor.AQUA +
-	                        " for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + ", " +
-	                        ChatColor.GREEN + paymentsLeft + ChatColor.AQUA + " payments left");
+	        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + Messages.getMessage(
+						RealEstate.instance.messages.msgInfoClaimOwnerLeaseStarted,
+						player.getName(),
+						claimTypeDisplay,
+						RealEstate.econ.format(price),
+						location,
+						paymentsLeft + ""));
 	        	}
 			}
 			
-			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "You have successfully paid lease for this " + claimType + 
-					" for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + ", " +
-                    ChatColor.GREEN + paymentsLeft + ChatColor.AQUA + " payments left");
+			Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimBuyerLeaseStarted,
+					claimTypeDisplay,
+					RealEstate.econ.format(price),
+					paymentsLeft + "");
 		}
 	}
 
@@ -404,27 +403,32 @@ public class ClaimLease extends BoughtTransaction
 	public void preview(Player player)
 	{
 		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
-		String msg = "";
 		if(player.hasPermission("realestate.info"))
 		{
 			String claimType = claim.parent == null ? "claim" : "subclaim";
-			msg = ChatColor.BLUE + "-----= " + ChatColor.WHITE + "[" + ChatColor.GOLD + "RealEstate Rent Info" + ChatColor.WHITE + "]" + 
-					ChatColor.BLUE + " =-----\n";
+			String claimTypeDisplay = claim.parent == null ? 
+				RealEstate.instance.messages.keywordClaim :
+				RealEstate.instance.messages.keywordSubclaim;
+			String msg;
+			msg = Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoHeader) + "\n";
 			if(buyer == null)
 			{
-				msg += ChatColor.AQUA + "This " + claimType + " is for lease for " +
-						ChatColor.GREEN + paymentsLeft + ChatColor.AQUA + " payments of " +
-						ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + " each.\nPayments are due every " + 
-						ChatColor.GREEN + Utils.getTime(frequency, null, true) + "\n";
+				msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoGeneralLeaseNoBuyer,
+						claimTypeDisplay,
+						paymentsLeft + "",
+						RealEstate.econ.format(price),
+						Utils.getTime(frequency, null, true)) + "\n";
 
 				if(claimType.equalsIgnoreCase("claim"))
 				{
-					msg += ChatColor.AQUA + "The current owner is: " + ChatColor.GREEN + claim.getOwnerName();
+					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoOwner,
+							claim.getOwnerName()) + "\n";
 	            }
 	            else
 	            {
-	            	msg += ChatColor.AQUA + "The main claim owner is: " + ChatColor.GREEN + claim.getOwnerName() + "\n";
-	            	msg += ChatColor.LIGHT_PURPLE + "Note: " + ChatColor.AQUA + "You will only get access to this subclaim!";
+					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoMainOwner,
+	            			claim.parent.getOwnerName()) + "\n";
+					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoNote) + "\n";
 	            }
 			}
 			else
@@ -439,40 +443,46 @@ public class ClaimLease extends BoughtTransaction
 				int daysLeft = frequency - days - 1;// we need to remove the current day
 				Duration timeRemaining = Duration.ofHours(24).minus(hours);
 				
-				msg += ChatColor.AQUA + "This " + claimType + " is currently leased by " + 
-						ChatColor.GREEN + Bukkit.getOfflinePlayer(buyer).getName() + ChatColor.AQUA + " for " +
-						ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + ". There is " +
-						ChatColor.GREEN + paymentsLeft + ChatColor.AQUA +  " payments left. Next payment is in " + 
-						ChatColor.GREEN + Utils.getTime(daysLeft, timeRemaining, true) + ChatColor.AQUA + ".\n";
-				if(claimType.equalsIgnoreCase("claim"))
-				{
-					msg += ChatColor.AQUA + "The current owner is: " + ChatColor.GREEN + claim.getOwnerName();
-	            }
-	            else
-	            {
-	            	msg += ChatColor.AQUA + "The main claim owner is: " + ChatColor.GREEN + claim.getOwnerName();
-	            }
+				msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoGeneralLeaseBuyer,
+						claimTypeDisplay,
+						Bukkit.getOfflinePlayer(buyer).getName(),
+						RealEstate.econ.format(price),
+						paymentsLeft + "",
+						Utils.getTime(daysLeft, timeRemaining, true),
+						Utils.getTime(frequency, null, true)) + "\n";
+						if(claimType.equalsIgnoreCase("claim"))
+						{
+							msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoOwner,
+									claim.getOwnerName()) + "\n";
+						}
+						else
+						{
+							msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoMainOwner,
+									claim.parent.getOwnerName()) + "\n";
+						}
 			}
+			Messages.sendMessage(player, msg);
 		}
 		else
 		{
-			msg = RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to view real estate informations!";
+			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimNoInfoPermission);
 		}
-		player.sendMessage(msg);
 	}
 
 	@Override
 	public void msgInfo(CommandSender cs)
 	{
-		cs.sendMessage(ChatColor.DARK_GREEN + "" + GriefPrevention.instance.dataStore.getClaim(claimId).getArea() + 
-				ChatColor.AQUA + " blocks to " + ChatColor.DARK_GREEN + "Lease " + ChatColor.AQUA + "at " + ChatColor.DARK_GREEN + 
-				"[" + GriefPrevention.instance.dataStore.getClaim(claimId).getLesserBoundaryCorner().getWorld().getName() + ", " +
-                "X: " + GriefPrevention.instance.dataStore.getClaim(claimId).getLesserBoundaryCorner().getBlockX() + ", " +
-                "Y: " + GriefPrevention.instance.dataStore.getClaim(claimId).getLesserBoundaryCorner().getBlockY() + ", " +
-                "Z: " + GriefPrevention.instance.dataStore.getClaim(claimId).getLesserBoundaryCorner().getBlockZ() + "] " + ChatColor.AQUA + "for " + 
-                ChatColor.GREEN + paymentsLeft + ChatColor.AQUA + " periods of " + ChatColor.GREEN + Utils.getTime(frequency, Duration.ZERO, false) +
-                ChatColor.AQUA + ", each period costs " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural()
-                );
+		Claim claim = GriefPrevention.instance.dataStore.getClaim(claimId);
+		String location = "[" + claim.getLesserBoundaryCorner().getWorld().getName() + ", " +
+		"X: " + claim.getLesserBoundaryCorner().getBlockX() + ", " +
+		"Y: " + claim.getLesserBoundaryCorner().getBlockY() + ", " +
+		"Z: " + claim.getLesserBoundaryCorner().getBlockZ() + "]";
+
+		Messages.sendMessage(cs, RealEstate.instance.messages.msgInfoClaimInfoLeaseOneline,
+				claim.getArea(),
+				location,
+				RealEstate.econ.format(price),
+				paymentsLeft + "");
 	}
 
 }
