@@ -410,7 +410,7 @@ public class ClaimLease extends BoughtTransaction
 				RealEstate.instance.messages.keywordClaim :
 				RealEstate.instance.messages.keywordSubclaim;
 			String msg;
-			msg = Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoHeader) + "\n";
+			msg = Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoLeaseHeader) + "\n";
 			if(buyer == null)
 			{
 				msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoGeneralLeaseNoBuyer,
@@ -450,16 +450,16 @@ public class ClaimLease extends BoughtTransaction
 						paymentsLeft + "",
 						Utils.getTime(daysLeft, timeRemaining, true),
 						Utils.getTime(frequency, null, true)) + "\n";
-						if(claimType.equalsIgnoreCase("claim"))
-						{
-							msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoOwner,
-									claim.getOwnerName()) + "\n";
-						}
-						else
-						{
-							msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoMainOwner,
-									claim.parent.getOwnerName()) + "\n";
-						}
+				if(claimType.equalsIgnoreCase("claim"))
+				{
+					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoOwner,
+							claim.getOwnerName()) + "\n";
+				}
+				else
+				{
+					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoMainOwner,
+							claim.parent.getOwnerName()) + "\n";
+				}
 			}
 			Messages.sendMessage(player, msg);
 		}

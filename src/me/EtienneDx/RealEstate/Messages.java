@@ -267,8 +267,8 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Info.Claim.BuyerRented", comment = "1: claim type, 2: formatted price")
     public String msgInfoClaimBuyerRented = "$bYou have rented the {1} for $a{2}";
 
-    @ConfigField(name="RealEstate.Info.Claim.Info.Header")
-    public String msgInfoClaimInfoHeader = "$9-----= $f[$6RealEstate Lease Info$f]$9 =-----";
+    @ConfigField(name="RealEstate.Info.Claim.Info.Lease.Header")
+    public String msgInfoClaimInfoLeaseHeader = "$9-----= $f[$6RealEstate Lease Info$f]$9 =-----";
 
     @ConfigField(name="RealEstate.Info.Claim.Info.Lease.GeneralNoBuyer", comment = "0: claim type, 1: payments left, 2: formatted price, 3: frequency")
     public String msgInfoClaimInfoGeneralLeaseNoBuyer = "$bThis {0} is for lease for $a{1} $bpayments of $a{2} each. Payments are due every $a{3}";
@@ -278,6 +278,27 @@ public class Messages extends AnnotationConfig
 
     @ConfigField(name="RealEstate.Info.Claim.Info.Lease.Oneline", comment = "0: claim area, 1: location, 2: payments left, 3: period, 4: formatted price")
     public String msgInfoClaimInfoLeaseOneline = "$2{0} $bblocks to $2Lease $bat $2{1} $bfor $a{2} periods of $a{3}$b, each period costs $a{4}";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Rent.Header")
+    public String msgInfoClaimInfoRentHeader = "$9-----= $f[$6RealEstate Rent Info$f]$9 =-----";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Rent.GeneralNoBuyer", comment = "0: claim type, 1: formatted price, 2: duration")
+    public String msgInfoClaimInfoGeneralRentNoBuyer = "$bThis {0} is for rent for $a{1}$b per $a{3}.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Rent.GeneralBuyer", comment = "0: claim type, 1: buyer name, 2: formatted price, 3: time left in current period, 5: duration of a period")
+    public String msgInfoClaimInfoGeneralRentBuyer = "$bThis {0} is currently rented by $a{1}$b for $a{2}$b. The {0} is rented until $a{3}$b. The rent period is $a{5}";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Rent.MaxPeriod", comment = "0: max periods")
+    public String msgInfoClaimInfoRentMaxPeriod = "$bIt can be rented for a maximum of $a{0}$b periods.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Rent.RemainingPeriods", comment = "0: periods left")
+    public String msgInfoClaimInfoRentRemainingPeriods = "$bThe contract will end after another $a{0}$b periods.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Rent.AutoRenew", comment = "0: enabled / disabled")
+    public String msgInfoClaimInfoRentAutoRenew = "$bAutomatic renew is currently $a{0}$b.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Rent.Oneline", comment = "0: claim area, 1: location, 2: formatted price, 3: duration")
+    public String msgInfoClaimInfoRentOneline = "$2{0} $bblocks to $2Rent $bat $2{1} $bfor $a{2}$b per $a{3}";
 
     @ConfigField(name="RealEstate.Info.Claim.Info.Owner", comment = "0: owner name")
     public String msgInfoClaimInfoOwner = "$bThe current owner is $a{0}";
