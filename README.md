@@ -8,12 +8,6 @@ Please feel free to report any issue in the [GitHub Issue section](https://githu
 
 ## GriefPrevention
 
-This plugin is dependent on GriefPrevention, which since version 1.3.0 will be included directly within the `RealEstate.jar` file.
+This plugin is dependent on GriefPrevention version 16.18 and up (this version of GP is still in a pre-release state while I'm writing this).
 
-The original GriefPrevention plugin can be found [here](https://github.com/TechFortress/GriefPrevention). To make RealEstate possible, I had to implement some modifications to GriefPrevention, which I did in this [fork](https://github.com/EtienneDx/GriefPrevention).
-
-<details>
-    <summary>Code ownership disclaimer</summary>
-    
-    **I AM NOT THE AUTHOR OF *GriefPrevention*, I MERELY MADE A FEW MODIFICATIONS TO IT. I DO NOT CLAIM ANY PROPERTY OVER THE *GriefPrevention* CODE.**
-</details>
+GriefPrevention plugin can be found [here](https://github.com/TechFortress/GriefPrevention).
