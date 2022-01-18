@@ -6,6 +6,9 @@ import org.bukkit.plugin.PluginManager;
 
 import me.EtienneDx.RealEstate.Transactions.BoughtTransaction;
 import me.EtienneDx.RealEstate.Transactions.Transaction;
+import me.ryanhamshire.GriefPrevention.Claim;
+import me.ryanhamshire.GriefPrevention.ClaimPermission;
+import me.ryanhamshire.GriefPrevention.events.ClaimDeletedEvent;
 import me.ryanhamshire.GriefPrevention.events.ClaimPermissionCheckEvent;
 
 public class ClaimPermissionListener implements Listener {
@@ -18,32 +21,60 @@ public class ClaimPermissionListener implements Listener {
     
     @EventHandler
     public void onClaimPermission(ClaimPermissionCheckEvent event) {
-        Transaction b = RealEstate.transactionsStore.getTransaction(event.getClaim());
+        Transaction transaction = RealEstate.transactionsStore.getTransaction(event.getClaim());
+        // we only have to remove the owner's access, the rest is handled by GP
         if(
-            b != null &&
-            event.getCheckedUUID().equals(b.getOwner()) &&
-            b instanceof BoughtTransaction &&
-            ((BoughtTransaction)b).getBuyer() != null
+            // if there is a transaction and the player is the owner
+            transaction != null &&
+            (
+                event.getCheckedUUID().equals(transaction.getOwner()) ||
+                (event.getClaim().isAdminClaim() && event.getCheckedPlayer().hasPermission("griefprevention.adminclaims"))
+            ) &&
+            transaction instanceof BoughtTransaction &&
+                ((BoughtTransaction)transaction).getBuyer() != null
         ) {
             switch(event.getRequiredPermission()) {
                 case Edit:
-                            event.setDenialReason(() -> RealEstate.instance.messages.msgErrorClaimInTransactionCantEdit);
+                    event.setDenialReason(() -> Messages.getMessage(RealEstate.instance.messages.msgErrorClaimInTransactionCantEdit));
                     break;
                 case Access:
-                            event.setDenialReason(() -> RealEstate.instance.messages.msgErrorClaimInTransactionCantAccess);
+                    event.setDenialReason(() -> Messages.getMessage(RealEstate.instance.messages.msgErrorClaimInTransactionCantAccess));
                     break;
                 case Build:
-                            event.setDenialReason(() -> RealEstate.instance.messages.msgErrorClaimInTransactionCantBuild);
+                    event.setDenialReason(() -> Messages.getMessage(RealEstate.instance.messages.msgErrorClaimInTransactionCantBuild));
                     break;
                 case Inventory:
-                            event.setDenialReason(() -> RealEstate.instance.messages.msgErrorClaimInTransactionCantInventory);
+                    event.setDenialReason(() -> Messages.getMessage(RealEstate.instance.messages.msgErrorClaimInTransactionCantInventory));
                     break;
                 case Manage:
-                            event.setDenialReason(() -> RealEstate.instance.messages.msgErrorClaimInTransactionCantManage);
+                    event.setDenialReason(() -> Messages.getMessage(RealEstate.instance.messages.msgErrorClaimInTransactionCantManage));
                     break;
                 default:
                     break;
             }
+        }
+
+        if(event.getRequiredPermission() == ClaimPermission.Edit || event.getRequiredPermission() == ClaimPermission.Manage) {
+            for (Claim child : event.getClaim().children) {
+                Transaction tr = RealEstate.transactionsStore.getTransaction(child);
+                if(tr != null && 
+                    tr instanceof BoughtTransaction &&
+                    ((BoughtTransaction)tr).getBuyer() != null
+                ) {
+                    event.setDenialReason(() -> Messages.getMessage(RealEstate.instance.messages.msgErrorSubclaimInTransaction));
+                }
+            }
+        }
+    }
+
+    // more of a safety measure, normally it shouldn't be needed
+    @EventHandler
+    public void onClaimDeleted(ClaimDeletedEvent event) {
+        Transaction tr = RealEstate.transactionsStore.getTransaction(event.getClaim());
+        if(tr != null) tr.tryCancelTransaction(null, true);
+        for (Claim child : event.getClaim().children) {
+            tr = RealEstate.transactionsStore.getTransaction(child);
+            if(tr != null) tr.tryCancelTransaction(null, true);
         }
     }
 }

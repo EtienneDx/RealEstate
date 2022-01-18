@@ -47,7 +47,7 @@ public class RECommand extends BaseCommand
 		}
 		else
 		{
-			Messages.sendMessage(player, RealEstate.instance.messages.msgNoTransactionFound);
+			Messages.sendMessage(player, RealEstate.instance.messages.msgNoTransactionFoundHere);
 		}
 
 	}
@@ -259,8 +259,7 @@ public class RECommand extends BaseCommand
 				else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
 	        	{
 	        		User u = RealEstate.ess.getUser(other);
-	        		u.addMail(RealEstate.instance.config.chatPrefix +
-						Messages.getMessage(RealEstate.instance.messages.msgInfoExitOfferCreatedByOther, 
+	        		u.addMail(Messages.getMessage(RealEstate.instance.messages.msgInfoExitOfferCreatedByOther, 
 							player.getName(), claimType, RealEstate.econ.format(price), location));
 	        	}
 			}
@@ -302,8 +301,7 @@ public class RECommand extends BaseCommand
 		        	{
 		        		User u = RealEstate.ess.getUser(other);
 						
-		        		u.addMail(RealEstate.instance.config.chatPrefix +
-							Messages.getMessage(RealEstate.instance.messages.msgInfoExitOfferAcceptedByOther,
+		        		u.addMail(Messages.getMessage(RealEstate.instance.messages.msgInfoExitOfferAcceptedByOther,
 								player.getName(), claimType, RealEstate.econ.format(bt.exitOffer.price), location));
 		        	}
 				}
@@ -351,8 +349,7 @@ public class RECommand extends BaseCommand
 					else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
 		        	{
 		        		User u = RealEstate.ess.getUser(other);
-		        		u.addMail(RealEstate.instance.config.chatPrefix +
-							Messages.getMessage(RealEstate.instance.messages.msgInfoExitOfferRejectedByOther,
+		        		u.addMail(Messages.getMessage(RealEstate.instance.messages.msgInfoExitOfferRejectedByOther,
 								player.getName(), claimType, location));
 		        	}
 				}
@@ -386,8 +383,7 @@ public class RECommand extends BaseCommand
 					else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
 		        	{
 		        		User u = RealEstate.ess.getUser(other);
-		        		u.addMail(RealEstate.instance.config.chatPrefix +
-							Messages.getMessage(RealEstate.instance.messages.msgInfoExitOfferCancelledByOther,
+		        		u.addMail(Messages.getMessage(RealEstate.instance.messages.msgInfoExitOfferCancelledByOther,
 								player.getName(), claimType, location));
 		        	}
 				}

@@ -81,7 +81,7 @@ public class ClaimRent extends BoughtTransaction
 			if(sign.getBlock().getState() instanceof Sign)
 			{
 				Sign s = (Sign) sign.getBlock().getState();
-				s.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader));
+				s.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
 				s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceRent);
 				//s.setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
 				String price_line = "";
@@ -164,10 +164,15 @@ public class ClaimRent extends BoughtTransaction
 		GriefPrevention.instance.dataStore.saveClaim(claim);
 		if(msgBuyer && Bukkit.getOfflinePlayer(buyer).isOnline() && RealEstate.instance.config.cfgMessageBuyer)
 		{
-			Bukkit.getPlayer(buyer).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + 
-					"The rent for the " + (claim.parent == null ? "claim" : "subclaim") + " at " + ChatColor.BLUE + "[" + 
-					sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + 
-					sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]" + ChatColor.AQUA + " is now over, your access has been revoked.");
+			String location = "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + 
+					sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]";
+			String claimType = claim.parent == null ?
+					RealEstate.instance.messages.keywordClaim :
+					RealEstate.instance.messages.keywordSubclaim;
+
+			Messages.sendMessage(Bukkit.getPlayer(buyer), RealEstate.instance.messages.msgInfoClaimInfoRentCancelled,
+					claimType,
+					location);
 		}
 		buyer = null;
 		RealEstate.transactionsStore.saveData();
@@ -181,7 +186,11 @@ public class ClaimRent extends BoughtTransaction
 		OfflinePlayer buyerPlayer = Bukkit.getOfflinePlayer(this.buyer);
 		OfflinePlayer seller = owner == null ? null : Bukkit.getOfflinePlayer(owner);
 		
-		String claimType = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null).parent == null ? "claim" : "subclaim";
+		String claimType = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null).parent == null ?
+				RealEstate.instance.messages.keywordClaim :
+				RealEstate.instance.messages.keywordSubclaim;
+		String location = "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + 
+				sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]";
 		
 		if((autoRenew || periodCount < maxPeriod) && Utils.makePayment(owner, this.buyer, price, false, false))
 		{
@@ -189,38 +198,38 @@ public class ClaimRent extends BoughtTransaction
 			startDate = LocalDateTime.now();
 			if(buyerPlayer.isOnline() && RealEstate.instance.config.cfgMessageBuyer)
 			{
-				((Player)buyerPlayer).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + 
-						"Paid rent for the " + claimType + " at " + ChatColor.BLUE + "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + 
-						", Y: " + sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]" + 
-						ChatColor.AQUA + "for the price of " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
+				Messages.sendMessage(buyerPlayer.getPlayer(), RealEstate.instance.messages.msgInfoClaimInfoRentPaymentBuyer,
+						claimType,
+						location,
+						RealEstate.econ.format(price));
 			}
 			else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
         	{
         		User u = RealEstate.ess.getUser(this.buyer);
-        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + 
-						"Paid rent for the " + claimType + " at " + ChatColor.BLUE + "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + 
-						", Y: " + sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]" + 
-						ChatColor.AQUA + "for the price of " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
+				u.addMail(Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoRentPaymentBuyer,
+						claimType,
+						location,
+						RealEstate.econ.format(price)));
         	}
 			
 			if(seller != null)
 			{
 				if(seller.isOnline() && RealEstate.instance.config.cfgMessageOwner)
 				{
-					((Player)seller).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + buyerPlayer.getName() + 
-							" has paid rent for the " + claimType + " at " + ChatColor.BLUE + "[" + 
-							sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + 
-							sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]" + 
-							ChatColor.AQUA + "at the price of " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
+					Messages.sendMessage(seller.getPlayer(), RealEstate.instance.messages.msgInfoClaimInfoRentPaymentOwner,
+							buyerPlayer.getName(),
+							claimType,
+							location,
+							RealEstate.econ.format(price));
 				}
 				else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
 	        	{
 	        		User u = RealEstate.ess.getUser(this.owner);
-	        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + buyerPlayer.getName() + 
-							" has paid rent for the " + claimType + " at " + ChatColor.BLUE + "[" + 
-							sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + 
-							sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]" + 
-							ChatColor.AQUA + "at the price of " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
+					u.addMail(Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoRentPaymentOwner,
+							buyerPlayer.getName(),
+							claimType,
+							location,
+							RealEstate.econ.format(price)));
 	        	}
 			}
 			
@@ -229,18 +238,18 @@ public class ClaimRent extends BoughtTransaction
 		{
 			if(buyerPlayer.isOnline() && RealEstate.instance.config.cfgMessageBuyer)
 			{
-				((Player)buyerPlayer).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
-						"Couldn't pay the rent for the " + claimType + " at " + ChatColor.BLUE + "[" + sign.getWorld().getName() + ", X: " + 
-						sign.getBlockX() + ", Y: " + 
-						sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]" + ChatColor.RED + ", your access has been revoked.");
+				Messages.sendMessage(buyerPlayer.getPlayer(), RealEstate.instance.messages.msgInfoClaimInfoRentPaymentBuyerCancelled,
+						claimType,
+						location,
+						RealEstate.econ.format(price));
 			}
 			else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
         	{
         		User u = RealEstate.ess.getUser(this.buyer);
-        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
-						"Couldn't pay the rent for the " + claimType + " at " + ChatColor.BLUE + "[" + sign.getWorld().getName() + ", X: " + 
-						sign.getBlockX() + ", Y: " + 
-						sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]" + ChatColor.RED + ", your access has been revoked.");
+				u.addMail(Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoRentPaymentBuyerCancelled,
+						claimType,
+						location,
+						RealEstate.econ.format(price)));
         	}
 			unRent(false);
 			return;
@@ -268,9 +277,13 @@ public class ClaimRent extends BoughtTransaction
 			else
 			{
 				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
-				if(p != null)
-					p.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "This " + (claim.parent == null ? "claim" : "subclaim") + 
-	            		" is currently rented, you can't cancel the transaction!");
+				if(p != null) {
+					Messages.sendMessage(p, RealEstate.instance.messages.msgErrorCantCancelAlreadyRented,
+						claim.parent == null ?
+							RealEstate.instance.messages.keywordClaim :
+							RealEstate.instance.messages.keywordSubclaim
+						);
+				}
 	            return false;
 			}
 		}
@@ -477,18 +490,10 @@ public class ClaimRent extends BoughtTransaction
 		"Z: " + claim.getLesserBoundaryCorner().getBlockZ() + "]";
 
 		Messages.sendMessage(cs, RealEstate.instance.messages.msgInfoClaimInfoRentOneline,
-				claim.getArea(),
+				claim.getArea() + "",
 				location,
 				RealEstate.econ.format(price),
 				Utils.getTime(duration, Duration.ZERO, false));
-		cs.sendMessage(ChatColor.DARK_GREEN + "" + GriefPrevention.instance.dataStore.getClaim(claimId).getArea() + 
-				ChatColor.AQUA + " blocks to " + ChatColor.DARK_GREEN + "Rent " + ChatColor.AQUA + "at " + ChatColor.DARK_GREEN + 
-				"[" + GriefPrevention.instance.dataStore.getClaim(claimId).getLesserBoundaryCorner().getWorld().getName() + ", " +
-                "X: " + GriefPrevention.instance.dataStore.getClaim(claimId).getLesserBoundaryCorner().getBlockX() + ", " +
-                "Y: " + GriefPrevention.instance.dataStore.getClaim(claimId).getLesserBoundaryCorner().getBlockY() + ", " +
-                "Z: " + GriefPrevention.instance.dataStore.getClaim(claimId).getLesserBoundaryCorner().getBlockZ() + "] " + ChatColor.AQUA + "for " + 
-                ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + " per period of " + ChatColor.GREEN + 
-                Utils.getTime(duration, Duration.ZERO, false));
 	}
 
 }

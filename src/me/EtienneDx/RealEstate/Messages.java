@@ -6,13 +6,14 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import me.EtienneDx.AnnotationConfig.AnnotationConfig;
 import me.EtienneDx.AnnotationConfig.ConfigField;
 import me.EtienneDx.AnnotationConfig.ConfigFile;
+import net.md_5.bungee.api.ChatColor;
 
 @ConfigFile(header = "Use a YAML editor like NotepadPlusPlus to edit this file.  \nAfter editing, back up your changes before reloading the server in case you made a syntax error.  \nUse dollar signs ($) for formatting codes, which are documented here: http://minecraft.gamepedia.com/Formatting_codes.\n You can use {0}, {1} to include the different values indicated in the comments")
 public class Messages extends AnnotationConfig
 {
     public PluginDescriptionFile pdf;
 
-    @ConfigField(name="RealEstate.Keywords.Enabled", comment = "Keywords used within other messages")
+    @ConfigField(name="RealEstate.Keywords.Enabled", comment = "Keywords used within other messages but with a longer text at the end just because i need to test some stuff")
     public String keywordEnabled = "enabled";
 
     @ConfigField(name="RealEstate.Keywords.Disabled")
@@ -24,8 +25,20 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Keywords.Subclaim")
     public String keywordSubclaim = "subclaim";
 
+    @ConfigField(name="RealEstate.Keywords.AdminClaimPrefix")
+    public String keywordAdminClaimPrefix = "an admin";
+
+    @ConfigField(name="RealEstate.Keywords.ClaimPrefix")
+    public String keywordClaimPrefix = "a";
+
+    @ConfigField(name="RealEstate.Keywords.TheServer")
+    public String keywordTheServer = "The server";
+
     @ConfigField(name="RealEstate.NoTransactionFound")
-    public String msgNoTransactionFound = "$cNo transaction found at your location!";
+    public String msgNoTransactionFound = "$cNo transaction found!";
+
+    @ConfigField(name="RealEstate.NoTransactionFoundHere")
+    public String msgNoTransactionFoundHere = "$cNo transaction found at your location!";
 
     @ConfigField(name="RealEstate.PageMustBePositive")
     public String msgPageMustBePositive = "$cPage must be a positive option";
@@ -66,6 +79,9 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Errors.InvalidOption")
     public String msgErrorInvalidOption = "$cInvalid option provided!";
 
+    @ConfigField(name="RealEstate.Errors.ClaimInTransaction.CantOwner")
+    public String msgErrorClaimInTransactionCantOwner = "$cThis claim is currently involved in a transaction, you can't modify it!";
+
     @ConfigField(name="RealEstate.Errors.ClaimInTransaction.CantEdit")
     public String msgErrorClaimInTransactionCantEdit = "$cThis claim is currently involved in a transaction, you can't edit it!";
 
@@ -80,12 +96,18 @@ public class Messages extends AnnotationConfig
 
     @ConfigField(name="RealEstate.Errors.ClaimInTransaction.CantManage")
     public String msgErrorClaimInTransactionCantManage = "$cThis claim is currently involved in a transaction, you can't manage it!";
+
+    @ConfigField(name="RealEstate.Errors.ClaimInTransaction.Subclaim")
+    public String msgErrorSubclaimInTransaction = "$cA subclaim is currently involved in a transaction, you can't edit or manage the parent claim!";
     
     @ConfigField(name="RealEstate.Errors.Command.Usage", comment = "0: command usage")
     public String msgErrorCommandUsage = "$cUsage: {0}";
 
     @ConfigField(name="RealEstate.Errors.BuyerOnly")
     public String msgErrorBuyerOnly = "$cOnly the buyer can perform this command!";
+
+    @ConfigField(name="RealEstate.Errors.Unexpected")
+    public String msgErrorUnexpected = "$cAn unexpected error has occured!";
 
     @ConfigField(name="RealEstate.Errors.InvalidNumber", comment = "0: number")
     public String msgErrorInvalidNumber = "$c{0} is not a valid number!";
@@ -101,6 +123,30 @@ public class Messages extends AnnotationConfig
 
     @ConfigField(name="RealEstate.Errors.InvalidDuration", comment = "0: duration, 1: example of duration format, 2: example, 3: example")
     public String msgErrorInvalidDuration = "$c{0} is not a valid duration! Durations must be in the format {1} or {2} or {3}!";
+
+    @ConfigField(name="RealEstate.Errors.NoMoneySelf")
+    public String msgErrorNoMoneySelf = "$cYou don't have enough money to make this transaction!";
+
+    @ConfigField(name="RealEstate.Errors.NoMoneyOther", comment = "0: Other player")
+    public String msgErrorNoMoneyOther = "$c{0} doesn't have enough money to make this transaction!";
+
+    @ConfigField(name="RealEstate.Errors.NoWithdrawSelf")
+    public String msgErrorNoWithdrawSelf = "$cCould not withdraw the money!";
+
+    @ConfigField(name="RealEstate.Errors.NoWithdrawOther", comment = "0: Other player")
+    public String msgErrorNoWithdrawOther = "$cCould not withdraw the money from {0}!";
+
+    @ConfigField(name="RealEstate.Errors.NoDepositSelf", comment = "0: Other player")
+    public String msgErrorNoDepositSelf = "$cCould not deposit the money to you, refunding {0}!";
+
+    @ConfigField(name="RealEstate.Errors.NoDepositOther", comment = "0: Other player")
+    public String msgErrorNoDepositOther = "$cCould not deposit the money to {0}, refunding you!";
+
+    @ConfigField(name="RealEstate.Errors.CantCancelAlreadyLeased", comment = "0: claim type")
+    public String msgErrorCantCancelAlreadyLeased = "$cThis {0} is currently being leased, you can't cancel the transaction!";
+
+    @ConfigField(name="RealEstate.Errors.CantCancelAlreadyRented", comment = "0: claim type")
+    public String msgErrorCantCancelAlreadyRented = "$cThis {0} is currently being rented, you can't cancel the transaction!";
 
     @ConfigField(name="RealEstate.Errors.AutoRenew.Disabled")
     public String msgErrorAutoRenewDisabled = "$cAutomatic renew is disabled!";
@@ -207,11 +253,14 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Errors.Claim.NoInfoPermission")
     public String msgErrorClaimNoInfoPermission = "$cYou don't have permission to view this real estate informations!";
 
+    @ConfigField(name="RealEstate.Errors.Claim.NoClaimBlocks", comment = "0: area; 1: claim blocks remaining; 2: missing claim blocks")
+    public String msgErrorClaimNoClaimBlocks = "$cYou don't have enough claim blocks! You need $a{2}$c more claim blocks to claim this area. The claim requires $a{0}$c claim blocks, you only have $a{1}$c claim blocks left.";
+
     @ConfigField(name="RealEstate.Info.ExitOffer.None")
     public String msgInfoExitOfferNone = "$bThere is currently no exit offer for this claim!";
 
     @ConfigField(name="RealEstate.Info.ExitOffer.MadeByStatus", comment = "0: formatted price")
-    public String msgInfoExitOfferMadeByStatus = "$bYou offered to exit the contract for $a{0}, but your offer hasn't been accepted or denied yet...";
+    public String msgInfoExitOfferMadeByStatus = "$bYou offered to exit the contract for $a{0}$b, but your offer hasn't been accepted or denied yet...";
 
     @ConfigField(name="RealEstate.Info.ExitOffer.MadeToStatus", comment = "0: player who made the offer; 1: formatted price")
     public String msgInfoExitOfferMadeToStatus = "$a{0} $boffered to exit the contract for $a{1}";
@@ -258,14 +307,14 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Info.Claim.OwnerRented", comment = "0: buyer name, 1: claim type, 2: formatted price, 3: claim location")
     public String msgInfoClaimOwnerRented = "$a{0} $bhas rented the {1} at $a{3} $bfor $a{2}";
 
-    @ConfigField(name="RealEstate.Info.Claim.BuyerBought", comment = "1: claim type, 2: formatted price")
-    public String msgInfoClaimBuyerSold = "$bYou have bought the {1} for $a{2}";
+    @ConfigField(name="RealEstate.Info.Claim.BuyerBought", comment = "0: claim type, 1: formatted price")
+    public String msgInfoClaimBuyerSold = "$bYou have bought the {0} for $a{1}";
 
-    @ConfigField(name="RealEstate.Info.Claim.BuyerLeaseStarted", comment = "1: claim type, 2: formatted price, 3: payments left")
-    public String msgInfoClaimBuyerLeaseStarted = "$bYou have leased the {1} for $a{2} with $a{3} $bpayments left";
+    @ConfigField(name="RealEstate.Info.Claim.BuyerLeaseStarted", comment = "0: claim type, 1: formatted price, 2: payments left")
+    public String msgInfoClaimBuyerLeaseStarted = "$bYou have leased the {0} for $a{1} with $a{2} $bpayments left";
 
-    @ConfigField(name="RealEstate.Info.Claim.BuyerRented", comment = "1: claim type, 2: formatted price")
-    public String msgInfoClaimBuyerRented = "$bYou have rented the {1} for $a{2}";
+    @ConfigField(name="RealEstate.Info.Claim.BuyerRented", comment = "0: claim type, 1: formatted price")
+    public String msgInfoClaimBuyerRented = "$bYou have rented the {0} for $a{1}";
 
     @ConfigField(name="RealEstate.Info.Claim.Info.Lease.Header")
     public String msgInfoClaimInfoLeaseHeader = "$9-----= $f[$6RealEstate Lease Info$f]$9 =-----";
@@ -279,14 +328,32 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Info.Claim.Info.Lease.Oneline", comment = "0: claim area, 1: location, 2: payments left, 3: period, 4: formatted price")
     public String msgInfoClaimInfoLeaseOneline = "$2{0} $bblocks to $2Lease $bat $2{1} $bfor $a{2} periods of $a{3}$b, each period costs $a{4}";
 
+    @ConfigField(name="RealEstate.Info.Claim.Info.Lease.PaymentBuyer", comment = "0: claim type, 1: location, 2: formatted price, 3: payments left")
+    public String msgInfoClaimInfoLeasePaymentBuyer = "$bPaid lease for the {0} at $a{1} $bfor $a{2}$b. There are $a{3} $bpayments left.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Lease.PaymentOwner", comment = "0: player name, 1: claim type, 2: location, 3: formatted price, 4: payments left")
+    public String msgInfoClaimInfoLeasePaymentOwner = "$a{0} $bpaid lease for the {1} at $a{2} $bfor $a{3}$b. There are $a{4} $bpayments left.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Lease.PaymentBuyerFinal", comment = "0: claim type, 1: location, 2: formatted price")
+    public String msgInfoClaimInfoLeasePaymentBuyerFinal = "$bPaid final lease for the {0} at $a{1} $bfor $a{2}$b. The {0} is now your property.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Lease.PaymentOwnerFinal", comment = "0: player name, 1: claim type, 2: location, 3: formatted price")
+    public String msgInfoClaimInfoLeasePaymentOwnerFinal = "$a{0} $bpaid final lease for the {1} at $a{2} $bfor $a{3}$b. The {1} is now $a{0}$b's property.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Lease.PaymentBuyerCancelled", comment = "0: claim type, 1: location, 2: formatted price")
+    public String msgInfoClaimInfoLeasePaymentBuyerCancelled = "$bCouldn't pay the lease for the {0} at $a{1} $bfor $a{2}$b. The lease has been cancelled.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Lease.PaymentOwnerCancelled", comment = "0: player name, 1: claim type, 2: location, 3: formatted price")
+    public String msgInfoClaimInfoLeasePaymentOwnerCancelled = "$a{0} $bcouldn't pay the lease for the {1} at $a{2} $bfor $a{3}$b. The lease has been cancelled.";
+
     @ConfigField(name="RealEstate.Info.Claim.Info.Rent.Header")
     public String msgInfoClaimInfoRentHeader = "$9-----= $f[$6RealEstate Rent Info$f]$9 =-----";
 
     @ConfigField(name="RealEstate.Info.Claim.Info.Rent.GeneralNoBuyer", comment = "0: claim type, 1: formatted price, 2: duration")
-    public String msgInfoClaimInfoGeneralRentNoBuyer = "$bThis {0} is for rent for $a{1}$b per $a{3}.";
+    public String msgInfoClaimInfoGeneralRentNoBuyer = "$bThis {0} is for rent for $a{1}$b per $a{2}.";
 
-    @ConfigField(name="RealEstate.Info.Claim.Info.Rent.GeneralBuyer", comment = "0: claim type, 1: buyer name, 2: formatted price, 3: time left in current period, 5: duration of a period")
-    public String msgInfoClaimInfoGeneralRentBuyer = "$bThis {0} is currently rented by $a{1}$b for $a{2}$b. The {0} is rented until $a{3}$b. The rent period is $a{5}";
+    @ConfigField(name="RealEstate.Info.Claim.Info.Rent.GeneralBuyer", comment = "0: claim type, 1: buyer name, 2: formatted price, 3: time left in current period, 4: duration of a period")
+    public String msgInfoClaimInfoGeneralRentBuyer = "$bThis {0} is currently rented by $a{1}$b for $a{2}$b. The {0} is rented until $a{3}$b. The rent period is $a{4}";
 
     @ConfigField(name="RealEstate.Info.Claim.Info.Rent.MaxPeriod", comment = "0: max periods")
     public String msgInfoClaimInfoRentMaxPeriod = "$bIt can be rented for a maximum of $a{0}$b periods.";
@@ -300,6 +367,30 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Info.Claim.Info.Rent.Oneline", comment = "0: claim area, 1: location, 2: formatted price, 3: duration")
     public String msgInfoClaimInfoRentOneline = "$2{0} $bblocks to $2Rent $bat $2{1} $bfor $a{2}$b per $a{3}";
 
+    @ConfigField(name="RealEstate.Info.Claim.Info.Rent.PaymentBuyer", comment = "0: claim type, 1: location, 2: formatted price")
+    public String msgInfoClaimInfoRentPaymentBuyer = "$bPaid rent for the {0} at $a{1} $bfor $a{2}$b.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Rent.PaymentOwner", comment = "0: player name, 1: claim type, 2: location, 3: formatted price")
+    public String msgInfoClaimInfoRentPaymentOwner = "$a{0} $bpaid rent for the {1} at $a{2} $bfor $a{3}$b.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Rent.PaymentBuyerCancelled", comment = "0: claim type, 1: location, 2: formatted price")
+    public String msgInfoClaimInfoRentPaymentBuyerCancelled = "$bCouldn't pay the rent for the {0} at $a{1} $bfor $a{2}$b. The rent has been cancelled.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Rent.PaymentOwnerCancelled", comment = "0: player name, 1: claim type, 2: location, 3: formatted price")
+    public String msgInfoClaimInfoRentPaymentOwnerCancelled = "$a{0} $bcouldn't pay the rent for the {1} at $a{2} $bfor $a{3}$b. The rent has been cancelled.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Rent.RentCancelled", comment = "0: claim type, 1: location")
+    public String msgInfoClaimInfoRentCancelled = "$bThe rent for the {0} at $a{1} $bis now over, your access has been revoked.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Sell.Header")
+    public String msgInfoClaimInfoSellHeader = "$9-----= $f[$6RealEstate Sale Info$f]$9 =-----";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Sell.General", comment = "0: claim type, 1: formatted price")
+    public String msgInfoClaimInfoSellGeneral = "$bThis {0} is for sale for $a{1}";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Sell.Oneline", comment = "0: claim area, 1: location, 2: formatted price")
+    public String msgInfoClaimInfoSellOneline = "$2{0} $bblocks to $2Sell $bat $2{1} $bfor $a{2}";
+
     @ConfigField(name="RealEstate.Info.Claim.Info.Owner", comment = "0: owner name")
     public String msgInfoClaimInfoOwner = "$bThe current owner is $a{0}";
 
@@ -308,6 +399,24 @@ public class Messages extends AnnotationConfig
 
     @ConfigField(name="RealEstate.Info.Claim.Info.Note")
     public String msgInfoClaimInfoNote = "$dNote: You will only get access to this subclaim.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Created.Sell", comment = "0: claim prefix, 1: claim type, 2: formatted price")
+    public String msgInfoClaimCreatedSell = "$bYou have successfully created {0} {1} sale for $a{2}";
+
+    @ConfigField(name="RealEstate.Info.Claim.Created.Lease", comment = "0: claim prefix, 1: claim type, 2: formatted price, 3: payments count, 4: frequency")
+    public String msgInfoClaimCreatedLease = "$bYou have successfully created {0} {1} lease for $a{3}$b payments of $a{2}$b each. Payments are due every $a{4}";
+
+    @ConfigField(name="RealEstate.Info.Claim.Created.Rent", comment = "0: claim prefix, 1: claim type, 2: formatted price, 3: duration")
+    public String msgInfoClaimCreatedRent = "$bYou have successfully created {0} {1} rent for $a{2}$b per $a{3}";
+
+    @ConfigField(name="RealEstate.Info.Claim.Created.SellBroadcast", comment = "0: player name, 1: claim prefix, 2: claim type, 3: formatted price")
+    public String msgInfoClaimCreatedSellBroadcast = "$a{0} $bhas created {1} {2} sale for $a{3}";
+
+    @ConfigField(name="RealEstate.Info.Claim.Created.LeaseBroadcast", comment = "0: player name, 1: claim prefix, 2: claim type, 3: formatted price, 4: payments count, 5: frequency")
+    public String msgInfoClaimCreatedLeaseBroadcast = "$a{0} $bhas created {1} {2} lease for $a{4}$b payments of $a{3}$b each. Payments are due every $a{5}";
+
+    @ConfigField(name="RealEstate.Info.Claim.Created.RentBroadcast", comment = "0: player name, 1: claim prefix, 2: claim type, 3: formatted price, 4: duration")
+    public String msgInfoClaimCreatedRentBroadcast = "$a{0} $bhas created {1} {2} rent for $a{3}$b per $a{4}";
 
     @ConfigField(name="RealEstate.List.Header", comment = "0: RE Offers|Sell Offers|Rent Offers|Lease Offers; 1: Page number; 2: Page count")
     public String msgListTransactionsHeader = "$1----= $f[ $6{0} page $2 {1} $6/ $2{2} $f] $1=----";
@@ -328,12 +437,19 @@ public class Messages extends AnnotationConfig
     }
 
     public static String getMessage(String msgTemplate, String... args) {
+        return getMessage(msgTemplate, true, args);
+    }
+
+    public static String getMessage(String msgTemplate, boolean withPrefix, String... args) {
+        if (withPrefix) {
+            msgTemplate = RealEstate.instance.config.chatPrefix + msgTemplate;
+        }
         for (int i = 0; i < args.length; i++) {
             String param = args[i];
-            msgTemplate = msgTemplate.replace("{" + i + "}", param);
+            msgTemplate = msgTemplate.replaceAll("\\{" + i + "\\}", param);
         }
 
-        return msgTemplate.replace('$', (char) 0x00A7);
+        return msgTemplate.replace('$', ChatColor.COLOR_CHAR);
     }
     //sends a color-coded message to a player
     public static void sendMessage(CommandSender player, String msgTemplate, String... args) {
@@ -348,13 +464,7 @@ public class Messages extends AnnotationConfig
 
     //sends a color-coded message to a player
     public static void sendMessage(CommandSender player, String message) {
-        if (message == null || message.length() == 0) return;
-
-        if (player == null) {
-            RealEstate.instance.log.info(message);
-        } else {
-            player.sendMessage(RealEstate.instance.config.chatPrefix + message.replace('$', (char) 0x00A7));
-        }
+        sendMessage(player, getMessage(message), 0);
     }
 
     public static void sendMessage(CommandSender player, String message, long delayInTicks) {
