@@ -18,3 +18,5 @@
 ### Fixed
 * Sign header color formatting being lost on server restart
 * Fixed issue preventing to buy claims due to currencies using $ character
+* Fixed error with `/re list`
+* Fixed error regarding renewrent

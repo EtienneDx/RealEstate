@@ -1,7 +1,6 @@
 package me.EtienneDx.RealEstate;
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -353,10 +352,10 @@ public class Messages extends AnnotationConfig
     public String msgInfoClaimInfoRentHeader = "$9-----= $f[$6RealEstate Rent Info$f]$9 =-----";
 
     @ConfigField(name="RealEstate.Info.Claim.Info.Rent.GeneralNoBuyer", comment = "0: claim type, 1: formatted price, 2: duration")
-    public String msgInfoClaimInfoGeneralRentNoBuyer = "$bThis {0} is for rent for $a{1}$b per $a{2}.";
+    public String msgInfoClaimInfoGeneralRentNoBuyer = "$bThis {0} is for rent for $a{1}$b per $a{2}$b.";
 
     @ConfigField(name="RealEstate.Info.Claim.Info.Rent.GeneralBuyer", comment = "0: claim type, 1: buyer name, 2: formatted price, 3: time left in current period, 4: duration of a period")
-    public String msgInfoClaimInfoGeneralRentBuyer = "$bThis {0} is currently rented by $a{1}$b for $a{2}$b. The {0} is rented until $a{3}$b. The rent period is $a{4}";
+    public String msgInfoClaimInfoGeneralRentBuyer = "$bThis {0} is currently rented by $a{1}$b for $a{2}$b. The {0} is rented for another $a{3}$b. The rent period is $a{4}";
 
     @ConfigField(name="RealEstate.Info.Claim.Info.Rent.MaxPeriod", comment = "0: max periods")
     public String msgInfoClaimInfoRentMaxPeriod = "$bIt can be rented for a maximum of $a{0}$b periods.";
@@ -449,11 +448,10 @@ public class Messages extends AnnotationConfig
         }
 
         msgTemplate = msgTemplate.replace('$', ChatColor.COLOR_CHAR);
-        
+
         for (int i = 0; i < args.length; i++) {
             String param = args[i];
-            Matcher matcher = Pattern.compile("\\{" + i + "\\}").matcher(msgTemplate);
-            msgTemplate = matcher.replaceAll(Matcher.quoteReplacement(param));
+            msgTemplate = msgTemplate.replaceAll("\\{" + i + "\\}", Matcher.quoteReplacement(param));
         }
 
         return msgTemplate;

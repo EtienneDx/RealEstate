@@ -479,7 +479,7 @@ public class ClaimLease extends BoughtTransaction
 	@Override
 	public void msgInfo(CommandSender cs)
 	{
-		Claim claim = GriefPrevention.instance.dataStore.getClaim(claimId);
+		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
 		String location = "[" + claim.getLesserBoundaryCorner().getWorld().getName() + ", " +
 		"X: " + claim.getLesserBoundaryCorner().getBlockX() + ", " +
 		"Y: " + claim.getLesserBoundaryCorner().getBlockY() + ", " +

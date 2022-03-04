@@ -192,7 +192,7 @@ public class ClaimRent extends BoughtTransaction
 		String location = "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + 
 				sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]";
 		
-		if((autoRenew || periodCount < maxPeriod) && Utils.makePayment(owner, this.buyer, price, false, false))
+		if((autoRenew || periodCount + 1 < maxPeriod) && Utils.makePayment(owner, this.buyer, price, false, false))
 		{
 			periodCount = (periodCount + 1) % maxPeriod;
 			startDate = LocalDateTime.now();
@@ -335,6 +335,7 @@ public class ClaimRent extends BoughtTransaction
 			buyer = player.getUniqueId();
 			startDate = LocalDateTime.now();
 			autoRenew = false;
+			periodCount = 0;
 			claim.setPermission(buyer.toString(), buildTrust ? ClaimPermission.Build : ClaimPermission.Inventory);
 			claim.setPermission(player.getUniqueId().toString(), ClaimPermission.Manage);
 			claim.managers.add(player.getUniqueId().toString());
@@ -477,7 +478,7 @@ public class ClaimRent extends BoughtTransaction
 	@Override
 	public void msgInfo(CommandSender cs)
 	{
-		Claim claim = GriefPrevention.instance.dataStore.getClaim(claimId);
+		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
 		String location = "[" + claim.getLesserBoundaryCorner().getWorld().getName() + ", " +
 		"X: " + claim.getLesserBoundaryCorner().getBlockX() + ", " +
 		"Y: " + claim.getLesserBoundaryCorner().getBlockY() + ", " +

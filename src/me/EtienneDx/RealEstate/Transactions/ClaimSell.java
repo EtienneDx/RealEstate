@@ -223,7 +223,7 @@ public class ClaimSell extends ClaimTransaction
 	@Override
 	public void msgInfo(CommandSender cs)
 	{
-		Claim claim = GriefPrevention.instance.dataStore.getClaim(claimId);
+		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
 		if(claim == null) {
 			tryCancelTransaction(null, true);
 			return;
