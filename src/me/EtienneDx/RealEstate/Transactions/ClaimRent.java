@@ -441,12 +441,6 @@ public class ClaimRent extends BoughtTransaction
 						RealEstate.econ.format(price),
 						Utils.getTime(daysLeft, timeRemaining, true),
 						Utils.getTime(duration, null, true)) + "\n";
-				msg += ChatColor.AQUA + "This " + claimType + " is currently rented by " + 
-						ChatColor.GREEN + Bukkit.getOfflinePlayer(buyer).getName() + ChatColor.AQUA + " for " +
-						ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + " for " + 
-						(maxPeriod - periodCount > 1 ? "" + ChatColor.GREEN + (maxPeriod - periodCount) + ChatColor.AQUA + " periods of " + 
-						ChatColor.GREEN + Utils.getTime(duration, null, false) + ChatColor.AQUA + ". The current period will end in " : "another ") +
-						ChatColor.GREEN + Utils.getTime(daysLeft, timeRemaining, true) + "\n";
 				
 				if(maxPeriod > 1 && maxPeriod - periodCount > 0)
 				{

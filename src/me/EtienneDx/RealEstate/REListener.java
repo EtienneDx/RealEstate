@@ -203,9 +203,9 @@ public class REListener implements Listener
 				if(duration == 0)
 				{
 					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidDuration, event.getLine(2),
-						ChatColor.GREEN + "10 weeks",
-						ChatColor.GREEN + "3 days",
-						ChatColor.GREEN + "1 week 3 days");
+						"10 weeks",
+						"3 days",
+						"1 week 3 days");
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
@@ -334,9 +334,9 @@ public class REListener implements Listener
 				if(frequency == 0)
 				{
 					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidDuration, event.getLine(3),
-						ChatColor.GREEN + "10 weeks",
-						ChatColor.GREEN + "3 days",
-						ChatColor.GREEN + "1 week 3 days");
+						"10 weeks",
+						"3 days",
+						"1 week 3 days");
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;

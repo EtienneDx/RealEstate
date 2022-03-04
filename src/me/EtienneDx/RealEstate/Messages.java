@@ -1,5 +1,8 @@
 package me.EtienneDx.RealEstate;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginDescriptionFile;
 
@@ -122,7 +125,7 @@ public class Messages extends AnnotationConfig
     public String msgErrorNonIntegerPrice = "$cThe price must be an integer!";
 
     @ConfigField(name="RealEstate.Errors.InvalidDuration", comment = "0: duration, 1: example of duration format, 2: example, 3: example")
-    public String msgErrorInvalidDuration = "$c{0} is not a valid duration! Durations must be in the format {1} or {2} or {3}!";
+    public String msgErrorInvalidDuration = "$c{0} is not a valid duration! Durations must be in the format $a{1}$c or $a{2}$c or $a{3}$c!";
 
     @ConfigField(name="RealEstate.Errors.NoMoneySelf")
     public String msgErrorNoMoneySelf = "$cYou don't have enough money to make this transaction!";
@@ -444,12 +447,16 @@ public class Messages extends AnnotationConfig
         if (withPrefix) {
             msgTemplate = RealEstate.instance.config.chatPrefix + msgTemplate;
         }
+
+        msgTemplate = msgTemplate.replace('$', ChatColor.COLOR_CHAR);
+        
         for (int i = 0; i < args.length; i++) {
             String param = args[i];
-            msgTemplate = msgTemplate.replaceAll("\\{" + i + "\\}", param);
+            Matcher matcher = Pattern.compile("\\{" + i + "\\}").matcher(msgTemplate);
+            msgTemplate = matcher.replaceAll(Matcher.quoteReplacement(param));
         }
 
-        return msgTemplate.replace('$', ChatColor.COLOR_CHAR);
+        return msgTemplate;
     }
     //sends a color-coded message to a player
     public static void sendMessage(CommandSender player, String msgTemplate, String... args) {
