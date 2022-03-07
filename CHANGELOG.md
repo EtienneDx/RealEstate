@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.0
+
+### Added
+* Support for GriefDefender 2.0.0
+
 ## 1.4.1
 
 ### Added
