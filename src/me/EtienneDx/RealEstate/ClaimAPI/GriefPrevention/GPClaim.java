@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
+import me.EtienneDx.RealEstate.RealEstate;
 import me.EtienneDx.RealEstate.ClaimAPI.ClaimPermission;
 import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 import me.ryanhamshire.GriefPrevention.Claim;
@@ -22,6 +23,12 @@ public class GPClaim implements IClaim
     public Claim getClaim()
     {
         return claim;
+    }
+
+    @Override
+    public String getId()
+    {
+        return claim.getID().toString();
     }
 
     @Override
@@ -119,6 +126,12 @@ public class GPClaim implements IClaim
             case MANAGE:
                 gpPermission = me.ryanhamshire.GriefPrevention.ClaimPermission.Manage;
                 break;
+            case ACCESS:
+                gpPermission = me.ryanhamshire.GriefPrevention.ClaimPermission.Access;
+                break;
+            case EDIT:
+                gpPermission = me.ryanhamshire.GriefPrevention.ClaimPermission.Edit;
+                break;
         }
         claim.setPermission(player.toString(), gpPermission);
     }
@@ -135,12 +148,27 @@ public class GPClaim implements IClaim
 
     @Override
     public String getOwnerName() {
-        return Bukkit.getPlayer(getOwner()).getName();
+        return getOwner() != null ? Bukkit.getPlayer(getOwner()).getName() : RealEstate.instance.messages.keywordTheServer;
     }
 
     @Override
     public void setInheritPermissions(boolean inherit) {
         claim.setSubclaimRestrictions(!inherit);
+    }
+
+    @Override
+    public void clearPlayerPermissions() {
+        claim.clearPermissions();
+    }
+
+    @Override
+    public void addManager(UUID player) {
+        claim.managers.add(player.toString());
+    }
+
+    @Override
+    public void clearManagers() {
+        claim.managers.clear();
     }
     
 }

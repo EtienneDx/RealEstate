@@ -10,7 +10,9 @@ public interface IClaimAPI
 
     public void saveClaim(IClaim claim);
 
-    public IPlayerData getPlayerData(UUID world, UUID player);
+    public IPlayerData getPlayerData(UUID player);
 
     public void changeClaimOwner(IClaim claim, UUID newOwner);
+
+    public void registerEvents();
 }

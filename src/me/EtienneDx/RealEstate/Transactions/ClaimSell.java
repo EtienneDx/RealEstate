@@ -7,8 +7,7 @@ import com.earth2me.essentials.User;
 import me.EtienneDx.RealEstate.Messages;
 import me.EtienneDx.RealEstate.RealEstate;
 import me.EtienneDx.RealEstate.Utils;
-import me.ryanhamshire.GriefPrevention.Claim;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 import net.md_5.bungee.api.ChatColor;
 
 import java.util.Map;
@@ -22,7 +21,7 @@ import org.bukkit.command.CommandSender;
 
 public class ClaimSell extends ClaimTransaction
 {
-	public ClaimSell(Claim claim, Player player, double price, Location sign)
+	public ClaimSell(IClaim claim, Player player, double price, Location sign)
 	{
 		super(claim, player, price, sign);
 	}
@@ -83,15 +82,15 @@ public class ClaimSell extends ClaimTransaction
 	@Override
 	public void interact(Player player)
 	{
-		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);// getting by id creates errors for subclaims
+		IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
 		if(claim == null)
 		{
 			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimDoesNotExist);
             RealEstate.transactionsStore.cancelTransaction(claim);
             return;
 		}
-		String claimType = claim.parent == null ? "claim" : "subclaim";
-		String claimTypeDisplay = claim.parent == null ? 
+		String claimType = claim.isParentClaim() ? "claim" : "subclaim";
+		String claimTypeDisplay = claim.isParentClaim() ? 
 			RealEstate.instance.messages.keywordClaim : RealEstate.instance.messages.keywordSubclaim;
 		
 		if (player.getUniqueId().equals(owner))
@@ -99,7 +98,7 @@ public class ClaimSell extends ClaimTransaction
 			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimAlreadyOwner, claimTypeDisplay);
             return;
         }
-		if(claim.parent == null && owner != null && !owner.equals(claim.ownerID))
+		if(claim.isParentClaim() && owner != null && !owner.equals(claim.getOwner()))
 		{
 			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimNotSoldByOwner, claimTypeDisplay);
             RealEstate.transactionsStore.cancelTransaction(claim);
@@ -112,9 +111,9 @@ public class ClaimSell extends ClaimTransaction
 		}
 		// for real claims, you may need to have enough claim blocks in reserve to purchase it (if transferClaimBlocks is false)
 		if(claimType.equalsIgnoreCase("claim") && !RealEstate.instance.config.cfgTransferClaimBlocks && 
-				GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId()).getRemainingClaimBlocks() < claim.getArea())
+				RealEstate.claimAPI.getPlayerData(player.getUniqueId()).getRemainingClaimBlocks() < claim.getArea())
 		{
-			int remaining = GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId()).getRemainingClaimBlocks();
+			int remaining = RealEstate.claimAPI.getPlayerData(player.getUniqueId()).getRemainingClaimBlocks();
 			int area = claim.getArea();
 			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimNoClaimBlocks,
 				area + "",
@@ -128,7 +127,7 @@ public class ClaimSell extends ClaimTransaction
 		{
 			Utils.transferClaim(claim, player.getUniqueId(), owner);
 			// normally, this is always the case, so it's not necessary, but until I proven my point, here
-			if(claim.parent != null || claim.ownerID.equals(player.getUniqueId()))
+			if(claim.isSubClaim() || claim.getOwner().equals(player.getUniqueId()))
 			{
 				String location = "[" + player.getLocation().getWorld() + ", " +
 					"X: " + player.getLocation().getBlockX() + ", " +
@@ -182,11 +181,11 @@ public class ClaimSell extends ClaimTransaction
 	@Override
 	public void preview(Player player)
 	{
-		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
+		IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
 		if(player.hasPermission("realestate.info"))
 		{
-			String claimType = claim.parent == null ? "claim" : "subclaim";
-			String claimTypeDisplay = claim.parent == null ? 
+			String claimType = claim.isParentClaim() ? "claim" : "subclaim";
+			String claimTypeDisplay = claim.isParentClaim() ? 
 				RealEstate.instance.messages.keywordClaim : RealEstate.instance.messages.keywordSubclaim;
 
 			String msg = Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoSellHeader) + "\n";
@@ -203,7 +202,7 @@ public class ClaimSell extends ClaimTransaction
 			else
 			{
 				msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoMainOwner,
-						claim.parent.getOwnerName()) + "\n";
+						claim.getParent().getOwnerName()) + "\n";
 				msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoNote) + "\n";
 			}
 			Messages.sendMessage(player, msg, false);
@@ -223,15 +222,15 @@ public class ClaimSell extends ClaimTransaction
 	@Override
 	public void msgInfo(CommandSender cs)
 	{
-		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
+		IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
 		if(claim == null) {
 			tryCancelTransaction(null, true);
 			return;
 		}
-		String location = "[" + claim.getLesserBoundaryCorner().getWorld().getName() + ", " +
-		"X: " + claim.getLesserBoundaryCorner().getBlockX() + ", " +
-		"Y: " + claim.getLesserBoundaryCorner().getBlockY() + ", " +
-		"Z: " + claim.getLesserBoundaryCorner().getBlockZ() + "]";
+		String location = "[" + claim.getWorld().getName() + ", " +
+		"X: " + claim.getX() + ", " +
+		"Y: " + claim.getY() + ", " +
+		"Z: " + claim.getZ() + "]";
 
 		Messages.sendMessage(cs, RealEstate.instance.messages.msgInfoClaimInfoSellOneline,
 				claim.getArea() + "",

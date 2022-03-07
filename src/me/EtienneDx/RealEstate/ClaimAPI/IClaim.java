@@ -6,6 +6,8 @@ import org.bukkit.World;
 
 public interface IClaim
 {
+    public String getId();
+
     public int getArea();
 
     public World getWorld();
@@ -32,7 +34,13 @@ public interface IClaim
 
     public void addPlayerPermissions(UUID player, ClaimPermission permission);
 
+    public void clearPlayerPermissions();
+
     public void removeManager(UUID player);
+
+    public void addManager(UUID player);
+
+    public void clearManagers();
 
     public UUID getOwner();
 

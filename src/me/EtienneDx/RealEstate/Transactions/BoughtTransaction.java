@@ -8,7 +8,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
 import me.EtienneDx.RealEstate.RealEstate;
-import me.ryanhamshire.GriefPrevention.Claim;
+import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 
 public abstract class BoughtTransaction extends ClaimTransaction
 {
@@ -27,7 +27,7 @@ public abstract class BoughtTransaction extends ClaimTransaction
 			destroyedSign = (boolean) map.get("destroyedSign");
 	}
 	
-	public BoughtTransaction(Claim claim, Player player, double price, Location sign)
+	public BoughtTransaction(IClaim claim, Player player, double price, Location sign)
 	{
 		super(claim, player, price, sign);
 	}

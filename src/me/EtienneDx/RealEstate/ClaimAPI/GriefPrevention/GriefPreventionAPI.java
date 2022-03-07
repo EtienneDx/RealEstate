@@ -24,7 +24,7 @@ public class GriefPreventionAPI implements IClaimAPI
     }
 
     @Override
-    public IPlayerData getPlayerData(UUID world, UUID player) {
+    public IPlayerData getPlayerData(UUID player) {
         return new GPPlayerData(GriefPrevention.instance.dataStore.getPlayerData(player));
     }
 
@@ -32,6 +32,11 @@ public class GriefPreventionAPI implements IClaimAPI
     public void changeClaimOwner(IClaim claim, UUID newOwner) {
         if(claim instanceof GPClaim)
             GriefPrevention.instance.dataStore.changeClaimOwner(((GPClaim) claim).getClaim(), newOwner);
+    }
+
+    @Override
+    public void registerEvents() {
+        new ClaimPermissionListener().registerEvents();
     }
     
 }

@@ -21,8 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import me.EtienneDx.RealEstate.Messages;
 import me.EtienneDx.RealEstate.RealEstate;
 import me.EtienneDx.RealEstate.Utils;
-import me.ryanhamshire.GriefPrevention.Claim;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 
 public class TransactionsStore
 {
@@ -128,26 +127,26 @@ public class TransactionsStore
 		}
     }
 	
-	public boolean anyTransaction(Claim claim)
+	public boolean anyTransaction(IClaim claim)
 	{
 		return claim != null && 
-				(claimSell.containsKey(claim.getID().toString()) || 
-						claimRent.containsKey(claim.getID().toString()) || 
-						claimLease.containsKey(claim.getID().toString()));
+				(claimSell.containsKey(claim.getId()) || 
+						claimRent.containsKey(claim.getId()) || 
+						claimLease.containsKey(claim.getId()));
 	}
 
-	public Transaction getTransaction(Claim claim)
+	public Transaction getTransaction(IClaim claim)
 	{
-		if(claimSell.containsKey(claim.getID().toString()))
-			return claimSell.get(claim.getID().toString());
-		if(claimRent.containsKey(claim.getID().toString()))
-			return claimRent.get(claim.getID().toString());
-		if(claimLease.containsKey(claim.getID().toString()))
-			return claimLease.get(claim.getID().toString());
+		if(claimSell.containsKey(claim.getId()))
+			return claimSell.get(claim.getId());
+		if(claimRent.containsKey(claim.getId()))
+			return claimRent.get(claim.getId());
+		if(claimLease.containsKey(claim.getId()))
+			return claimLease.get(claim.getId());
 		return null;
 	}
 
-	public void cancelTransaction(Claim claim)
+	public void cancelTransaction(IClaim claim)
 	{
 		if(anyTransaction(claim))
 		{
@@ -182,24 +181,24 @@ public class TransactionsStore
 				(tr instanceof ClaimLease && ((ClaimLease)tr).buyer == null);
 	}
 
-	public void sell(Claim claim, Player player, double price, Location sign)
+	public void sell(IClaim claim, Player player, double price, Location sign)
 	{
 		ClaimSell cs = new ClaimSell(claim, claim.isAdminClaim() ? null : player, price, sign);
-		claimSell.put(claim.getID().toString(), cs);
+		claimSell.put(claim.getId(), cs);
 		cs.update();
 		saveData();
 		
 		RealEstate.instance.addLogEntry("[" + this.dateFormat.format(this.date) + "] " + (player == null ? "The Server" : player.getName()) + 
-				" has made " + (claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.parent == null ? "claim" : "subclaim") + " for sale at " +
-                "[" + claim.getGreaterBoundaryCorner().getWorld() + ", " +
-                "X: " + claim.getGreaterBoundaryCorner().getBlockX() + ", " +
-                "Y: " + claim.getGreaterBoundaryCorner().getBlockY() + ", " +
-                "Z: " + claim.getGreaterBoundaryCorner().getBlockZ() + "] " +
+				" has made " + (claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.isParentClaim() ? "claim" : "subclaim") + " for sale at " +
+                "[" + claim.getWorld() + ", " +
+                "X: " + claim.getX() + ", " +
+                "Y: " + claim.getY() + ", " +
+                "Z: " + claim.getZ() + "] " +
                 "Price: " + price + " " + RealEstate.econ.currencyNamePlural());
 	
 		String claimPrefix = claim.isAdminClaim() ? RealEstate.instance.messages.keywordAdminClaimPrefix :
 				RealEstate.instance.messages.keywordClaimPrefix;
-		String claimTypeDisplay = claim.parent == null ? RealEstate.instance.messages.keywordClaim :
+		String claimTypeDisplay = claim.isParentClaim() ? RealEstate.instance.messages.keywordClaim :
 				RealEstate.instance.messages.keywordSubclaim;
 
 		if(player != null)
@@ -225,24 +224,24 @@ public class TransactionsStore
 		}
 	}
 
-	public void rent(Claim claim, Player player, double price, Location sign, int duration, int rentPeriods, boolean buildTrust)
+	public void rent(IClaim claim, Player player, double price, Location sign, int duration, int rentPeriods, boolean buildTrust)
 	{
 		ClaimRent cr = new ClaimRent(claim, claim.isAdminClaim() ? null : player, price, sign, duration, rentPeriods, buildTrust);
-		claimRent.put(claim.getID().toString(), cr);
+		claimRent.put(claim.getId(), cr);
 		cr.update();
 		saveData();
 		
 		RealEstate.instance.addLogEntry("[" + this.dateFormat.format(this.date) + "] " + (player == null ? "The Server" : player.getName()) + 
-				" has made " + (claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.parent == null ? "claim" : "subclaim") + " for" + (buildTrust ? "" : " container") + " rent at " +
-				"[" + claim.getLesserBoundaryCorner().getWorld() + ", " +
-                "X: " + claim.getLesserBoundaryCorner().getBlockX() + ", " +
-                "Y: " + claim.getLesserBoundaryCorner().getBlockY() + ", " +
-                "Z: " + claim.getLesserBoundaryCorner().getBlockZ() + "] " +
+				" has made " + (claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.isParentClaim() ? "claim" : "subclaim") + " for" + (buildTrust ? "" : " container") + " rent at " +
+				"[" + claim.getWorld() + ", " +
+                "X: " + claim.getX() + ", " +
+                "Y: " + claim.getY() + ", " +
+                "Z: " + claim.getZ() + "] " +
                 "Price: " + price + " " + RealEstate.econ.currencyNamePlural());
 	
 		String claimPrefix = claim.isAdminClaim() ? RealEstate.instance.messages.keywordAdminClaimPrefix :
 				RealEstate.instance.messages.keywordClaimPrefix;
-		String claimTypeDisplay = claim.parent == null ? RealEstate.instance.messages.keywordClaim :
+		String claimTypeDisplay = claim.isParentClaim() ? RealEstate.instance.messages.keywordClaim :
 				RealEstate.instance.messages.keywordSubclaim;
 		
 		if(player != null)
@@ -270,25 +269,25 @@ public class TransactionsStore
 		}
 	}
 
-	public void lease(Claim claim, Player player, double price, Location sign, int frequency, int paymentsCount)
+	public void lease(IClaim claim, Player player, double price, Location sign, int frequency, int paymentsCount)
 	{
 		ClaimLease cl = new ClaimLease(claim, claim.isAdminClaim() ? null : player, price, sign, frequency, paymentsCount);
-		claimLease.put(claim.getID().toString(), cl);
+		claimLease.put(claim.getId(), cl);
 		cl.update();
 		saveData();
 		
 		RealEstate.instance.addLogEntry("[" + this.dateFormat.format(this.date) + "] " + (player == null ? "The Server" : player.getName()) + 
-				" has made " + (claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.parent == null ? "claim" : "subclaim") + " for lease at " +
-				"[" + claim.getLesserBoundaryCorner().getWorld() + ", " +
-                "X: " + claim.getLesserBoundaryCorner().getBlockX() + ", " +
-                "Y: " + claim.getLesserBoundaryCorner().getBlockY() + ", " +
-                "Z: " + claim.getLesserBoundaryCorner().getBlockZ() + "] " +
+				" has made " + (claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.isParentClaim() ? "claim" : "subclaim") + " for lease at " +
+				"[" + claim.getWorld() + ", " +
+                "X: " + claim.getX() + ", " +
+                "Y: " + claim.getY() + ", " +
+                "Z: " + claim.getZ() + "] " +
                 "Payments Count : " + paymentsCount + " " + 
                 "Price: " + price + " " + RealEstate.econ.currencyNamePlural());
 	
 		String claimPrefix = claim.isAdminClaim() ? RealEstate.instance.messages.keywordAdminClaimPrefix :
 				RealEstate.instance.messages.keywordClaimPrefix;
-		String claimTypeDisplay = claim.parent == null ? RealEstate.instance.messages.keywordClaim :
+		String claimTypeDisplay = claim.isParentClaim() ? RealEstate.instance.messages.keywordClaim :
 				RealEstate.instance.messages.keywordSubclaim;
 		
 		if(player != null)
@@ -321,7 +320,7 @@ public class TransactionsStore
 	public Transaction getTransaction(Player player)
 	{
 		if(player == null) return null;
-		Claim c = GriefPrevention.instance.dataStore.getClaimAt(player.getLocation(), false, null);
+		IClaim c = RealEstate.claimAPI.getClaimAt(player.getLocation());
 		return getTransaction(c);
 	}
 }

@@ -5,4 +5,6 @@ public enum ClaimPermission
     BUILD,
     CONTAINER,
     MANAGE,
+    EDIT,
+    ACCESS
 }

@@ -25,6 +25,9 @@ import com.earth2me.essentials.Essentials;
 
 import co.aikar.commands.BukkitCommandManager;
 import co.aikar.commands.ConditionFailedException;
+import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
+import me.EtienneDx.RealEstate.ClaimAPI.IClaimAPI;
+import me.EtienneDx.RealEstate.ClaimAPI.GriefPrevention.GriefPreventionAPI;
 import me.EtienneDx.RealEstate.Transactions.BoughtTransaction;
 import me.EtienneDx.RealEstate.Transactions.ClaimLease;
 import me.EtienneDx.RealEstate.Transactions.ClaimRent;
@@ -32,8 +35,6 @@ import me.EtienneDx.RealEstate.Transactions.ClaimSell;
 import me.EtienneDx.RealEstate.Transactions.ExitOffer;
 import me.EtienneDx.RealEstate.Transactions.Transaction;
 import me.EtienneDx.RealEstate.Transactions.TransactionsStore;
-import me.ryanhamshire.GriefPrevention.Claim;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
@@ -53,6 +54,8 @@ public class RealEstate extends JavaPlugin
     public static RealEstate instance = null;
     
     public static TransactionsStore transactionsStore = null;
+
+	public static IClaimAPI claimAPI = null;
 	
 	@SuppressWarnings("deprecation")
 	public void onEnable()
@@ -63,29 +66,50 @@ public class RealEstate extends JavaPlugin
         if (checkVault())
         {
             this.log.info("Vault has been detected and enabled.");
-            if (setupEconomy())
-            {
-                this.log.info("Vault is using " + econ.getName() + " as the economy plugin.");
-            }
-            else
-            {
-                this.log.warning("No compatible economy plugin detected [Vault].");
-                this.log.warning("Disabling plugin.");
-                getPluginLoader().disablePlugin(this);
-                return;
-            }
-            if (setupPermissions())
-            {
-                this.log.info("Vault is using " + perms.getName() + " for the permissions.");
-            }
-            else
-            {
-                this.log.warning("No compatible permissions plugin detected [Vault].");
-                this.log.warning("Disabling plugin.");
-                getPluginLoader().disablePlugin(this);
-                return;
-            }
         }
+		else
+		{
+			this.log.info("Vault has not been detected. RealEstate will not work without Vault.");
+			this.log.info("Disabling RealEstate...");
+			getPluginLoader().disablePlugin(this);
+			return;
+		}
+		if (setupEconomy())
+		{
+			this.log.info("Vault is using " + econ.getName() + " as the economy plugin.");
+		}
+		else
+		{
+			this.log.warning("No compatible economy plugin detected [Vault].");
+			this.log.warning("Disabling RealEstate...");
+			getPluginLoader().disablePlugin(this);
+			return;
+		}
+		if (setupPermissions())
+		{
+			this.log.info("Vault is using " + perms.getName() + " for the permissions.");
+		}
+		else
+		{
+			this.log.warning("No compatible permissions plugin detected [Vault].");
+			this.log.warning("Disabling RealEstate...");
+			getPluginLoader().disablePlugin(this);
+			return;
+		}
+
+		if(setupGriefPreventionAPI())
+		{
+			this.log.info("RealEstate is using GriefPrevention as a claim management plugin.");
+		}
+		/**Insert alternate claim APIs here**/
+		else
+		{
+			this.log.warning("No compatible Claim API detected. Please install GriefPrevention.");
+			this.log.warning("Disabling RealEstate...");
+			getPluginLoader().disablePlugin(this);
+			return;
+		}
+
         if((ess = (Essentials)getServer().getPluginManager().getPlugin("Essentials")) != null)
         {
         	this.log.info("Found Essentials, using version " + ess.getDescription().getVersion());
@@ -107,7 +131,6 @@ public class RealEstate extends JavaPlugin
         RealEstate.transactionsStore = new TransactionsStore();
         
         new REListener().registerEvents();
-        new ClaimPermissionListener().registerEvents();
         
         manager = new BukkitCommandManager(this);
         manager.enableUnstableAPI("help");
@@ -121,7 +144,7 @@ public class RealEstate extends JavaPlugin
     {
         manager.getCommandConditions().addCondition("inClaim", (context) -> {
         	if(context.getIssuer().isPlayer() && 
-        			GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null) != null)
+        			claimAPI.getClaimAt(context.getIssuer().getPlayer().getLocation()) != null)
         	{
         		return;
         	}
@@ -132,7 +155,7 @@ public class RealEstate extends JavaPlugin
         	{
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorPlayerOnly));
         	}
-        	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
+        	IClaim c = claimAPI.getClaimAt(context.getIssuer().getPlayer().getLocation());
         	if(c == null)
         	{
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
@@ -148,7 +171,7 @@ public class RealEstate extends JavaPlugin
         	{
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorPlayerOnly));
         	}
-        	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
+        	IClaim c = claimAPI.getClaimAt(context.getIssuer().getPlayer().getLocation());
         	if(c == null)
         	{
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
@@ -168,7 +191,7 @@ public class RealEstate extends JavaPlugin
         	{
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorPlayerOnly));
         	}
-        	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
+        	IClaim c = claimAPI.getClaimAt(context.getIssuer().getPlayer().getLocation());
         	if(c == null)
         	{
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
@@ -184,7 +207,7 @@ public class RealEstate extends JavaPlugin
         	{
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorPlayerOnly));
         	}
-        	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
+        	IClaim c = claimAPI.getClaimAt(context.getIssuer().getPlayer().getLocation());
         	if(c == null)
         	{
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
@@ -211,7 +234,7 @@ public class RealEstate extends JavaPlugin
         	{
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorPlayerOnly));
         	}
-        	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
+        	IClaim c = claimAPI.getClaimAt(context.getIssuer().getPlayer().getLocation());
         	if(c == null)
         	{
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
@@ -265,6 +288,16 @@ public class RealEstate extends JavaPlugin
         vaultPresent = getServer().getPluginManager().getPlugin("Vault") != null;
         return vaultPresent;
     }
+
+	private boolean setupGriefPreventionAPI()
+	{
+		if(getServer().getPluginManager().getPlugin("GriefPrevention") != null)
+		{
+			claimAPI = new GriefPreventionAPI();
+			return true;
+		}
+		return false;
+	}
 
     private boolean setupEconomy()
     {

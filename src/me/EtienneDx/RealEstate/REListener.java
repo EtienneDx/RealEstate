@@ -16,9 +16,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.PluginManager;
 
+import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 import me.EtienneDx.RealEstate.Transactions.Transaction;
-import me.ryanhamshire.GriefPrevention.Claim;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
 
 public class REListener implements Listener
 {
@@ -41,7 +40,7 @@ public class REListener implements Listener
 			Player player = event.getPlayer();
 			Location loc = event.getBlock().getLocation();
 
-			Claim claim = GriefPrevention.instance.dataStore.getClaimAt(loc, false, null);
+			IClaim claim = RealEstate.claimAPI.getClaimAt(loc);
 			if(claim == null)// must have something to sell
 			{
 				Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotInClaim);
@@ -56,14 +55,14 @@ public class REListener implements Listener
 				event.getBlock().breakNaturally();
 				return;
 			}
-			if(RealEstate.transactionsStore.anyTransaction(claim.parent))
+			if(RealEstate.transactionsStore.anyTransaction(claim.getParent()))
 			{
 				Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignParentOngoingTransaction);
 				event.setCancelled(true);
 				event.getBlock().breakNaturally();
 				return;
 			}
-			for(Claim c : claim.children)
+			for(IClaim c : claim.getChildren())
 			{
 				if(RealEstate.transactionsStore.anyTransaction(c))
 				{
@@ -85,8 +84,8 @@ public class REListener implements Listener
 					return;
 				}
 
-				String type = claim.parent == null ? "claim" : "subclaim";
-				String typeDisplay = claim.parent == null ?
+				String type = claim.isParentClaim() ? "claim" : "subclaim";
+				String typeDisplay = claim.isParentClaim() ?
 						RealEstate.instance.messages.keywordClaim : RealEstate.instance.messages.keywordSubclaim;
 				if(!RealEstate.perms.has(player, "realestate." + type + ".sell"))
 				{
@@ -134,7 +133,7 @@ public class REListener implements Listener
 						return;
 					}
 				}
-				else if(type.equals("claim") && !player.getUniqueId().equals(claim.ownerID))// only the owner may sell his claim
+				else if(type.equals("claim") && !player.getUniqueId().equals(claim.getOwner()))// only the owner may sell his claim
 				{
 					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotOwner, typeDisplay);
 					event.setCancelled(true);
@@ -156,8 +155,8 @@ public class REListener implements Listener
 					event.getBlock().breakNaturally();
 					return;
 				}
-				String type = claim.parent == null ? "claim" : "subclaim";
-				String typeDisplay = claim.parent == null ?
+				String type = claim.isParentClaim() ? "claim" : "subclaim";
+				String typeDisplay = claim.isParentClaim() ?
 						RealEstate.instance.messages.keywordClaim : RealEstate.instance.messages.keywordSubclaim;
 				if(!RealEstate.perms.has(player, "realestate." + type + ".rent"))
 				{
@@ -247,7 +246,7 @@ public class REListener implements Listener
 						return;
 					}
 				}
-				else if(type.equals("claim") && !player.getUniqueId().equals(claim.ownerID))// only the owner may sell his claim
+				else if(type.equals("claim") && !player.getUniqueId().equals(claim.getOwner()))// only the owner may sell his claim
 				{
 					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotOwner, typeDisplay);
 					event.setCancelled(true);
@@ -269,8 +268,8 @@ public class REListener implements Listener
 					event.getBlock().breakNaturally();
 					return;
 				}
-				String type = claim.parent == null ? "claim" : "subclaim";
-				String typeDisplay = claim.parent == null ?
+				String type = claim.isParentClaim() ? "claim" : "subclaim";
+				String typeDisplay = claim.isParentClaim() ?
 					RealEstate.instance.messages.keywordClaim :
 					RealEstate.instance.messages.keywordSubclaim;
 				if(!RealEstate.perms.has(player, "realestate." + type + ".lease"))
@@ -352,7 +351,7 @@ public class REListener implements Listener
 						return;
 					}
 				}
-				else if(type.equals("claim") && !player.getUniqueId().equals(claim.ownerID))// only the owner may sell his claim
+				else if(type.equals("claim") && !player.getUniqueId().equals(claim.getOwner()))// only the owner may sell his claim
 				{
 					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotOwner, typeDisplay);
 					event.setCancelled(true);
@@ -405,7 +404,7 @@ public class REListener implements Listener
 				Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false))))
 			{
 				Player player = event.getPlayer();
-				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(event.getClickedBlock().getLocation(), false, null);
+				IClaim claim = RealEstate.claimAPI.getClaimAt(event.getClickedBlock().getLocation());
 
 				if(!RealEstate.transactionsStore.anyTransaction(claim))
 				{
@@ -429,7 +428,7 @@ public class REListener implements Listener
 	{
 		if(event.getBlock().getState() instanceof Sign)
 		{
-			Claim claim = GriefPrevention.instance.dataStore.getClaimAt(event.getBlock().getLocation(), false, null);
+			IClaim claim = RealEstate.claimAPI.getClaimAt(event.getBlock().getLocation());
 			if(claim != null)
 			{
 				Transaction tr = RealEstate.transactionsStore.getTransaction(claim);

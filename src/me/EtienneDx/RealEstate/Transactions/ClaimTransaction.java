@@ -10,18 +10,18 @@ import org.bukkit.block.Sign;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 
-import me.ryanhamshire.GriefPrevention.Claim;
+import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 
 public abstract class ClaimTransaction implements ConfigurationSerializable, Transaction
 {
-	public long claimId;
+	public String claimId;
 	public UUID owner = null;
 	public double price;
 	public Location sign = null;
 	
-	public ClaimTransaction(Claim claim, Player player, double price, Location sign)
+	public ClaimTransaction(IClaim claim, Player player, double price, Location sign)
 	{
-		this.claimId = claim.getID().longValue();
+		this.claimId = claim.getId();
 		this.owner = player != null ? player.getUniqueId() : null;
 		this.price = price;
 		this.sign = sign;
@@ -29,7 +29,7 @@ public abstract class ClaimTransaction implements ConfigurationSerializable, Tra
 	
 	public ClaimTransaction(Map<String, Object> map)
 	{
-		this.claimId = Long.valueOf(String.valueOf(map.get("claimId")));
+		this.claimId = String.valueOf(map.get("claimId"));
 		if(map.get("owner") != null)
 			this.owner = UUID.fromString((String) map.get("owner"));
 		this.price = (double) map.get("price");

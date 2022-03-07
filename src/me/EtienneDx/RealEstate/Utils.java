@@ -6,10 +6,9 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
-import me.ryanhamshire.GriefPrevention.Claim;
-import me.ryanhamshire.GriefPrevention.ClaimPermission;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import me.ryanhamshire.GriefPrevention.PlayerData;
+import me.EtienneDx.RealEstate.ClaimAPI.ClaimPermission;
+import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
+import me.EtienneDx.RealEstate.ClaimAPI.IPlayerData;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 public class Utils
@@ -87,18 +86,18 @@ public class Utils
 		return time;
 	}
 	
-	public static void transferClaim(Claim claim, UUID buyer, UUID seller)
+	public static void transferClaim(IClaim claim, UUID buyer, UUID seller)
 	{
 		// blocks transfer :
 		// if transfert is true, the seller will lose the blocks he had
 		// and the buyer will get them
 		// (that means the buyer will keep the same amount of remaining blocks after the transaction)
-		if(claim.parent == null && RealEstate.instance.config.cfgTransferClaimBlocks)
+		if(claim.isParentClaim() && RealEstate.instance.config.cfgTransferClaimBlocks)
 		{
-			PlayerData buyerData = GriefPrevention.instance.dataStore.getPlayerData(buyer);
+			IPlayerData buyerData = RealEstate.claimAPI.getPlayerData(buyer);
 			if(seller != null)
 			{
-				PlayerData sellerData = GriefPrevention.instance.dataStore.getPlayerData(seller);
+				IPlayerData sellerData = RealEstate.claimAPI.getPlayerData(seller);
 				
 				// the seller has to provide the blocks
 				sellerData.setBonusClaimBlocks(sellerData.getBonusClaimBlocks() - claim.getArea());
@@ -114,21 +113,23 @@ public class Utils
 		}
 		
 		// start to change owner
-		if(claim.parent == null)
-			for(Claim child : claim.children)
+		if(claim.isParentClaim())
+		{
+			for(IClaim child : claim.getChildren())
 			{
-				child.clearPermissions();
-				child.managers.clear();
+				child.clearPlayerPermissions();
+				child.clearManagers();
 			}
-		claim.clearPermissions();
+		}
+		claim.clearPlayerPermissions();
 		
 		try
 		{
-			if(claim.parent == null)
-				GriefPrevention.instance.dataStore.changeClaimOwner(claim, buyer);
+			if(claim.isParentClaim())
+				RealEstate.claimAPI.changeClaimOwner(claim, buyer);
 			else
 			{
-				claim.setPermission(buyer.toString(), ClaimPermission.Build);
+				claim.addPlayerPermissions(buyer, ClaimPermission.BUILD);
 			}
 		}
 		catch (Exception e)// error occurs when trying to change subclaim owner
@@ -136,7 +137,7 @@ public class Utils
 			e.printStackTrace();
 			return;
 		}
-		GriefPrevention.instance.dataStore.saveClaim(claim);
+		RealEstate.claimAPI.saveClaim(claim);
 					
 	}
 	
