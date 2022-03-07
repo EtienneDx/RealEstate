@@ -44,21 +44,21 @@ public class REListener implements Listener
 			Claim claim = GriefPrevention.instance.dataStore.getClaimAt(loc, false, null);
 			if(claim == null)// must have something to sell
 			{
-				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "The sign you placed is not inside a claim!");
+				Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotInClaim);
 				event.setCancelled(true);
 				event.getBlock().breakNaturally();
 				return;
 			}
 			if(RealEstate.transactionsStore.anyTransaction(claim))
 			{
-				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "This claim already has an ongoing transaction!");
+				Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignOngoingTransaction);
 				event.setCancelled(true);
 				event.getBlock().breakNaturally();
 				return;
 			}
 			if(RealEstate.transactionsStore.anyTransaction(claim.parent))
 			{
-				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "The parent claim already has an ongoing transaction!");
+				Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignParentOngoingTransaction);
 				event.setCancelled(true);
 				event.getBlock().breakNaturally();
 				return;
@@ -67,8 +67,7 @@ public class REListener implements Listener
 			{
 				if(RealEstate.transactionsStore.anyTransaction(c))
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
-							"A subclaim of this claim already has an ongoing transaction!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignSubclaimOngoingTransaction);
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
@@ -80,16 +79,18 @@ public class REListener implements Listener
 			{
 				if(!RealEstate.instance.config.cfgEnableSell)
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Selling is disabled!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignSellingDisabled);
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
 				}
 
 				String type = claim.parent == null ? "claim" : "subclaim";
+				String typeDisplay = claim.parent == null ?
+						RealEstate.instance.messages.keywordClaim : RealEstate.instance.messages.keywordSubclaim;
 				if(!RealEstate.perms.has(player, "realestate." + type + ".sell"))
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to sell " + type + "s!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNoSellPermission, typeDisplay);
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
@@ -103,21 +104,21 @@ public class REListener implements Listener
 				}
 				catch (NumberFormatException e)
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "The price you entered is not a valid number!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidNumber, event.getLine(1));
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
 				}
 				if(price <= 0)
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "The price must be greater than 0!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorNegativePrice, event.getLine(1));
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
 				}
 				if((price%1)!=0 && !RealEstate.instance.config.cfgUseDecimalCurrency) //if the price has a decimal number AND Decimal currency is disabled
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "The price cannot have a decimal number!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorNonIntegerPrice, event.getLine(1));
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
@@ -127,7 +128,7 @@ public class REListener implements Listener
 				{
 					if(!RealEstate.perms.has(player, "realestate.admin"))// admin may sell admin claims
 					{
-						player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to sell admin claims!");
+						Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNoAdminSellPermission, typeDisplay);
 						event.setCancelled(true);
 						event.getBlock().breakNaturally();
 						return;
@@ -135,7 +136,7 @@ public class REListener implements Listener
 				}
 				else if(type.equals("claim") && !player.getUniqueId().equals(claim.ownerID))// only the owner may sell his claim
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You can only sell claims you own!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotOwner, typeDisplay);
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
@@ -150,15 +151,17 @@ public class REListener implements Listener
 			{
 				if(!RealEstate.instance.config.cfgEnableRent)
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Renting is disabled!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignRentingDisabled);
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
 				}
 				String type = claim.parent == null ? "claim" : "subclaim";
+				String typeDisplay = claim.parent == null ?
+						RealEstate.instance.messages.keywordClaim : RealEstate.instance.messages.keywordSubclaim;
 				if(!RealEstate.perms.has(player, "realestate." + type + ".rent"))
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to rent " + type + "s!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNoRentPermission, typeDisplay);
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
@@ -172,21 +175,21 @@ public class REListener implements Listener
 				}
 				catch (NumberFormatException e)
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "The price you entered is not a valid number!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidNumber, event.getLine(1));
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
 				}
 				if(price <= 0)
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "The price must be greater than 0!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorNegativePrice, event.getLine(1));
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
 				}
 				if((price%1)!=0 && !RealEstate.instance.config.cfgUseDecimalCurrency) //if the price has a decimal number AND Decimal currency is disabled
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "The price cannot have a decimal number!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorNonIntegerPrice, event.getLine(1));
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
@@ -199,9 +202,10 @@ public class REListener implements Listener
 				int duration = parseDuration(event.getLine(2));
 				if(duration == 0)
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Couldn't read the date!\n" + 
-							"Date must be formatted as follow : " + ChatColor.GREEN + "10 weeks" + ChatColor.RED + " or " + 
-							ChatColor.GREEN + "3 days" + ChatColor.RED + " or " +  ChatColor.GREEN + "1 week 3 days");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidDuration, event.getLine(2),
+						"10 weeks",
+						"3 days",
+						"1 week 3 days");
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
@@ -219,16 +223,14 @@ public class REListener implements Listener
 					}
 					catch (NumberFormatException e)
 					{
-						player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
-								"The number of rent periods you entered is not a valid number!");
+						Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidNumber, event.getLine(3));
 						event.setCancelled(true);
 						event.getBlock().breakNaturally();
 						return;
 					}
 					if(rentPeriods <= 0)
 					{
-						player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
-								"The number of rent periods must be greater than 0!");
+						Messages.sendMessage(player, RealEstate.instance.messages.msgErrorNegativeNumber, event.getLine(3));
 						event.setCancelled(true);
 						event.getBlock().breakNaturally();
 						return;
@@ -239,7 +241,7 @@ public class REListener implements Listener
 				{
 					if(!RealEstate.perms.has(player, "realestate.admin"))// admin may sell admin claims
 					{
-						player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to rent admin claims!");
+						Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNoAdminRentPermission, typeDisplay);
 						event.setCancelled(true);
 						event.getBlock().breakNaturally();
 						return;
@@ -247,7 +249,7 @@ public class REListener implements Listener
 				}
 				else if(type.equals("claim") && !player.getUniqueId().equals(claim.ownerID))// only the owner may sell his claim
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You can only rent claims you own!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotOwner, typeDisplay);
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
@@ -262,15 +264,18 @@ public class REListener implements Listener
 			{
 				if(!RealEstate.instance.config.cfgEnableLease)
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Leasing is disabled!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignLeasingDisabled);
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
 				}
 				String type = claim.parent == null ? "claim" : "subclaim";
+				String typeDisplay = claim.parent == null ?
+					RealEstate.instance.messages.keywordClaim :
+					RealEstate.instance.messages.keywordSubclaim;
 				if(!RealEstate.perms.has(player, "realestate." + type + ".lease"))
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to lease " + type + "s!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNoLeasePermission, typeDisplay);
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
@@ -284,21 +289,21 @@ public class REListener implements Listener
 				}
 				catch (NumberFormatException e)
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "The price you entered is not a valid number!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidNumber, event.getLine(1));
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
 				}
 				if(price <= 0)
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "The price must be greater than 0!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorNegativePrice, event.getLine(1));
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
 				}
 				if((price%1)!=0 && !RealEstate.instance.config.cfgUseDecimalCurrency) //if the price has a decimal number AND Decimal currency is disabled
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "The price cannot have a decimal number!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorNonIntegerPrice, event.getLine(1));
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
@@ -315,8 +320,7 @@ public class REListener implements Listener
 				}
 				catch(Exception e)
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
-							"The number of payments you enterred is not a valid number!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidNumber, event.getLine(2));
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
@@ -329,9 +333,10 @@ public class REListener implements Listener
 				int frequency = parseDuration(event.getLine(3));
 				if(frequency == 0)
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Couldn't read the date!\n" + 
-							"Date must be formatted as follow" + ChatColor.GREEN + "10 weeks" + ChatColor.RED + " or " + 
-							ChatColor.GREEN + "3 days" + ChatColor.RED + " or " +  ChatColor.GREEN + "1 week 3 days");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidDuration, event.getLine(3),
+						"10 weeks",
+						"3 days",
+						"1 week 3 days");
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
@@ -341,7 +346,7 @@ public class REListener implements Listener
 				{
 					if(!RealEstate.perms.has(player, "realestate.admin"))// admin may sell admin claims
 					{
-						player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You don't have the permission to lease admin claims!");
+						Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNoAdminLeasePermission, typeDisplay);
 						event.setCancelled(true);
 						event.getBlock().breakNaturally();
 						return;
@@ -349,7 +354,7 @@ public class REListener implements Listener
 				}
 				else if(type.equals("claim") && !player.getUniqueId().equals(claim.ownerID))// only the owner may sell his claim
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "You can only lease claims you own!");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotOwner, typeDisplay);
 					event.setCancelled(true);
 					event.getBlock().breakNaturally();
 					return;
@@ -394,16 +399,17 @@ public class REListener implements Listener
 				event.getClickedBlock().getState() instanceof Sign)
 		{
 			Sign sign = (Sign)event.getClickedBlock().getState();
+			RealEstate.instance.log.info(sign.getLine(0));
 			// it is a real estate sign
-			if(ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase(ChatColor.stripColor(RealEstate.instance.config.cfgSignsHeader)))
+			if(ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase(ChatColor.stripColor(
+				Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false))))
 			{
 				Player player = event.getPlayer();
 				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(event.getClickedBlock().getLocation(), false, null);
 
 				if(!RealEstate.transactionsStore.anyTransaction(claim))
 				{
-					player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
-							"This claim is no longer for rent, sell or lease, sorry...");
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNoTransaction);
 					event.getClickedBlock().breakNaturally();
 					event.setCancelled(true);
 					return;
@@ -432,15 +438,13 @@ public class REListener implements Listener
 					if(event.getPlayer() != null && tr.getOwner() != null  && !event.getPlayer().getUniqueId().equals(tr.getOwner()) && 
 							!RealEstate.perms.has(event.getPlayer(), "realestate.destroysigns"))
 					{
-						event.getPlayer().sendMessage(RealEstate.instance.config.chatPrefix + 
-								ChatColor.RED + "Only the author of the sell/rent/lease sign is allowed to destroy it");
+						Messages.sendMessage(event.getPlayer(), RealEstate.instance.messages.msgErrorSignNotAuthor);
 						event.setCancelled(true);
 						return;
 					}
 					else if(event.getPlayer() != null && tr.getOwner() == null && !RealEstate.perms.has(event.getPlayer(), "realestate.admin"))
 					{
-						event.getPlayer().sendMessage(RealEstate.instance.config.chatPrefix + 
-								ChatColor.RED + "Only an admin is allowed to destroy this sign");
+						Messages.sendMessage(event.getPlayer(), RealEstate.instance.messages.msgErrorSignNotAdmin);
 						event.setCancelled(true);
 						return;
 					}

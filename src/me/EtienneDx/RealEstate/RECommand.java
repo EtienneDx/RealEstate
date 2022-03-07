@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -48,7 +47,7 @@ public class RECommand extends BaseCommand
 		}
 		else
 		{
-			Messages.sendMessage(player, RealEstate.instance.messages.msgNoTransactionFound);
+			Messages.sendMessage(player, RealEstate.instance.messages.msgNoTransactionFoundHere);
 		}
 
 	}
@@ -156,29 +155,36 @@ public class RECommand extends BaseCommand
 		Location loc = player.getLocation();
 		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(loc, false, null);
 		ClaimRent cr = (ClaimRent)RealEstate.transactionsStore.getTransaction(claim);
-		String claimType = claim.parent == null ? "claim" : "subclaim";
+		String claimType = claim.parent == null ? 
+			RealEstate.instance.messages.keywordClaim : RealEstate.instance.messages.keywordSubclaim;
 		if(!RealEstate.instance.config.cfgEnableAutoRenew)
 		{
-			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Automatic renew is disabled!");
+			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorAutoRenewDisabled);
 			return;
 		}
 		if(newStatus == null)
 		{
-			Messages.sendMessage(player, RealEstate.instance.messages.msgRenewRentCurrently, cr.autoRenew ? "enabled" : "disabled", claimType);
+			Messages.sendMessage(player, RealEstate.instance.messages.msgRenewRentCurrently, cr.autoRenew ? 
+					RealEstate.instance.messages.keywordEnabled :
+					RealEstate.instance.messages.keywordDisabled,
+				claimType);
 		}
 		else if(!newStatus.equalsIgnoreCase("enable") && !newStatus.equalsIgnoreCase("disable"))
 		{
-			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Usage : /re renewrent [enable|disable]!");
+			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorCommandUsage, "/re renewrent [enable|disable]");
 		}
 		else if(cr.buyer.equals(player.getUniqueId()))
 		{
 			cr.autoRenew = newStatus.equalsIgnoreCase("enable");
 			RealEstate.transactionsStore.saveData();
-			Messages.sendMessage(player, RealEstate.instance.messages.msgRenewRentNow, cr.autoRenew ? "enabled" : "disabled", claimType);
+			Messages.sendMessage(player, RealEstate.instance.messages.msgRenewRentNow, cr.autoRenew ? 
+					RealEstate.instance.messages.keywordEnabled :
+					RealEstate.instance.messages.keywordDisabled,
+				claimType);
 		}
 		else
 		{
-			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + "Only the buyer may change this setting!");
+			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorBuyerOnly);
 		}
 	}
 	
@@ -194,24 +200,23 @@ public class RECommand extends BaseCommand
 			BoughtTransaction bt = (BoughtTransaction)RealEstate.transactionsStore.getTransaction(player);
 			if(bt.exitOffer == null)
 			{
-				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "There is currently no exit offer for this claim!");
+				Messages.sendMessage(player, RealEstate.instance.messages.msgInfoExitOfferNone);
 			}
 			else if(bt.exitOffer.offerBy.equals(player.getUniqueId()))
 			{
-				String msg = RealEstate.instance.config.chatPrefix + ChatColor.AQUA + "You offered to exit the contract for " + 
-						ChatColor.GREEN + bt.exitOffer.price + " " + RealEstate.econ.currencyNamePlural() + ChatColor.AQUA + 
-						", but your offer hasn't been accepted or denied yet...\n";
-				msg += ChatColor.AQUA + "To cancel your offer, just type " + ChatColor.LIGHT_PURPLE + "/re exitoffer cancel";
-				player.sendMessage(msg);
+				Messages.sendMessage(player, RealEstate.instance.messages.msgInfoExitOfferMadeByStatus, 
+						RealEstate.econ.format(bt.exitOffer.price));
+				Messages.sendMessage(player, RealEstate.instance.messages.msgInfoExitOfferCancel, 
+						"/re exitoffer cancel");
 			}
-			else// it is the other person
+			else// it is the other player
 			{
-				String msg = RealEstate.instance.config.chatPrefix + ChatColor.GREEN + Bukkit.getOfflinePlayer(bt.exitOffer.offerBy).getName() +
-						ChatColor.AQUA + " offered to exit the contract for " + 
-						ChatColor.GREEN + bt.exitOffer.price + " " + RealEstate.econ.currencyNamePlural() + "\n";
-				msg += ChatColor.AQUA + "To accept the offer, just type " + ChatColor.LIGHT_PURPLE + "/re exitoffer accept\n";
-				msg += ChatColor.AQUA + "To refuse the offer, just type " + ChatColor.LIGHT_PURPLE + "/re exitoffer refuse\n";
-				player.sendMessage(msg);
+				Messages.sendMessage(player, RealEstate.instance.messages.msgInfoExitOfferMadeToStatus, 
+					Bukkit.getOfflinePlayer(bt.exitOffer.offerBy).getName(), RealEstate.econ.format(bt.exitOffer.price));
+				Messages.sendMessage(player, RealEstate.instance.messages.msgInfoExitOfferAccept, 
+						"/re exitoffer accept");
+				Messages.sendMessage(player, RealEstate.instance.messages.msgInfoExitOfferReject,
+						"/re exitoffer refuse");
 			}
 		}
 		
@@ -223,40 +228,39 @@ public class RECommand extends BaseCommand
 			BoughtTransaction bt = (BoughtTransaction)RealEstate.transactionsStore.getTransaction(player);
 			if(bt.exitOffer != null)
 			{
-				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
-						"There is already an exit proposition for this transaction!");
+				Messages.sendMessage(player, RealEstate.instance.messages.msgErrorExitOfferAlreadyExists);
 				return;
 			}
 			if(bt.buyer == null)
 			{
-				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
-						"No one is engaged by this transaction yet!");
+				Messages.sendMessage(player, RealEstate.instance.messages.msgErrorExitOfferNoBuyer);
 				return;
 			}
 			bt.exitOffer = new ExitOffer(player.getUniqueId(), price);
 
-			player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + 
-					"The proposition has been successfully created!");
+			Messages.sendMessage(player, RealEstate.instance.messages.msgInfoExitOfferCreatedBySelf, 
+					RealEstate.econ.format(price));
+
 			UUID other = player.getUniqueId().equals(bt.owner) ? bt.buyer : bt.owner;
 			if(other != null)// not an admin claim
 			{
 				OfflinePlayer otherP = Bukkit.getOfflinePlayer(other);
 				Location loc = player.getLocation();
-				String claimType = GriefPrevention.instance.dataStore.getClaimAt(loc, false, null).parent == null ? "claim" : "subclaim";
+				String claimType = GriefPrevention.instance.dataStore.getClaimAt(loc, false, null).parent == null ? 
+					RealEstate.instance.messages.keywordClaim : RealEstate.instance.messages.keywordSubclaim;
+				String location = "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
+					+ loc.getBlockZ() + "]";
+
 				if(otherP.isOnline())
 				{
-					((Player)otherP).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
-							ChatColor.AQUA + " has created an offer to exit the rent/lease contract for the " + claimType + " at " + 
-							ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
-							+ loc.getBlockZ() + "]" + ChatColor.AQUA + " for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
+					Messages.sendMessage(otherP.getPlayer(), RealEstate.instance.messages.msgInfoExitOfferCreatedByOther, 
+							player.getName(), claimType, RealEstate.econ.format(price), location);
 				}
 				else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
 	        	{
 	        		User u = RealEstate.ess.getUser(other);
-	        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
-							ChatColor.AQUA + " has created an offer to exit the rent/lease contract for the " + claimType + " at " + 
-							ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
-							+ loc.getBlockZ() + "]" + ChatColor.AQUA + " for " + ChatColor.GREEN + price + " " + RealEstate.econ.currencyNamePlural());
+	        		u.addMail(Messages.getMessage(RealEstate.instance.messages.msgInfoExitOfferCreatedByOther, 
+							player.getName(), claimType, RealEstate.econ.format(price), location));
 	        	}
 			}
 		}
@@ -271,36 +275,34 @@ public class RECommand extends BaseCommand
 			String claimType = claim.parent == null ? "claim" : "subclaim";
 			if(bt.exitOffer == null)
 			{
-				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
-						"There has been no exit propositions for this transaction!");
+				Messages.sendMessage(player, RealEstate.instance.messages.msgErrorExitOfferNone);
 			}
 			else if(bt.exitOffer.offerBy.equals(player.getUniqueId()))
 			{
-				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
-						"You can't accept or refuse an offer you made!");
+				Messages.sendMessage(player, RealEstate.instance.messages.msgErrorExitOfferCantAcceptSelf);
 			}
 			else if(Utils.makePayment(player.getUniqueId(), bt.exitOffer.offerBy, bt.exitOffer.price, true, false))
 			{
-				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + 
-						"This exit offer has been accepted, the " + claimType + " is no longer rented or leased!");
+				Messages.sendMessage(player, RealEstate.instance.messages.msgInfoExitOfferAcceptedBySelf, 
+						claimType, RealEstate.econ.format(bt.exitOffer.price));
+
 				UUID other = player.getUniqueId().equals(bt.owner) ? bt.buyer : bt.owner;
+				String location = "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
+					", Z: " + loc.getBlockZ() + "]";
 				if(other != null)
 				{
 					OfflinePlayer otherP = Bukkit.getOfflinePlayer(other);
 					if(otherP.isOnline())
 					{
-						((Player)otherP).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
-								ChatColor.AQUA + " has accepted your offer to exit the rent/lease contract for the " + claimType + " at " + 
-								ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
-								", Z: " + loc.getBlockZ() + "]. It is no longer rented or leased.");
+						Messages.sendMessage(otherP.getPlayer(), RealEstate.instance.messages.msgInfoExitOfferAcceptedByOther, 
+								player.getName(), claimType, RealEstate.econ.format(bt.exitOffer.price), location);
 					}
 					else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
 		        	{
 		        		User u = RealEstate.ess.getUser(other);
-		        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
-								ChatColor.AQUA + " has accepted your offer to exit the rent/lease contract for the " + claimType + " at " + 
-								ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
-								", Z: " + loc.getBlockZ() + "]. It is no longer rented or leased.");
+						
+		        		u.addMail(Messages.getMessage(RealEstate.instance.messages.msgInfoExitOfferAcceptedByOther,
+								player.getName(), claimType, RealEstate.econ.format(bt.exitOffer.price), location));
 		        	}
 				}
 				bt.exitOffer = null;
@@ -323,37 +325,32 @@ public class RECommand extends BaseCommand
 			String claimType = claim.parent == null ? "claim" : "subclaim";
 			if(bt.exitOffer == null)
 			{
-				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
-						"There has been no exit propositions for this transaction!");
+				Messages.sendMessage(player, RealEstate.instance.messages.msgErrorExitOfferNone);
 			}
 			else if(bt.exitOffer.offerBy.equals(player.getUniqueId()))
 			{
-				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
-						"You can't accept or refuse an offer you made!");
+				Messages.sendMessage(player, RealEstate.instance.messages.msgErrorExitOfferCantRefuseSelf);
 			}
 			else
 			{
 				bt.exitOffer = null;
-				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + 
-						"This exit offer has been refused");
+				Messages.sendMessage(player, RealEstate.instance.messages.msgInfoExitOfferRejectedBySelf);
 				UUID other = player.getUniqueId().equals(bt.owner) ? bt.buyer : bt.owner;
+				String location = "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
+					", Z: " + loc.getBlockZ() + "]";
 				if(other != null)
 				{
 					OfflinePlayer otherP = Bukkit.getOfflinePlayer(other);
 					if(otherP.isOnline())
 					{
-						((Player)otherP).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
-								ChatColor.AQUA + " has refused your offer to exit the rent/lease contract for the " + claimType + " at " + 
-								ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
-								", Z: " + loc.getBlockZ() + "]");
+						Messages.sendMessage(otherP.getPlayer(), RealEstate.instance.messages.msgInfoExitOfferRejectedByOther, 
+								player.getName(), claimType, location);
 					}
 					else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
 		        	{
 		        		User u = RealEstate.ess.getUser(other);
-		        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
-								ChatColor.AQUA + " has refused your offer to exit the rent/lease contract for the " + claimType + " at " + 
-								ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
-								", Z: " + loc.getBlockZ() + "]");
+		        		u.addMail(Messages.getMessage(RealEstate.instance.messages.msgInfoExitOfferRejectedByOther,
+								player.getName(), claimType, location));
 		        	}
 				}
 			}
@@ -370,33 +367,30 @@ public class RECommand extends BaseCommand
 			if(bt.exitOffer.offerBy.equals(player.getUniqueId()))
 			{
 				bt.exitOffer = null;
-				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.AQUA + 
-						"This exit offer has been cancelled");
+				Messages.sendMessage(player, RealEstate.instance.messages.msgInfoExitOfferCancelledBySelf);
+				
 				UUID other = player.getUniqueId().equals(bt.owner) ? bt.buyer : bt.owner;
+				String location = "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + 
+					", Z: " + loc.getBlockZ() + "]";
 				if(other != null)
 				{
 					OfflinePlayer otherP = Bukkit.getOfflinePlayer(other);
 					if(otherP.isOnline())
 					{
-						((Player)otherP).sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
-								ChatColor.AQUA + " has cancelled his offer to exit the rent/lease contract for the " + claimType + " at " + 
-								ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
-								+ loc.getBlockZ() + "]");
+						Messages.sendMessage(otherP.getPlayer(), RealEstate.instance.messages.msgInfoExitOfferCancelledByOther, 
+								player.getName(), claimType, location);
 					}
 					else if(RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null)
 		        	{
 		        		User u = RealEstate.ess.getUser(other);
-		        		u.addMail(RealEstate.instance.config.chatPrefix + ChatColor.GREEN + player.getName() + 
-								ChatColor.AQUA + " has cancelled his offer to exit the rent/lease contract for the " + claimType + " at " + 
-								ChatColor.BLUE + "[" + loc.getWorld().getName() + ", X: " + loc.getBlockX() + ", Y: " + loc.getBlockY() + ", Z: "
-								+ loc.getBlockZ() + "]");
+		        		u.addMail(Messages.getMessage(RealEstate.instance.messages.msgInfoExitOfferCancelledByOther,
+								player.getName(), claimType, location));
 		        	}
 				}
 			}
 			else
 			{
-				player.sendMessage(RealEstate.instance.config.chatPrefix + ChatColor.RED + 
-						"Only the player who created this exit proposition may cancel it");
+				Messages.sendMessage(player, RealEstate.instance.messages.msgErrorExitOfferCantCancelOther);
 			}
 		}
 	}

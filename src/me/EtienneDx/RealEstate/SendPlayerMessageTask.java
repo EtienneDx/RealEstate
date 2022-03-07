@@ -17,11 +17,12 @@ class SendPlayerMessageTask implements Runnable
 	@Override
 	public void run()
 	{
-		if(player == null)
-		{
-			RealEstate.instance.log.info(message);
-		    return;
-		}
-		Messages.sendMessage(this.player, this.message);
+        if (message == null || message.length() == 0) return;
+
+        if (player == null) {
+            RealEstate.instance.log.info(message);
+        } else {
+            player.sendMessage(message);
+        }
 	}
 }

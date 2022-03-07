@@ -96,13 +96,12 @@ public class RealEstate extends JavaPlugin
         RealEstate.transactionsStore = new TransactionsStore();
         
         new REListener().registerEvents();
+        new ClaimPermissionListener().registerEvents();
         
         manager = new BukkitCommandManager(this);
         manager.enableUnstableAPI("help");
         registerConditions();
         manager.registerCommand(new RECommand());
-        
-        GriefPrevention.addonPlugins.add(new GP_RealEstateHook());
 	}
 
     private void registerConditions()
@@ -113,78 +112,78 @@ public class RealEstate extends JavaPlugin
         	{
         		return;
         	}
-        	throw new ConditionFailedException(config.chatPrefix + messages.msgErrorOutOfClaim);
+        	throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
         });
         manager.getCommandConditions().addCondition("claimHasTransaction", (context) -> {
         	if(!context.getIssuer().isPlayer())
         	{
-        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorPlayerOnly);
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorPlayerOnly));
         	}
         	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
         	if(c == null)
         	{
-        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorOutOfClaim);
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
         	}
         	Transaction tr = transactionsStore.getTransaction(c);
         	if(tr == null)
         	{
-        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorNoOngoingTransaction);
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorNoOngoingTransaction));
         	}
         });
         manager.getCommandConditions().addCondition("inPendingTransactionClaim", (context) -> {
         	if(!context.getIssuer().isPlayer())
         	{
-        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorPlayerOnly);
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorPlayerOnly));
         	}
         	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
         	if(c == null)
         	{
-        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorOutOfClaim);
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
         	}
         	Transaction tr = transactionsStore.getTransaction(c);
         	if(tr == null)
         	{
-        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorNotRentNorLease);
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorNotRentNorLease));
         	}
         	else if(tr instanceof BoughtTransaction && ((BoughtTransaction)tr).getBuyer() != null)
         	{
-        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorAlreadyBought);
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorAlreadyBought));
         	}
         });
         manager.getCommandConditions().addCondition("inBoughtClaim", (context) -> {
         	if(!context.getIssuer().isPlayer())
         	{
-        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorPlayerOnly);
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorPlayerOnly));
         	}
         	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
         	if(c == null)
         	{
-        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorOutOfClaim);
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
         	}
         	Transaction tr = transactionsStore.getTransaction(c);
         	if(tr == null || !(tr instanceof BoughtTransaction))
         	{
-        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorNotRentNorLease);
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorNotRentNorLease));
         	}
         });
         manager.getCommandConditions().addCondition("partOfBoughtTransaction", context -> {
         	if(!context.getIssuer().isPlayer())
         	{
-        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorPlayerOnly);
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorPlayerOnly));
         	}
         	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
         	if(c == null)
         	{
-        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorOutOfClaim);
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
         	}
         	Transaction tr = transactionsStore.getTransaction(c);
         	if(tr == null)
         	{
-        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorNoOngoingTransaction);
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorNoOngoingTransaction));
         	}
         	if(!(tr instanceof BoughtTransaction))
         	{
-            	throw new ConditionFailedException(config.chatPrefix + messages.msgErrorNotRentNorLease);
+            	throw new ConditionFailedException(Messages.getMessage(messages.msgErrorNotRentNorLease));
         	}
         	if((((BoughtTransaction)tr).buyer != null && ((BoughtTransaction)tr).buyer.equals(context.getIssuer().getPlayer().getUniqueId())) || 
         			(tr.getOwner() != null && (tr.getOwner().equals(context.getIssuer().getPlayer().getUniqueId()))) || 
@@ -192,26 +191,26 @@ public class RealEstate extends JavaPlugin
         	{
         		return;
         	}
-        	throw new ConditionFailedException(config.chatPrefix + messages.msgErrorNotPartOfTransaction);
+        	throw new ConditionFailedException(Messages.getMessage(messages.msgErrorNotPartOfTransaction));
         });
         manager.getCommandConditions().addCondition("partOfRent", context -> {
         	if(!context.getIssuer().isPlayer())
         	{
-        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorPlayerOnly);
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorPlayerOnly));
         	}
         	Claim c = GriefPrevention.instance.dataStore.getClaimAt(context.getIssuer().getPlayer().getLocation(), false, null);
         	if(c == null)
         	{
-        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorOutOfClaim);
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
         	}
         	Transaction tr = transactionsStore.getTransaction(c);
         	if(tr == null)
         	{
-        		throw new ConditionFailedException(config.chatPrefix + messages.msgErrorNoOngoingTransaction);
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorNoOngoingTransaction));
         	}
         	if(!(tr instanceof ClaimRent))
         	{
-            	throw new ConditionFailedException(config.chatPrefix + messages.msgErrorRentOnly);
+            	throw new ConditionFailedException(Messages.getMessage(messages.msgErrorRentOnly));
         	}
         	if((((ClaimRent)tr).buyer != null && ((ClaimRent)tr).buyer.equals(context.getIssuer().getPlayer().getUniqueId())) || 
         			(tr.getOwner() != null && (tr.getOwner().equals(context.getIssuer().getPlayer().getUniqueId()))) || 
@@ -219,11 +218,11 @@ public class RealEstate extends JavaPlugin
         	{
         		return;
         	}
-        	throw new ConditionFailedException(config.chatPrefix + messages.msgErrorNotPartOfTransaction);
+        	throw new ConditionFailedException(Messages.getMessage(messages.msgErrorNotPartOfTransaction));
         });
         manager.getCommandConditions().addCondition(Double.class, "positiveDouble", (c, exec, value) -> {
         	if(value > 0) return;
-        	throw new ConditionFailedException(config.chatPrefix + messages.msgErrorValueGreaterThanZero);
+        	throw new ConditionFailedException(Messages.getMessage(messages.msgErrorValueGreaterThanZero));
         });
 	}
 
