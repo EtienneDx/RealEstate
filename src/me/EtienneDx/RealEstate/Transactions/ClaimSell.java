@@ -83,7 +83,7 @@ public class ClaimSell extends ClaimTransaction
 	public void interact(Player player)
 	{
 		IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
-		if(claim == null)
+		if(claim == null || claim.isWilderness())
 		{
 			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimDoesNotExist);
             RealEstate.transactionsStore.cancelTransaction(claim);
@@ -223,7 +223,7 @@ public class ClaimSell extends ClaimTransaction
 	public void msgInfo(CommandSender cs)
 	{
 		IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
-		if(claim == null) {
+		if(claim == null || claim.isWilderness()) {
 			tryCancelTransaction(null, true);
 			return;
 		}

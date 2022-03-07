@@ -297,7 +297,7 @@ public class ClaimRent extends BoughtTransaction
 	public void interact(Player player)
 	{
 		IClaim claim = RealEstate.claimAPI.getClaimAt(sign);// getting by id creates errors for subclaims
-		if(claim == null)
+		if(claim == null || claim.isWilderness())
 		{
 			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimDoesNotExist);
             RealEstate.transactionsStore.cancelTransaction(claim);

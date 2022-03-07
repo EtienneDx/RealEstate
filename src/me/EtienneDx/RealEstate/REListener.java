@@ -41,7 +41,7 @@ public class REListener implements Listener
 			Location loc = event.getBlock().getLocation();
 
 			IClaim claim = RealEstate.claimAPI.getClaimAt(loc);
-			if(claim == null)// must have something to sell
+			if(claim == null || claim.isWilderness())// must have something to sell
 			{
 				Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotInClaim);
 				event.setCancelled(true);
@@ -429,7 +429,7 @@ public class REListener implements Listener
 		if(event.getBlock().getState() instanceof Sign)
 		{
 			IClaim claim = RealEstate.claimAPI.getClaimAt(event.getBlock().getLocation());
-			if(claim != null)
+			if(claim != null && !claim.isWilderness())
 			{
 				Transaction tr = RealEstate.transactionsStore.getTransaction(claim);
 				if(tr != null && event.getBlock().equals(tr.getHolder()))

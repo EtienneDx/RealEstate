@@ -130,6 +130,7 @@ public class TransactionsStore
 	public boolean anyTransaction(IClaim claim)
 	{
 		return claim != null && 
+				!claim.isWilderness() &&
 				(claimSell.containsKey(claim.getId()) || 
 						claimRent.containsKey(claim.getId()) || 
 						claimLease.containsKey(claim.getId()));

@@ -27,6 +27,7 @@ import co.aikar.commands.BukkitCommandManager;
 import co.aikar.commands.ConditionFailedException;
 import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 import me.EtienneDx.RealEstate.ClaimAPI.IClaimAPI;
+import me.EtienneDx.RealEstate.ClaimAPI.GriefDefender.GriefDefenderAPI;
 import me.EtienneDx.RealEstate.ClaimAPI.GriefPrevention.GriefPreventionAPI;
 import me.EtienneDx.RealEstate.Transactions.BoughtTransaction;
 import me.EtienneDx.RealEstate.Transactions.ClaimLease;
@@ -101,6 +102,10 @@ public class RealEstate extends JavaPlugin
 		{
 			this.log.info("RealEstate is using GriefPrevention as a claim management plugin.");
 		}
+		else if(setupGriefDefenderAPI())
+		{
+			this.log.info("RealEstate is using GriefDefender as a claim management plugin.");
+		}
 		/**Insert alternate claim APIs here**/
 		else
 		{
@@ -156,7 +161,7 @@ public class RealEstate extends JavaPlugin
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorPlayerOnly));
         	}
         	IClaim c = claimAPI.getClaimAt(context.getIssuer().getPlayer().getLocation());
-        	if(c == null)
+        	if(c == null || c.isWilderness())
         	{
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
         	}
@@ -172,7 +177,7 @@ public class RealEstate extends JavaPlugin
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorPlayerOnly));
         	}
         	IClaim c = claimAPI.getClaimAt(context.getIssuer().getPlayer().getLocation());
-        	if(c == null)
+        	if(c == null || c.isWilderness())
         	{
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
         	}
@@ -192,7 +197,7 @@ public class RealEstate extends JavaPlugin
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorPlayerOnly));
         	}
         	IClaim c = claimAPI.getClaimAt(context.getIssuer().getPlayer().getLocation());
-        	if(c == null)
+        	if(c == null || c.isWilderness())
         	{
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
         	}
@@ -208,7 +213,7 @@ public class RealEstate extends JavaPlugin
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorPlayerOnly));
         	}
         	IClaim c = claimAPI.getClaimAt(context.getIssuer().getPlayer().getLocation());
-        	if(c == null)
+        	if(c == null || c.isWilderness())
         	{
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
         	}
@@ -235,7 +240,7 @@ public class RealEstate extends JavaPlugin
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorPlayerOnly));
         	}
         	IClaim c = claimAPI.getClaimAt(context.getIssuer().getPlayer().getLocation());
-        	if(c == null)
+        	if(c == null || c.isWilderness())
         	{
         		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
         	}
@@ -294,6 +299,16 @@ public class RealEstate extends JavaPlugin
 		if(getServer().getPluginManager().getPlugin("GriefPrevention") != null)
 		{
 			claimAPI = new GriefPreventionAPI();
+			return true;
+		}
+		return false;
+	}
+
+	private boolean setupGriefDefenderAPI()
+	{
+		if(getServer().getPluginManager().getPlugin("GriefDefender") != null)
+		{
+			claimAPI = new GriefDefenderAPI();
 			return true;
 		}
 		return false;

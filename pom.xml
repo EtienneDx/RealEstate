@@ -124,6 +124,11 @@
 	        <id>ess-repo</id>
 	        <url>https://ci.ender.zone/plugin/repository/everything/</url>
 	    </repository>
+		<!-- GriefDefender repo -->
+		<repository>
+	        <id>glaremasters</id>
+	        <url>https://repo.glaremasters.me/repository/bloodshot</url>
+	    </repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -159,6 +164,12 @@
 		    <groupId>com.github.TechFortress</groupId>
 		    <artifactId>GriefPrevention</artifactId>
 		    <version>16.18</version>
+		    <scope>provided</scope>
+		</dependency>
+		<dependency>
+		    <groupId>com.griefdefender</groupId>
+		    <artifactId>api</artifactId>
+		    <version>2.0.0-20211206.072436-12</version>
 		    <scope>provided</scope>
 		</dependency>
 	    <dependency>
