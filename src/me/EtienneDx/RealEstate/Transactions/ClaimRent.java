@@ -29,8 +29,6 @@ public class ClaimRent extends BoughtTransaction
 	int duration;
 	public boolean autoRenew = false;
 	public boolean buildTrust = true;
-	public int periodCount = 0;
-	public int maxPeriod;
 	
 	public ClaimRent(Map<String, Object> map)
 	{
@@ -39,8 +37,6 @@ public class ClaimRent extends BoughtTransaction
 			startDate = LocalDateTime.parse((String) map.get("startDate"), DateTimeFormatter.ISO_DATE_TIME);
 		duration = (int)map.get("duration");
 		autoRenew = (boolean) map.get("autoRenew");
-		periodCount = (int) map.get("periodCount");
-		maxPeriod = (int) map.get("maxPeriod");
 		try {
 			buildTrust = (boolean) map.get("buildTrust");
 		}
@@ -49,11 +45,10 @@ public class ClaimRent extends BoughtTransaction
 		}
 	}
 	
-	public ClaimRent(IClaim claim, Player player, double price, Location sign, int duration, int rentPeriods, boolean buildTrust)
+	public ClaimRent(IClaim claim, Player player, double price, Location sign, int duration, boolean buildTrust)
 	{
 		super(claim, player, price, sign);
 		this.duration = duration;
-		this.maxPeriod = RealEstate.instance.config.cfgEnableRentPeriod ? rentPeriods : 1;
 		this.buildTrust = buildTrust;
 	}
 
@@ -65,8 +60,6 @@ public class ClaimRent extends BoughtTransaction
 			map.put("startDate", startDate.format(DateTimeFormatter.ISO_DATE_TIME));
 		map.put("duration", duration);
 		map.put("autoRenew",  autoRenew);
-		map.put("periodCount", periodCount);
-		map.put("maxPeriod", maxPeriod);
 		map.put("buildTrust", buildTrust);
 		
 		return map;
@@ -107,7 +100,7 @@ public class ClaimRent extends BoughtTransaction
 						price_line = price + " " + RealEstate.econ.currencyNamePlural();
 					}
 				}
-				String period = (maxPeriod > 1 ? maxPeriod + "x " : "") + Utils.getTime(duration, null, false);
+				String period = Utils.getTime(duration, null, false);
 				if(this.buildTrust) {
 					s.setLine(2, price_line);
 					s.setLine(3, period);
@@ -191,9 +184,8 @@ public class ClaimRent extends BoughtTransaction
 		String location = "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + 
 				sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]";
 		
-		if((autoRenew || periodCount + 1 < maxPeriod) && Utils.makePayment(owner, this.buyer, price, false, false))
+		if(autoRenew && Utils.makePayment(owner, this.buyer, price, false, false))
 		{
-			periodCount = (periodCount + 1) % maxPeriod;
 			startDate = LocalDateTime.now();
 			if(buyerPlayer.isOnline() && RealEstate.instance.config.cfgMessageBuyer)
 			{
@@ -334,7 +326,6 @@ public class ClaimRent extends BoughtTransaction
 			buyer = player.getUniqueId();
 			startDate = LocalDateTime.now();
 			autoRenew = false;
-			periodCount = 0;
 			claim.addPlayerPermissions(buyer, buildTrust ? ClaimPermission.BUILD : ClaimPermission.CONTAINER);
 			claim.addPlayerPermissions(player.getUniqueId(), ClaimPermission.MANAGE);
 			claim.addManager(player.getUniqueId());
@@ -405,11 +396,6 @@ public class ClaimRent extends BoughtTransaction
 						claimTypeDisplay,
 						RealEstate.econ.format(price),
 						Utils.getTime(duration, null, true)) + "\n";
-				if(maxPeriod > 1)
-				{
-					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoRentMaxPeriod,
-							maxPeriod + "") + "\n";
-				}
 
 				if(claimType.equalsIgnoreCase("claim"))
 				{
@@ -442,12 +428,6 @@ public class ClaimRent extends BoughtTransaction
 						Utils.getTime(daysLeft, timeRemaining, true),
 						Utils.getTime(duration, null, true)) + "\n";
 				
-				if(maxPeriod > 1 && maxPeriod - periodCount > 0)
-				{
-					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoRentRemainingPeriods,
-							(maxPeriod - periodCount) + "") + "\n";
-				}
-
 				if((owner != null && owner.equals(player.getUniqueId()) || buyer.equals(player.getUniqueId())) && RealEstate.instance.config.cfgEnableAutoRenew)
 				{
 					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoRentAutoRenew,

@@ -209,32 +209,6 @@ public class REListener implements Listener
 					event.getBlock().breakNaturally();
 					return;
 				}
-				int rentPeriods = 1;
-				if(RealEstate.instance.config.cfgEnableRentPeriod)
-				{
-					if(event.getLine(3).isEmpty())
-					{
-						event.setLine(3, "1");
-					}
-					try
-					{
-						rentPeriods = Integer.parseInt(event.getLine(3));
-					}
-					catch (NumberFormatException e)
-					{
-						Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidNumber, event.getLine(3));
-						event.setCancelled(true);
-						event.getBlock().breakNaturally();
-						return;
-					}
-					if(rentPeriods <= 0)
-					{
-						Messages.sendMessage(player, RealEstate.instance.messages.msgErrorNegativeNumber, event.getLine(3));
-						event.setCancelled(true);
-						event.getBlock().breakNaturally();
-						return;
-					}
-				}
 
 				if(claim.isAdminClaim())
 				{
@@ -256,7 +230,7 @@ public class REListener implements Listener
 
 				// all should be good, we can create the rent
 				event.setCancelled(true);
-				RealEstate.transactionsStore.rent(claim, player, price, event.getBlock().getLocation(), duration, rentPeriods,
+				RealEstate.transactionsStore.rent(claim, player, price, event.getBlock().getLocation(), duration,
 						RealEstate.instance.config.cfgRentKeywords.contains(event.getLine(0).toLowerCase()));
 			}
 			else if(RealEstate.instance.config.cfgLeaseKeywords.contains(event.getLine(0).toLowerCase()))// we want to rent it

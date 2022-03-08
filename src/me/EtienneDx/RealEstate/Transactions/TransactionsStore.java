@@ -225,9 +225,9 @@ public class TransactionsStore
 		}
 	}
 
-	public void rent(IClaim claim, Player player, double price, Location sign, int duration, int rentPeriods, boolean buildTrust)
+	public void rent(IClaim claim, Player player, double price, Location sign, int duration, boolean buildTrust)
 	{
-		ClaimRent cr = new ClaimRent(claim, claim.isAdminClaim() ? null : player, price, sign, duration, rentPeriods, buildTrust);
+		ClaimRent cr = new ClaimRent(claim, claim.isAdminClaim() ? null : player, price, sign, duration, buildTrust);
 		claimRent.put(claim.getId(), cr);
 		cr.update();
 		saveData();

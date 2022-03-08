@@ -5,6 +5,9 @@
 ### Added
 * Support for GriefDefender 2.0.0
 
+### Removed
+* Remove confusing *rent period* behavior
+
 ## 1.4.1
 
 ### Added

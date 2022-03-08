@@ -55,8 +55,6 @@ public class Config extends AnnotationConfig
 
     @ConfigField(name="RealEstate.Rules.AutomaticRenew", comment = "Can players renting claims enable automatic renew of their contracts?")
     public boolean cfgEnableAutoRenew = true;
-    @ConfigField(name="RealEstate.Rules.RentPeriods", comment = "Can a rent contract last multiple periods?")
-    public boolean cfgEnableRentPeriod = true;
     @ConfigField(name="RealEstate.Rules.DestroySigns.Rent", comment = "Should the rent signs get destroyed once the claim is rented?")
     public boolean cfgDestroyRentSigns = false;
     @ConfigField(name="RealEstate.Rules.DestroySigns.Lease", comment = "Should the lease signs get destroyed once the claim is leased?")
