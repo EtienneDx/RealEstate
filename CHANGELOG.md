@@ -7,6 +7,7 @@
 
 ### Removed
 * Remove confusing *rent period* behavior
+* Remove logs whenever a sign is interacted with
 
 ## 1.4.1
 
