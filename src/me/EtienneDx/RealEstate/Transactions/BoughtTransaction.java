@@ -60,9 +60,4 @@ public abstract class BoughtTransaction extends ClaimTransaction
 	{
 		return buyer;
 	}
-	
-	public void setOwner(UUID newOwner)
-	{
-		this.owner = newOwner;
-	}
 }

@@ -34,13 +34,17 @@ public class Config extends AnnotationConfig
     public List<String> cfgContainerRentKeywords = Arrays.asList("[container rent]", "[crent]");
     @ConfigField(name="RealEstate.Keywords.Lease", comment = "List of all possible possible signs headers to lease a claim")
     public List<String> cfgLeaseKeywords = Arrays.asList("[lease]", "[lease claim]", "[lc]");
+    @ConfigField(name="RealEstate.Keywords.Auction", comment = "List of all possible possible signs headers to auction a claim")
+    public List<String> cfgAuctionKeywords = Arrays.asList("[auction]", "[auction claim]", "[ac]");
 
-    @ConfigField(name="RealEstate.Keywords.Replace.Sell", comment = "What is displayed on signs for preoperties to sell")
+    @ConfigField(name="RealEstate.Keywords.Replace.Sell", comment = "What is displayed on signs for properties to sell")
     public String cfgReplaceSell = "FOR SALE";
-    @ConfigField(name="RealEstate.Keywords.Replace.Rent", comment = "What is displayed on signs for preoperties to rent")
+    @ConfigField(name="RealEstate.Keywords.Replace.Rent", comment = "What is displayed on signs for properties to rent")
     public String cfgReplaceRent = "FOR RENT";
-    @ConfigField(name="RealEstate.Keywords.Replace.Lease", comment = "What is displayed on signs for preoperties to lease")
+    @ConfigField(name="RealEstate.Keywords.Replace.Lease", comment = "What is displayed on signs for properties to lease")
     public String cfgReplaceLease = "FOR LEASE";
+    @ConfigField(name="RealEstate.Keywords.Replace.Auction", comment = "What is displayed on signs for properties to lease")
+    public String cfgReplaceAuction = "FOR AUCTION";
     @ConfigField(name="RealEstate.Keywords.Replace.Ongoing.Rent", comment = "What is displayed on the first line of the sign once someone rents a claim.")
     public String cfgReplaceOngoingRent = "[Rented]";
     @ConfigField(name="RealEstate.Keywords.Replace.ContainerRent", comment = "What is displayed on the third line of the sign when renting container access only.")
@@ -52,6 +56,13 @@ public class Config extends AnnotationConfig
     public boolean cfgEnableRent = true;
     @ConfigField(name="RealEstate.Rules.Lease", comment = "Is leasing claims enabled?")
     public boolean cfgEnableLease = true;
+    @ConfigField(name="RealEstate.Rules.Auction", comment = "Is auctionning claims enabled?")
+    public boolean cfgEnableAuction = true;
+
+    @ConfigField(name="RealEstate.Rules.CancelAuction", comment = "Can an auctionner cancel his auction if he already received offers?")
+    public boolean cfgCancelAuction = false;
+    @ConfigField(name="RealEstate.Rules.DisableOutbidSelf", comment = "Can an auctionner outbid himself?")
+    public boolean cfgDisableOutbidSelf = false;
 
     @ConfigField(name="RealEstate.Rules.AutomaticRenew", comment = "Can players renting claims enable automatic renew of their contracts?")
     public boolean cfgEnableAutoRenew = true;

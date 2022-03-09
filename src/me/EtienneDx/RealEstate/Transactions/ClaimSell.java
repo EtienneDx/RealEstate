@@ -11,7 +11,6 @@ import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 import net.md_5.bungee.api.ChatColor;
 
 import java.util.Map;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -211,12 +210,6 @@ public class ClaimSell extends ClaimTransaction
 		{
 			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimNoInfoPermission);
 		}
-	}
-
-	@Override
-	public void setOwner(UUID newOwner)
-	{
-		this.owner = newOwner;
 	}
 
 	@Override

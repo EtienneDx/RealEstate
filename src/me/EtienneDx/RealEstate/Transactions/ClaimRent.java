@@ -259,7 +259,7 @@ public class ClaimRent extends BoughtTransaction
 	{
 		if(buyer != null)
 		{
-			if(p.hasPermission("realestate.admin") && force == true)
+			if(p.hasPermission("realestate.admin") || force == true)
 			{
 				this.unRent(true);
 				RealEstate.transactionsStore.cancelTransaction(this);
@@ -267,8 +267,8 @@ public class ClaimRent extends BoughtTransaction
 			}
 			else
 			{
-				IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
 				if(p != null) {
+					IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
 					Messages.sendMessage(p, RealEstate.instance.messages.msgErrorCantCancelAlreadyRented,
 						claim.isParentClaim() ?
 							RealEstate.instance.messages.keywordClaim :

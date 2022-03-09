@@ -68,6 +68,12 @@ public abstract class ClaimTransaction implements ConfigurationSerializable, Tra
 	{
 		return owner;
 	}
+
+	@Override
+	public void setOwner(UUID newOwner)
+	{
+		this.owner = newOwner;
+	}
 	
 	@Override
 	public boolean tryCancelTransaction(Player p)
