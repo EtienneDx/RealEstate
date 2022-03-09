@@ -13,49 +13,54 @@ import net.milkbowl.vault.economy.EconomyResponse;
 
 public class Utils
 {
-    public static boolean makePayment(UUID receiver, UUID giver, double amount, boolean msgSeller, boolean msgBuyer)
+    public static boolean makePayment(UUID receiver, UUID giver, double amount, boolean msgReceiver, boolean msgGiver)
     {
     	// seller might be null if it is the server
-    	OfflinePlayer s = receiver != null ? Bukkit.getOfflinePlayer(receiver) : null, b = Bukkit.getOfflinePlayer(giver);
-    	if(!RealEstate.econ.has(b, amount))
+    	OfflinePlayer giveTo = receiver != null ? Bukkit.getOfflinePlayer(receiver) : null;
+		OfflinePlayer takeFrom = giver != null ? Bukkit.getOfflinePlayer(giver) : null;
+    	if(takeFrom != null && !RealEstate.econ.has(takeFrom, amount))
     	{
-    		if(b.isOnline() && msgBuyer)
+    		if(takeFrom.isOnline() && msgGiver)
     		{
-				Messages.sendMessage(b.getPlayer(), RealEstate.instance.messages.msgErrorNoMoneySelf);
+				Messages.sendMessage(takeFrom.getPlayer(), RealEstate.instance.messages.msgErrorNoMoneySelf);
     		}
-    		if(s != null && s.isOnline() && msgSeller)
+    		if(giveTo != null && giveTo.isOnline() && msgReceiver)
     		{
-				Messages.sendMessage(s.getPlayer(), RealEstate.instance.messages.msgErrorNoMoneyOther, b.getName());
+				Messages.sendMessage(giveTo.getPlayer(), RealEstate.instance.messages.msgErrorNoMoneyOther, takeFrom.getName());
     		}
     		return false;
     	}
-    	EconomyResponse resp = RealEstate.econ.withdrawPlayer(b, amount);
-    	if(!resp.transactionSuccess())
+		if(takeFrom != null)
+		{
+			EconomyResponse resp = RealEstate.econ.withdrawPlayer(takeFrom, amount);
+			if(!resp.transactionSuccess())
+			{
+				if(takeFrom.isOnline() && msgGiver)
+				{
+					Messages.sendMessage(takeFrom.getPlayer(), RealEstate.instance.messages.msgErrorNoWithdrawSelf);
+				}
+				if(giveTo != null && giveTo.isOnline() && msgReceiver)
+				{
+					Messages.sendMessage(giveTo.getPlayer(), RealEstate.instance.messages.msgErrorNoWithdrawOther);
+				}
+				return false;
+			}
+		}
+    	if(giveTo != null)
     	{
-    		if(b.isOnline() && msgBuyer)
-    		{
-				Messages.sendMessage(b.getPlayer(), RealEstate.instance.messages.msgErrorNoWithdrawSelf);
-    		}
-    		if(s != null && s.isOnline() && msgSeller)
-    		{
-				Messages.sendMessage(b.getPlayer(), RealEstate.instance.messages.msgErrorNoWithdrawOther);
-    		}
-    		return false;
-    	}
-    	if(s != null)
-    	{
-    		resp = RealEstate.econ.depositPlayer(s, amount);
+    		EconomyResponse resp = RealEstate.econ.depositPlayer(giveTo, amount);
     		if(!resp.transactionSuccess())
     		{
-    			if(b.isOnline() && msgBuyer)
+    			if(takeFrom != null && takeFrom.isOnline() && msgGiver)
         		{
-					Messages.sendMessage(b.getPlayer(), RealEstate.instance.messages.msgErrorNoDepositOther, s.getName());
+					Messages.sendMessage(giveTo.getPlayer(), RealEstate.instance.messages.msgErrorNoDepositOther, giveTo.getName());
         		}
-        		if(s != null && s.isOnline() && msgSeller)
+        		if(giveTo != null && giveTo.isOnline() && msgReceiver)
         		{
-					Messages.sendMessage(b.getPlayer(), RealEstate.instance.messages.msgErrorNoDepositSelf, b.getName());
+					Messages.sendMessage(takeFrom.getPlayer(), RealEstate.instance.messages.msgErrorNoDepositSelf, takeFrom.getName());
         		}
-        		RealEstate.econ.depositPlayer(b, amount);
+				// refund
+        		RealEstate.econ.depositPlayer(takeFrom, amount);
         		return false;
     		}
     	}
