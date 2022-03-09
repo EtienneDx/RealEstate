@@ -7,6 +7,9 @@ import com.griefdefender.api.event.ChangeClaimEvent;
 import com.griefdefender.api.event.Event;
 import com.griefdefender.api.event.ProcessTrustUserEvent;
 import com.griefdefender.api.event.RemoveClaimEvent;
+import com.griefdefender.lib.kyori.adventure.text.Component;
+import com.griefdefender.lib.kyori.event.EventBus;
+import com.griefdefender.lib.kyori.event.EventSubscriber;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -14,9 +17,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import me.EtienneDx.RealEstate.ClaimEvents;
 import me.EtienneDx.RealEstate.ClaimAPI.ClaimPermission;
-import net.kyori.adventure.text.Component;
-import net.kyori.event.EventBus;
-import net.kyori.event.EventSubscriber;
 
 public class GDPermissionListener
 {

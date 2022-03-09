@@ -41,8 +41,7 @@ public class GriefDefenderAPI implements IClaimAPI{
 
     @Override
     public void registerEvents() {
-        // TODO Auto-generated method stub
-        
+        new GDPermissionListener();
     }
     
 }
