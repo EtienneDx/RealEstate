@@ -450,6 +450,12 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Sign.Auction.RemainingTime", comment="0: formatted time")
     public String msgSignAuctionRemainingTime = "$b$a{0}";
 
+    @ConfigField(name="RealEstate.Sign.Auction.Ended")
+    public String msgSignAuctionEnded = "$bAuction ended";
+
+    @ConfigField(name="RealEstate.Sign.Auction.Won", comment="next line: winner")
+    public String msgSignAuctionWon = "$bAuction won by";
+
     public Messages()
     {
         this.pdf = RealEstate.instance.getDescription();

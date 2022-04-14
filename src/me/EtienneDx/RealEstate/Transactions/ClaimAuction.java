@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -64,7 +65,50 @@ public class ClaimAuction extends ClaimTransaction {
         }
         if(days < 0)
         {
-            // TODO finish auction
+            if(buyer != null)
+            {
+                IClaim claim = RealEstate.claimAPI.getClaimAt(sign);// getting by id creates errors for subclaims
+                OfflinePlayer buyerPlayer = Bukkit.getOfflinePlayer(buyer);
+                if(claim == null || claim.isWilderness())
+                {
+                    if(!Utils.makePayment(buyer, null, price, false, false))
+                    {
+                        RealEstate.instance.log.warning("Couldn't reimburse " + price + " to " + buyerPlayer.getName() + " for the auction of a deleted claim");
+                    }
+                    if(buyerPlayer.isOnline())
+                    {
+                        Messages.sendMessage(buyerPlayer.getPlayer(), RealEstate.instance.messages.msgErrorClaimDoesNotExist);
+                    }
+                    RealEstate.transactionsStore.cancelTransaction(claim);
+                }
+                else if(Utils.makePayment(owner, null, price, false, false)) {
+                    // TODO: send message to owner
+                }
+                else
+                {
+                    
+                    Utils.transferClaim(claim, buyer, owner);
+                    if(getHolder().getState() instanceof Sign)
+                    {
+                        Sign sign = (Sign) getHolder();
+                        sign.setLine(0, "");
+                        sign.setLine(1, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionWon, false));
+                        sign.setLine(2, buyerPlayer.getName());
+                        sign.setLine(3, "");
+                        sign.update();
+                    }
+                    return true;
+                }
+            }
+            if(getHolder().getState() instanceof Sign)
+            {
+                Sign sign = (Sign) getHolder();
+                sign.setLine(0, "");
+                sign.setLine(1, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionEnded, false));
+                sign.setLine(2, "");
+                sign.setLine(3, "");
+                sign.update();
+            }
             return true;
         }
         else
