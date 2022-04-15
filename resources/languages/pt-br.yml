@@ -1,0 +1,347 @@
+# Use a YAML editor like NotepadPlusPlus to edit this file.  
+# After editing, back up your changes before reloading the server in case you made a syntax error.  
+# Use dollar signs ($) for formatting codes, which are documented here: http://minecraft.gamepedia.com/Formatting_codes.
+#  You can use {0}, {1} to include the different values indicated in the comments
+RealEstate:
+  Keywords:
+    # Keywords used within other messages but with a longer text at
+      # the end just because i need to test some stuff
+    Enabled: ativado
+    Disabled: desativado
+    Claim: reivindicação
+    Subclaim: subreivindicação
+    AdminClaimPrefix: um administrador
+    ClaimPrefix: um
+    TheServer: Servidor
+  NoTransactionFound: $cNenhuma transação encontrada!
+  NoTransactionFoundHere: $cNenhuma transação encontrada em sua localização!
+  PageMustBePositive: $cA página deve ser uma opção positiva
+  PageNotExists: $cEsta página não existe!
+  # 0: enabled/disabled; 1:
+    # type of claim
+  RenewRentNow: $bA renovação automática é agora $a{0} $bpor esta {1}
+  # 0: enabled/disabled;
+    # 1: type of claim
+  RenewRentCurrently: $bA renovação automática está atualmente $a{0} $bpor esta {1}
+  Errors:
+    OutOfClaim: $cVocê deve estar dentro de uma reivindicação para usar este comando!
+    PlayerOnlyCmd: $cSomente jogadores podem executar este comando!
+    NoOngoingTransaction: $cEsta reivindicação não tem transações em andamento!
+    NotRentNorLease: $cEsta reivindicação não é nem para alugar nem para arrendar!
+    AlreadyBought: $cEsta reivindicação já tem um comprador!
+    NotPartOfTransaction: $cVocê não faz parte desta transação!
+    RentOnly: $cEste comando aplica-se apenas a sinistros alugados!
+    ValueGreaterThanZero: $cO valor deve ser maior que zero!
+    InvalidOption: $cOpção inválida fornecida!
+    ClaimInTransaction:
+      CantOwner: $cEsta reivindicação está atualmente envolvida em uma transação, você não pode modificar
+         isto!
+      CantEdit: $cEsta reivindicação está atualmente envolvida em uma transação, você não pode editar
+         isto!
+      CantAccess: $cEsta reivindicação está atualmente envolvida em uma transação, você não pode acessar
+         isto!
+      CantBuild: $cEsta reivindicação está atualmente envolvida em uma transação, você não pode criar
+         nele!
+      CantInventory: $cEsta reivindicação está atualmente envolvida em uma transação, você não pode
+         acesse seus contêineres!
+      CantManage: $cEsta reivindicação está atualmente envolvida em uma transação, você não pode gerenciar
+         isto!
+      Subclaim: $cUma sub-reivindicação está atualmente envolvida em uma transação, você não pode editar
+         ou gerencie a reivindicação dos pais!
+    Command:
+      # 0: command usage
+      Usage: '$cUso: {0}'
+    BuyerOnly: $cSomente o comprador pode realizar este comando!
+    Unexpected: $cOcorreu um erro inesperado!
+    # 0: number
+    InvalidNumber: $c{0} não é um número válido!
+    # 0: number
+    NegativeNumber: $c{0} é um número negativo!
+    # 0: price
+    NegativePrice: $cO preço deve ser maior que zero!
+    # 0: price
+    NonIntegerPrice: $cThe price must be an integer!
+    # 0: duration, 1:
+      # example of duration format, 2: example, 3:
+      # example
+    InvalidDuration: $c{0} não é uma duração válida! As durações devem estar no formato
+      $a{1}$c ou $a{2}$c ou $a{3}$c!
+    NoMoneySelf: $cVocê não tem dinheiro suficiente para fazer esta transação!
+    # 0: Other player
+    NoMoneyOther: $c{0} não tem dinheiro suficiente para fazer esta transação!
+    NoWithdrawSelf: $cNão foi possível retirar o dinheiro!
+    # 0: Other player
+    NoWithdrawOther: $cNão foi possível retirar o dinheiro de {0}!
+    # 0: Other player
+    NoDepositSelf: $cNão foi possível depositar o dinheiro para você, reembolsando {0}!
+    # 0: Other player
+    NoDepositOther: $cNão foi possível depositar o dinheiro para {0}, reembolsando você!
+    # 0: claim type
+    CantCancelAlreadyLeased: $cEste {0} está sendo alugado no momento, você não pode cancelar
+       a transação!
+    # 0: claim type
+    CantCancelAlreadyRented: $cEste {0} está sendo alugado no momento, você não pode cancelar
+       a transação!
+    AutoRenew:
+      Disabled: $cA renovação automática está desativada!
+    ExitOffer:
+      AlreadyExists: $cJá existe uma proposta de saída para esta transação!
+      NoBuyer: $cNinguém está envolvido nesta transação ainda!
+      None: $cNo momento, não há oferta de saída para esta reivindicação!
+      CantAcceptSelf: $cVocê não pode aceitar sua própria oferta de saída!
+      CantRefuseSelf: $cVocê não pode recusar sua própria oferta de saída!
+      CantCancelOther: $cApenas o jogador que criou esta proposta de saída pode cancelar
+         isto!
+    Sign:
+      NotInClaim: $cA placa que você colocou não está dentro de uma reivindicação!
+      OngoingTransaction: $cEsta reivindicação já tem uma transação em andamento!
+      ParentOngoingTransaction: $cO pai desta reivindicação já tem uma transação em andamento!
+      SubclaimOngoingTransaction: $cEsta reivindicação tem sub-reivindicações com transações em andamento!
+      SellingDisabled: $cA venda está desativada!
+      LeasingDisabled: $cA locação está desabilitada!
+      RentingDisabled: $cO aluguel está desativado!
+      # 0: claim type
+      NoSellPermission: $cVocê não tem permissão para vender isso {0}!
+      # 0: claim type
+      NoLeasePermission: $cVocê não tem permissão para alugar isso {0}!
+      # 0: claim type
+      NoRentPermission: $cVocê não tem permissão para alugar isso {0}!
+      # 0: claim type
+      NoAdminSellPermission: $cVocê não tem permissão para vender este administrador {0}!
+      # 0: claim type
+      NoAdminLeasePermission: $cVocê não tem permissão para alugar este administrador {0}!
+      # 0: claim type
+      NoAdminRentPermission: $cVocê não tem permissão para alugar este administrador {0}!
+      # 0: claim type
+      NotOwner: $cVocê só pode vender/alugar/arrendar {0} que possui!
+      NotAuthor: $cApenas o autor do sinal de venda/aluguel/arrendamento está autorizado a destruir
+         isto!
+      NotAdmin: $cApenas um administrador tem permissão para destruir este sinal!
+      NoTransaction: $cEsta reivindicação não é mais para alugar, vender ou arrendar, desculpe...
+    Claim:
+      DoesNotExist: $cEsta afirmação não existe!
+      # 0: claim type
+      AlreadyOwner: $cVocê já é o proprietário deste {0}!
+      # 0: claim type
+      NotSoldByOwner: $cEste {0} não é vendido pelo proprietário!
+      # 0: claim type
+      NotLeasedByOwner: $cEste {0} não é alugado por seu proprietário!
+      # 0: claim type
+      NotRentedByOwner: $cEste {0} não é alugado pelo proprietário!
+      # 0: claim type
+      NoBuyPermission: $cVocê não tem permissão para comprar este {0}!
+      # 0: claim type
+      NoLeasePermission: $cVocê não tem permissão para alugar este {0}!
+      # 0: claim type
+      NoRentPermission: $cVocê não tem permissão para alugar este {0}!
+      # 0: claim type
+      AlreadyLeased: $cEste {0} já está alugado!
+      # 0: claim type
+      AlreadyRented: $cEste {0} já está alugado!
+      NoInfoPermission: $cVocê não tem permissão para visualizar as informações deste imóvel!
+      # 0: area; 1:
+        # claim blocks remaining; 2: missing claim blocks
+      NoClaimBlocks: $cVocê não tem blocos de reivindicação suficientes! Você precisa $a{2}$c mais reivindicação
+         blocos para reivindicar esta área. A reivindicação exige $a{0}$c blocos de reivindicação, você só
+         tem $a{1}$c blocos de reivindicação restantes.
+  Info:
+    ExitOffer:
+      None: $bNo momento, não há oferta de saída para esta reivindicação!
+      # 0: formatted price
+      MadeByStatus: $bVocê se ofereceu para rescindir o contrato por $a{0}$b, mas sua oferta
+         ainda não foi aceito ou negado...
+      # 0: player who made the
+        # offer; 1: formatted price
+      MadeToStatus: $a{0} $bofereceu a rescisão do contrato de $a{1}
+      # 0: cancel command
+      Cancel: $bPara cancelar sua oferta, use $d{0}
+      # 0: accept command
+      Accept: $bPara aceitar esta oferta, use $d{0}
+      # 0: reject command
+      Reject: $bPara rejeitar esta oferta, use $d{0}
+      # 0: formatted price
+      CreatedBySelf: $bA oferta foi criada com sucesso para $a{0}
+      # 0: player name, 1:
+        # claim type, 2: formatted price, 3:
+        # claim location
+      CreatedByOther: $a{0} $bcriou uma oferta para sair da transação para o
+        {1} no $a{3} $bpara $a{2}
+      # 0: claim type, 1:formatted
+        # price
+      AcceptedBySelf: $bO {0} não é mais alugado ou arrendado, você foi cobrado
+        $a{1}
+      # 0: player name, 1:
+        # claim type, 2: formatted price, 3:
+        # claim location
+      AcceptedByOther: $a{0} $baceitou a oferta para sair da transação para
+         a {1} no $a{3} $bpara $a{2}. Não é mais alugado ou alugado.
+      RejectedBySelf: $bA oferta de saída foi recusada.
+      # 0: player name, 1:
+        # claim type, 2: claim location
+      RejectedByOther: $a{0} $brecusou a oferta de sair da transação para o
+        {1} no $a{2}
+      CancelledBySelf: $bA oferta de saída foi cancelada.
+      # 0: player name, 1:
+        # claim type, 2: claim location
+      CancelledByOther: $a{0} $bcancelou a oferta para sair da transação para
+        o {1} no $a{2}
+    Claim:
+      # 0: buyer name, 1:
+        # claim type, 2: formatted price, 3:
+        # claim location
+      OwnerSold: $a{0} $bcomprou o {1} no $a{3} $bpara $a{2}
+      # 0: buyer name, 1:
+        # claim type, 2: formatted price, 3:
+        # claim location, 4: payments left
+      OwnerLeaseStarted: $a{0} $balugou o {1} no $a{3} $bpara $a{2} com $a{4}
+        $bpayments left
+      # 0: buyer name, 1:
+        # claim type, 2: formatted price, 3:
+        # claim location
+      OwnerRented: $a{0} $balugou o {1} no $a{3} $bpara $a{2}
+      # 0: claim type, 1:
+        # formatted price
+      BuyerBought: $bVocê comprou o {0} para $a{1}
+      # 0: claim type, 1:
+        # formatted price, 2: payments left
+      BuyerLeaseStarted: $bVocê alugou o {0} para $a{1} com $a{2} $bpagamentos
+         restantes
+      # 0: claim type, 1:
+        # formatted price
+      BuyerRented: $bVocê alugou o {0} para $a{1}
+      Info:
+        Lease:
+          Header: $9-----= $f[$6RealEstate Arrendamento$f]$9 =-----
+          # 0: claim type, 1:
+            # payments left, 2: formatted price, 3:
+            # frequency
+          GeneralNoBuyer: $bEste {0} é para arrendado para $a{1} $bpagamentos de $a{2} cada.
+             Os pagamentos são devidos a cada $a{3}
+          # 0: claim type, 1:
+            # buyer name, 2: formatted price, 3:
+            # payments left, 4: next payment due, 5:
+            # frequency
+          GeneralBuyer: $bEste {0} está atualmente arrendado por $a{1}$b para $a{2}$b.
+            Há $a{3} $bpagamentos restantes. O próximo pagamento é em $a{4}$b. Os pagamentos são devidos
+             cada $a{5}
+          # 0: claim area, 1:
+            # location, 2: payments left, 3:
+            # period, 4: formatted price
+          Oneline: $2{0} $bblocos para $2arrendado $bat $2{1} $bpara $a{2} períodos de $a{3}$b,
+            custo de cada período $a{4}
+          # 0: claim type, 1:
+            # location, 2: formatted price, 3:
+            # payments left
+          PaymentBuyer: $bArrendamento pago para {0} no $a{1} $bpara $a{2}$b. Tem
+            $a{3} $bpagamentos restantes.
+          # 0: player name, 1:
+            # claim type, 2: location, 3:
+            # formatted price, 4: payments left
+          PaymentOwner: $a{0} $bArrendamento pago para {1} no $a{2} $bpara $a{3}$b. Tem
+            $a{4} $bpagamentos restantes.
+          # 0: claim type,
+            # 1: location, 2:
+            # formatted price
+          PaymentBuyerFinal: $bArrendamento final pago para o {0} no $a{1} $bpara $a{2}$b.
+            O {0} agora é sua propriedade.
+          # 0: player name,
+            # 1: claim type, 2:
+            # location, 3: formatted price
+          PaymentOwnerFinal: $a{0} $bArrendamento final pago para o {1} no $a{2} $bpara $a{3}$b.
+            O {1} é agora propriedade de $a{0}$b.
+          # 0: claim
+            # type, 1: location, 2:
+            # formatted price
+          PaymentBuyerCancelled: $bNão foi possível pagar o arrendamento do {0} no $a{1} $bpara
+            $a{2}$b. O arrendamento foi cancelada.
+          # 0: player
+            # name, 1: claim type, 2:
+            # location, 3: formatted price
+          PaymentOwnerCancelled: $a{0} $bnão conseguiu pagar o arrendamento do {1} no $a{2}
+            $bfor $a{3}$b. O arrendamento foi cancelada.
+        Rent:
+          Header: $9-----= $f[$6RealEstate Inf. aluguel$f]$9 =-----
+          # 0: claim type, 1:
+            # formatted price, 2: duration
+          GeneralNoBuyer: $bEste {0} é para alugar $a{1}$b por $a{2}$b.
+          # 0: claim type, 1:
+            # buyer name, 2: formatted price, 3:
+            # time left in current period, 4: duration
+            # of a period
+          GeneralBuyer: $bEste {0} atualmente é alugado por $a{1}$b para $a{2}$b. O
+            {0} é alugado para outro $a{3}$b. O período de aluguel é $a{4}
+          # 0: enabled / disabled
+          AutoRenew: $bA renovação automática está atualmente $a{0}$b.
+          # 0: claim area, 1:
+            # location, 2: formatted price, 3:
+            # duration
+          Oneline: $2{0} $bblocos para $2aluguel $bno $2{1} $bpara $a{2}$b por $a{3}
+          # 0: claim type, 1:
+            # location, 2: formatted price
+          PaymentBuyer: $bAluguel pago para {0} no $a{1} $bpara $a{2}$b.
+          # 0: player name, 1:
+            # claim type, 2: location, 3:
+            # formatted price
+          PaymentOwner: $a{0} $baluguel pago para {1} no $a{2} $bpara $a{3}$b.
+          # 0: claim
+            # type, 1: location, 2:
+            # formatted price
+          PaymentBuyerCancelled: $bNão foi possível pagar o aluguel do {0} no $a{1} $bpara
+            $a{2}$b. O aluguel foi cancelado.
+          # 0: player
+            # name, 1: claim type, 2:
+            # location, 3: formatted price
+          PaymentOwnerCancelled: $a{0} $bnão podia pagar o aluguel do {1} no $a{2}
+            $bpara $a{3}$b. O aluguel foi cancelado.
+          # 0: claim type, 1:
+            # location
+          RentCancelled: $bO aluguel para {0} at $a{1} $bacabou, sua permissão
+             foi revogado.
+        Sell:
+          Header: $9-----= $f[$6RealEstate inf. venda$f]$9 =-----
+          # 0: claim type, 1:
+            # formatted price
+          General: $bEste {0} está à venda para $a{1}
+          # 0: claim area, 1:
+            # location, 2: formatted price
+          Oneline: $2{0} $bblocos para $2Vender $bat $2{1} $bpara $a{2}
+        # 0: owner name
+        Owner: $bO atual proprietário é $a{0}
+        # 0: owner name
+        MainOwner: $bO proprietário da reivindicação principal é $a{0}
+        Note: '$dObs: você só terá acesso a esta sub-reivindicação'
+      Created:
+        # 0: claim prefix, 1:
+          # claim type, 2: formatted price
+        Sell: $bVocê criou com sucesso {0} {1} venda para $a{2}
+        # 0: claim prefix, 1:
+          # claim type, 2: formatted price, 3:
+          # payments count, 4: frequency
+        Lease: $bVocê criou com sucesso {0} {1} arrendamento para $a{3}$b pagamentos
+           do $a{2}$b cada. Os pagamentos são devidos a cada $a{4}
+        # 0: claim prefix, 1:
+          # claim type, 2: formatted price, 3:
+          # duration
+        Rent: $bVocê criou com sucesso {0} {1} aluguel para $a{2}$b por $a{3}
+        # 0: player name, 1:
+          # claim prefix, 2: claim type, 3:
+          # formatted price
+        SellBroadcast: $a{0} $bcriou {1} {2} venda em $a{3}
+        # 0: player name, 1:
+          # claim prefix, 2: claim type, 3:
+          # formatted price, 4: payments count, 5:
+          # frequency
+        LeaseBroadcast: $a{0} $bcriou {1} {2} arrendamento para $a{4}$b pagamentos de
+          $a{3}$b cada. Os pagamentos são debitado a cada $a{5}
+        # 0: player name, 1:
+          # claim prefix, 2: claim type, 3:
+          # formatted price, 4: duration
+        RentBroadcast: $a{0} $bcriou {1} {2} aluguel em $a{3}$b por $a{4}
+  List:
+    # 0: RE Offers|Sell Offers|Rent
+      # Offers|Lease Offers; 1: Page number; 2:
+      # Page count
+    Header: $1----= $f[ $6{0} página $2 {1} $6/ $2{2} $f] $1=----
+    # 0: all|sell|rent|lease; 1:
+      # next page number
+    NextPage: $6Para ver a próxima página, digite $a/re list {0} {1}

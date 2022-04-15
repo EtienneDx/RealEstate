@@ -3,8 +3,19 @@ package me.EtienneDx.RealEstate;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -102,6 +113,8 @@ public class RealEstate extends JavaPlugin
         manager.enableUnstableAPI("help");
         registerConditions();
         manager.registerCommand(new RECommand());
+
+		copyResourcesIntoPluginDirectory();
 	}
 
     private void registerConditions()
@@ -269,4 +282,75 @@ public class RealEstate extends JavaPlugin
         perms = (Permission)rsp.getProvider();
         return perms != null;
     }
+
+	private void copyResourcesIntoPluginDirectory()
+	{
+		Path pluginPath = Paths.get(RealEstate.pluginDirPath);
+		File pluginDirectory = pluginPath.toFile();
+		if(!pluginDirectory.exists())
+		{
+			pluginDirectory.mkdirs();
+		}
+		// for each file in the resource folder
+		FileSystem fileSystem = null;
+		try
+		{
+			URI uri = RealEstate.class.getResource("/resources").toURI();
+			Path myPath;
+
+			if (uri.getScheme().equals("jar"))
+			{
+				fileSystem = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
+				myPath = fileSystem.getPath("/resources");
+			}
+			else
+			{
+				myPath = Paths.get(uri);
+			}
+			
+			try(Stream<Path> walk = Files.walk(myPath, 3))
+			{
+				Iterator<Path> it = walk.iterator();
+				it.next();// skip first
+				for (; it.hasNext();)
+				{
+					Path path = it.next();
+					Path targetPath = pluginPath.resolve(path.toString().substring(11));
+					this.log.info(path.toString());
+					this.log.info(targetPath.toString());
+					if(!targetPath.toFile().exists())
+					{
+						Files.createDirectories(targetPath.getParent());
+						try(InputStream s = RealEstate.class.getResourceAsStream(path.toString()))
+						{
+							if(s.available() > 0)
+							{
+								Files.copy(s, targetPath);
+							}
+						}
+						catch(NoSuchFileException e)
+						{
+							// ignore
+						}
+					}
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			this.log.warning("Couldn't copy resources to plugin directory...");
+			e.printStackTrace();
+		}
+		if(fileSystem != null)
+		{
+			try
+			{
+				fileSystem.close();
+			}
+			catch(IOException e)
+			{
+				// do nothing in case of error
+			}
+		}
+	}
 }
