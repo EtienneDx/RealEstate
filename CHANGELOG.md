@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.1 - Unreleased
+
+### Fixed
+* Fixed #47 regarding `/re info` command formating
+* Fixed #50 regarding error with `/re renewrent` on claims with no buyer
+* Fixed #51 regarding a duplicate prefix on `/re info`
+
 ## 1.4.0
 
 ### Added
