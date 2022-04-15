@@ -2,6 +2,10 @@
 
 ## 1.4.1 - Unreleased
 
+### Added
+* Added support for multiple languages files within the jar
+* Added `pt-br` as a language option
+
 ### Fixed
 * Fixed #47 regarding `/re info` command formating
 * Fixed #50 regarding error with `/re renewrent` on claims with no buyer

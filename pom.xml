@@ -19,6 +19,10 @@
 					<include>plugin.yml</include>
 				</includes>
 			</resource>
+			<resource>
+				<directory>./resources</directory>
+				<targetPath>./resources</targetPath>
+			</resource>
 		</resources>
 		<plugins>
 			<plugin>
