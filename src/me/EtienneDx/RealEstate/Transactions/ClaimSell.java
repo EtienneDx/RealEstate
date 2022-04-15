@@ -206,7 +206,7 @@ public class ClaimSell extends ClaimTransaction
 						claim.parent.getOwnerName()) + "\n";
 				msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoNote) + "\n";
 			}
-			Messages.sendMessage(player, msg);
+			Messages.sendMessage(player, msg, false);
 		}
 		else
 		{

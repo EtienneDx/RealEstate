@@ -467,7 +467,7 @@ public class ClaimRent extends BoughtTransaction
 							claim.parent.getOwnerName()) + "\n";
 				}
 			}
-			Messages.sendMessage(player, msg);
+			Messages.sendMessage(player, msg, false);
 		}
 		else
 		{
