@@ -472,6 +472,11 @@ public class Messages extends AnnotationConfig
         sendMessage(player, getMessage(message), 0);
     }
 
+    //sends a color-coded message to a player
+    public static void sendMessage(CommandSender player, String message, Boolean fixColors) {
+        sendMessage(player, fixColors ? getMessage(message) : message, 0);
+    }
+
     public static void sendMessage(CommandSender player, String message, long delayInTicks) {
         SendPlayerMessageTask task = new SendPlayerMessageTask(player, message);
 

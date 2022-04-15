@@ -468,7 +468,7 @@ public class ClaimLease extends BoughtTransaction
 							claim.parent.getOwnerName()) + "\n";
 				}
 			}
-			Messages.sendMessage(player, msg);
+			Messages.sendMessage(player, msg, false);
 		}
 		else
 		{

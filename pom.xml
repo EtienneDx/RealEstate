@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>Me.EtienneDx</groupId>
 	<artifactId>real-estate</artifactId>
-	<version>1.4.0</version>
+	<version>1.4.1</version>
 	<name>RealEstate</name>
 	<description>A spigot plugin for selling, renting and leasing GriefPrevention claims</description>
 	<build>
