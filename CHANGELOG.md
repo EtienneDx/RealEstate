@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.4.1 - Unreleased
+## 1.4.1
 
 ### Added
 * Added support for multiple languages files within the jar
