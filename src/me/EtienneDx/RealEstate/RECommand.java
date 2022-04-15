@@ -173,7 +173,7 @@ public class RECommand extends BaseCommand
 		{
 			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorCommandUsage, "/re renewrent [enable|disable]");
 		}
-		else if(cr.buyer.equals(player.getUniqueId()))
+		else if(cr.buyer != null && cr.buyer.equals(player.getUniqueId()))
 		{
 			cr.autoRenew = newStatus.equalsIgnoreCase("enable");
 			RealEstate.transactionsStore.saveData();
