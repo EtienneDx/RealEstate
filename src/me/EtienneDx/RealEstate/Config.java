@@ -90,17 +90,24 @@ public class Config extends AnnotationConfig
     @ConfigField(name="RealEstate.Messaging.MailOffline", comment = "Should offline owner/buyers receive mails (using the Essentials plugin) when they're offline?")
     public boolean cfgMailOffline = true;
 
-    @ConfigField(name="RealEstate.Default.PricesPerBlock.Sell", comment = "Chat is the default price per block when selling a claim")
+    @ConfigField(name="RealEstate.Default.PricesPerBlock.Sell", comment = "The default price per block when selling a claim")
     public double cfgPriceSellPerBlock = 5.0;
-    @ConfigField(name="RealEstate.Default.PricesPerBlock.Rent", comment = "Chat is the default price per block when renting a claim")
+    @ConfigField(name="RealEstate.Default.PricesPerBlock.Rent", comment = "The default price per block when renting a claim")
     public double cfgPriceRentPerBlock = 2.0;
-    @ConfigField(name="RealEstate.Default.PricesPerBlock.Lease", comment = "Chat is the default price per block when leasing a claim")
+    @ConfigField(name="RealEstate.Default.PricesPerBlock.Lease", comment = "The default price per block when leasing a claim")
     public double cfgPriceLeasePerBlock = 2.0;
+    @ConfigField(name="RealEstate.Default.PricesPerBlock.Auction", comment = "The default price per block when auctioning a claim")
+    public double cfgPriceAuctionPerBlock = 1.0;
+    @ConfigField(name="RealEstate.Default.Prices.AuctionBidStep", comment = "The default bid step when auctioning a claim")
+    public double cfgPriceAuctionBidStep = 2.0;
+
 
     @ConfigField(name="RealEstate.Default.Duration.Rent", comment = "How long is a rent period by default")
     public String cfgRentTime = "7D";
     @ConfigField(name="RealEstate.Default.Duration.Lease", comment = "How long is a lease period by default")
     public String cfgLeaseTime = "7D";
+    @ConfigField(name="RealEstate.Default.Duration.Auction", comment = "How long is an auction period by default")
+    public String cfgAuctionTime = "7D";
 
     @ConfigField(name="RealEstate.Default.LeasePaymentsCount", comment = "How many lease periods are required before the buyer gets the claim's ownership by default")
     public int cfgLeasePayments = 5;

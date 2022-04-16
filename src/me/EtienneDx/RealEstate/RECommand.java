@@ -25,6 +25,7 @@ import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
 import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 import me.EtienneDx.RealEstate.Transactions.BoughtTransaction;
+import me.EtienneDx.RealEstate.Transactions.ClaimAuction;
 import me.EtienneDx.RealEstate.Transactions.ClaimRent;
 import me.EtienneDx.RealEstate.Transactions.ExitOffer;
 import me.EtienneDx.RealEstate.Transactions.Transaction;
@@ -392,6 +393,18 @@ public class RECommand extends BaseCommand
 				Messages.sendMessage(player, RealEstate.instance.messages.msgErrorExitOfferCantCancelOther);
 			}
 		}
+	}
+
+	@Subcommand("bid")
+	@Conditions("claimIsAuctioned")
+	@CommandPermission("realestate.bid")
+	@Syntax("<bid>")
+	public static void bid(Player player, @Conditions("positiveDouble") double bid)
+	{
+		Location loc = player.getLocation();
+		IClaim claim = RealEstate.claimAPI.getClaimAt(loc);
+		ClaimAuction ca = (ClaimAuction)RealEstate.transactionsStore.getTransaction(claim);
+		ca.bid(player, bid);
 	}
 	
 	@Subcommand("cancel")

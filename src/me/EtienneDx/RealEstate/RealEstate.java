@@ -30,6 +30,7 @@ import me.EtienneDx.RealEstate.ClaimAPI.IClaimAPI;
 import me.EtienneDx.RealEstate.ClaimAPI.GriefDefender.GriefDefenderAPI;
 import me.EtienneDx.RealEstate.ClaimAPI.GriefPrevention.GriefPreventionAPI;
 import me.EtienneDx.RealEstate.Transactions.BoughtTransaction;
+import me.EtienneDx.RealEstate.Transactions.ClaimAuction;
 import me.EtienneDx.RealEstate.Transactions.ClaimLease;
 import me.EtienneDx.RealEstate.Transactions.ClaimRent;
 import me.EtienneDx.RealEstate.Transactions.ClaimSell;
@@ -131,6 +132,7 @@ public class RealEstate extends JavaPlugin
         ConfigurationSerialization.registerClass(ClaimSell.class);
         ConfigurationSerialization.registerClass(ClaimRent.class);
         ConfigurationSerialization.registerClass(ClaimLease.class);
+        ConfigurationSerialization.registerClass(ClaimAuction.class);
         ConfigurationSerialization.registerClass(ExitOffer.class);
         
         RealEstate.transactionsStore = new TransactionsStore();
@@ -265,6 +267,26 @@ public class RealEstate extends JavaPlugin
         	if(value > 0) return;
         	throw new ConditionFailedException(Messages.getMessage(messages.msgErrorValueGreaterThanZero));
         });
+		manager.getCommandConditions().addCondition("claimIsAuctioned", (context) -> {
+			if(!context.getIssuer().isPlayer())
+			{
+				throw new ConditionFailedException(Messages.getMessage(messages.msgErrorPlayerOnly));
+			}
+			IClaim c = claimAPI.getClaimAt(context.getIssuer().getPlayer().getLocation());
+			if(c == null || c.isWilderness())
+			{
+				throw new ConditionFailedException(Messages.getMessage(messages.msgErrorOutOfClaim));
+			}
+        	Transaction tr = transactionsStore.getTransaction(c);
+        	if(tr == null)
+        	{
+        		throw new ConditionFailedException(Messages.getMessage(messages.msgErrorNoOngoingTransaction));
+        	}
+        	if(!(tr instanceof ClaimAuction))
+        	{
+            	throw new ConditionFailedException(Messages.getMessage(messages.msgErrorAuctionOnly));
+        	}
+		});
 	}
 
 	public void addLogEntry(String entry)
