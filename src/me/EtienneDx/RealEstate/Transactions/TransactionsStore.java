@@ -206,7 +206,9 @@ public class TransactionsStore
 	
 	public boolean canCancelTransaction(Transaction tr)
 	{
-		return tr instanceof ClaimSell || tr instanceof ClaimAuction || (tr instanceof ClaimRent && ((ClaimRent)tr).buyer == null) || 
+		return tr instanceof ClaimSell ||
+				(tr instanceof ClaimAuction && ((ClaimRent)tr).buyer == null || RealEstate.instance.config.cfgCancelAuction) ||
+				(tr instanceof ClaimRent && ((ClaimRent)tr).buyer == null) ||
 				(tr instanceof ClaimLease && ((ClaimLease)tr).buyer == null);
 	}
 
