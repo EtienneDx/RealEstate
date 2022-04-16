@@ -6,6 +6,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,6 +33,7 @@ public class TransactionsStore
     public HashMap<String, ClaimSell> claimSell;
     public HashMap<String, ClaimRent> claimRent;
     public HashMap<String, ClaimLease> claimLease;
+    public HashMap<String, ClaimAuction> claimAuction;
     
     public TransactionsStore()
     {
@@ -42,18 +44,25 @@ public class TransactionsStore
 			@Override
 			public void run()
 			{
-				Iterator<ClaimRent> ite = claimRent.values().iterator();
-				while(ite.hasNext())
+				Iterator<ClaimRent> it1 = claimRent.values().iterator();
+				while(it1.hasNext())
 				{
-					if(ite.next().update())
-						ite.remove();
+					if(it1.next().update())
+						it1.remove();
 				}
 
-				Iterator<ClaimLease> it = claimLease.values().iterator();
-				while(it.hasNext())
+				Iterator<ClaimLease> it2 = claimLease.values().iterator();
+				while(it2.hasNext())
 				{
-					if(it.next().update())
-						it.remove();
+					if(it2.next().update())
+						it2.remove();
+				}
+
+				Iterator<ClaimAuction> it3 = claimAuction.values().iterator();
+				while(it3.hasNext())
+				{
+					if(it3.next().update())
+						it3.remove();
 				}
 				saveData();
 			}
@@ -65,6 +74,7 @@ public class TransactionsStore
     	claimSell = new HashMap<>();
     	claimRent = new HashMap<>();
     	claimLease = new HashMap<>();
+    	claimAuction = new HashMap<>();
     	
     	File file = new File(this.dataFilePath);
     	
@@ -79,6 +89,7 @@ public class TransactionsStore
 	    	ConfigurationSection sell = config.getConfigurationSection("Sell");
 	    	ConfigurationSection rent = config.getConfigurationSection("Rent");
 	    	ConfigurationSection lease = config.getConfigurationSection("Lease");
+	    	ConfigurationSection auction = config.getConfigurationSection("Auction");
 	    	if(sell != null)
 	    	{
 	    		RealEstate.instance.addLogEntry(sell.toString());
@@ -105,6 +116,14 @@ public class TransactionsStore
 					claimLease.put(key, cl);
 		    	}
 			}
+	    	if(auction != null)
+	    	{
+				for(String key : auction.getKeys(false))
+				{
+					ClaimAuction cl = (ClaimAuction)auction.get(key);
+					claimAuction.put(key, cl);
+		    	}
+			}
     	}
     }
     
@@ -115,8 +134,10 @@ public class TransactionsStore
             config.set("Sell." + cs.claimId, cs);
         for (ClaimRent cr : claimRent.values())
             config.set("Rent." + cr.claimId, cr);
-        for (ClaimLease cl : claimLease.values())
-            config.set("Lease." + cl.claimId, cl);
+		for (ClaimLease cl : claimLease.values())
+			config.set("Lease." + cl.claimId, cl);
+		for (ClaimAuction cl : claimAuction.values())
+			config.set("Auction." + cl.claimId, cl);
         try
         {
 			config.save(new File(this.dataFilePath));
@@ -133,7 +154,8 @@ public class TransactionsStore
 				!claim.isWilderness() &&
 				(claimSell.containsKey(claim.getId()) || 
 						claimRent.containsKey(claim.getId()) || 
-						claimLease.containsKey(claim.getId()));
+						claimLease.containsKey(claim.getId()) || 
+						claimAuction.containsKey(claim.getId()));
 	}
 
 	public Transaction getTransaction(IClaim claim)
@@ -144,6 +166,8 @@ public class TransactionsStore
 			return claimRent.get(claim.getId());
 		if(claimLease.containsKey(claim.getId()))
 			return claimLease.get(claim.getId());
+		if(claimAuction.containsKey(claim.getId()))
+			return claimAuction.get(claim.getId());
 		return null;
 	}
 
@@ -173,12 +197,16 @@ public class TransactionsStore
 		{
 			claimLease.remove(String.valueOf(((ClaimLease) tr).claimId));
 		}
+		if(tr instanceof ClaimAuction)
+		{
+			claimAuction.remove(String.valueOf(((ClaimAuction) tr).claimId));
+		}
 		saveData();
 	}
 	
 	public boolean canCancelTransaction(Transaction tr)
 	{
-		return tr instanceof ClaimSell || (tr instanceof ClaimRent && ((ClaimRent)tr).buyer == null) || 
+		return tr instanceof ClaimSell || tr instanceof ClaimAuction || (tr instanceof ClaimRent && ((ClaimRent)tr).buyer == null) || 
 				(tr instanceof ClaimLease && ((ClaimLease)tr).buyer == null);
 	}
 
@@ -313,6 +341,56 @@ public class TransactionsStore
 							RealEstate.econ.format(price),
 							paymentsCount + "",
 							Utils.getTime(frequency, null, false));
+				}
+			}
+		}
+	}
+
+	public void auction(IClaim claim, Player player, double price, Location sign, int duration, double bidStep)
+	{
+		LocalDateTime endDate = LocalDateTime.now().plusDays(duration);
+		ClaimAuction ca = new ClaimAuction(claim, claim.isAdminClaim() ? null : player, price, sign, endDate, bidStep);
+		claimAuction.put(claim.getId(), ca);
+		ca.update();
+		saveData();
+		
+		RealEstate.instance.addLogEntry("[" + this.dateFormat.format(this.date) + "] " + (player == null ? "The Server" : player.getName()) + 
+				" has made " + (claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.isParentClaim() ? "claim" : "subclaim") + " for auction at " +
+				"[" + claim.getWorld() + ", " +
+                "X: " + claim.getX() + ", " +
+                "Y: " + claim.getY() + ", " +
+                "Z: " + claim.getZ() + "] " +
+                "Price: " + price + " " + RealEstate.econ.currencyNamePlural() +
+				"Bid Step: " + bidStep + " " + RealEstate.econ.currencyNamePlural() +
+				"End Date: " + endDate.toString());
+	
+		String claimPrefix = claim.isAdminClaim() ? RealEstate.instance.messages.keywordAdminClaimPrefix :
+				RealEstate.instance.messages.keywordClaimPrefix;
+		String claimTypeDisplay = claim.isParentClaim() ? RealEstate.instance.messages.keywordClaim :
+				RealEstate.instance.messages.keywordSubclaim;
+
+		if(player != null)
+		{
+			Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimCreatedAuction,
+					claimPrefix,
+					claimTypeDisplay,
+					RealEstate.econ.format(price),
+					RealEstate.econ.format(bidStep),
+					Utils.getTime(duration, null, false));
+		}
+		if(RealEstate.instance.config.cfgBroadcastSell)
+		{
+			for(Player p : Bukkit.getServer().getOnlinePlayers())
+			{
+				if(p != player)
+				{
+					Messages.sendMessage(p, RealEstate.instance.messages.msgInfoClaimCreatedAuctionBroadcast,
+							player == null ? RealEstate.instance.messages.keywordTheServer : player.getDisplayName(),
+							claimPrefix,
+							claimTypeDisplay,
+							RealEstate.econ.format(price),
+							RealEstate.econ.format(bidStep),
+							Utils.getTime(duration, null, false));
 				}
 			}
 		}

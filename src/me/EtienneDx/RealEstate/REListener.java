@@ -35,7 +35,8 @@ public class REListener implements Listener
 		if(RealEstate.instance.config.cfgSellKeywords.contains(event.getLine(0).toLowerCase()) || 
 				RealEstate.instance.config.cfgLeaseKeywords.contains(event.getLine(0).toLowerCase()) || 
 				RealEstate.instance.config.cfgRentKeywords.contains(event.getLine(0).toLowerCase()) || 
-				RealEstate.instance.config.cfgContainerRentKeywords.contains(event.getLine(0).toLowerCase()))
+				RealEstate.instance.config.cfgContainerRentKeywords.contains(event.getLine(0).toLowerCase()) ||
+				RealEstate.instance.config.cfgAuctionKeywords.contains(event.getLine(0).toLowerCase()))
 		{
 			Player player = event.getPlayer();
 			Location loc = event.getBlock().getLocation();
@@ -336,6 +337,108 @@ public class REListener implements Listener
 				// all should be good, we can create the rent
 				event.setCancelled(true);
 				RealEstate.transactionsStore.lease(claim, player, price, event.getBlock().getLocation(), frequency, paymentsCount);
+			}
+			else if(RealEstate.instance.config.cfgAuctionKeywords.contains(event.getLine(0).toLowerCase()))
+			{
+				if(!RealEstate.instance.config.cfgEnableAuction)
+				{
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignAuctionDisabled);
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+				String type = claim.isParentClaim() ? "claim" : "subclaim";
+				String typeDisplay = claim.isParentClaim() ?
+					RealEstate.instance.messages.keywordClaim :
+					RealEstate.instance.messages.keywordSubclaim;
+				if(!RealEstate.perms.has(player, "realestate." + type + ".auction"))
+				{
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNoAuctionPermission, typeDisplay);
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+
+				// check for a valid price
+				double price;
+				try
+				{
+					price = getDouble(event, 1, RealEstate.instance.config.cfgPriceAuctionPerBlock * claim.getArea());
+				}
+				catch (NumberFormatException e)
+				{
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidNumber, event.getLine(1));
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+				if(price <= 0)
+				{
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorNegativePrice, event.getLine(1));
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+
+				// check for a valied bid step
+				double bidStep;
+				try
+				{
+					bidStep = getDouble(event, 2, RealEstate.instance.config.cfgPriceAuctionBidStep);
+				}
+				catch (NumberFormatException e)
+				{
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidNumber, event.getLine(2));
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+				if(bidStep <= 0)
+				{
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorNegativeBidStep, event.getLine(2));
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+
+				// check for a valid duration
+				if(event.getLine(3).isEmpty())
+				{
+					event.setLine(3, RealEstate.instance.config.cfgLeaseTime);
+				}
+				int duration = parseDuration(event.getLine(3));
+				if(duration == 0)
+				{
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidDuration, event.getLine(3),
+						"10 weeks",
+						"3 days",
+						"1 week 3 days");
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+
+				if(claim.isAdminClaim())
+				{
+					if(!RealEstate.perms.has(player, "realestate.admin"))// admin may sell admin claims
+					{
+						Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNoAdminAuctionPermission, typeDisplay);
+						event.setCancelled(true);
+						event.getBlock().breakNaturally();
+						return;
+					}
+				}
+				else if(type.equals("claim") && !player.getUniqueId().equals(claim.getOwner()))// only the owner may sell his claim
+				{
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotOwner, typeDisplay);
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+
+				// all should be good, we can create the auction
+				event.setCancelled(true);
+				RealEstate.transactionsStore.auction(claim, player, price, event.getBlock().getLocation(), duration, bidStep);
 			}
 		}
 	}

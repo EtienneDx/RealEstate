@@ -16,7 +16,7 @@ commands:
     
 permissions:
   realestate.*:
-    description: Gives access to all Real Estate permissions
+    description: Gives access to all Real Estate permissions (including admin!)
     default: op
     children:
       realestate.info: true
@@ -59,7 +59,21 @@ permissions:
     description: Allows the player to sell and lease admin claims, as well as see plugin informations
     default: op
     children:
-      realestate.*: true
+      realestate.info: true
+      realestate.destroysigns: true
+      realestate.claim.buy: true
+      realestate.claim.sell: true
+      realestate.claim.rent: true
+      realestate.claim.lease: true
+      realestate.claim.auction: true
+      realestate.claim.bid: true
+      realestate.subclaim.buy: true
+      realestate.subclaim.sell: true
+      realestate.subclaim.rent: true
+      realestate.subclaim.lease: true
+      realestate.subclaim.auction: true
+      realestate.subclaim.bid: true
+      realestate.autorenew: true
   realestate.info:
     description: Allow the player to get informations about the claim
     default: true

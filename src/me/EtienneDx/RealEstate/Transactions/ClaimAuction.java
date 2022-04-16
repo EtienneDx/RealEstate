@@ -32,7 +32,7 @@ public class ClaimAuction extends ClaimTransaction {
         super(map);
 		if(map.get("buyer") != null)
 			buyer = UUID.fromString((String)map.get("buyer"));
-        if(map.get("startDate") != null)
+        if(map.get("endDate") != null)
 			endDate = LocalDateTime.parse((String) map.get("endDate"), DateTimeFormatter.ISO_DATE_TIME);
         bidStep = (double) map.get("bidStep");
     }
@@ -56,8 +56,8 @@ public class ClaimAuction extends ClaimTransaction {
 
     @Override
     public boolean update() {
-        int days = Period.between(endDate.toLocalDate(), LocalDate.now()).getDays();
-        Duration hours = Duration.between(endDate.toLocalTime(), LocalTime.now());
+        int days = Period.between(LocalDate.now(), endDate.toLocalDate()).getDays();
+        Duration hours = Duration.between(LocalTime.now(), endDate.toLocalTime());
         if(hours.isNegative() && !hours.isZero())
         {
             hours = hours.plusHours(24);
@@ -69,6 +69,7 @@ public class ClaimAuction extends ClaimTransaction {
             {
                 IClaim claim = RealEstate.claimAPI.getClaimAt(sign);// getting by id creates errors for subclaims
                 OfflinePlayer buyerPlayer = Bukkit.getOfflinePlayer(buyer);
+                OfflinePlayer ownerPlayer = owner != null ? Bukkit.getOfflinePlayer(owner) : null;
                 if(claim == null || claim.isWilderness())
                 {
                     if(!Utils.makePayment(buyer, null, price, false, false))
@@ -77,12 +78,22 @@ public class ClaimAuction extends ClaimTransaction {
                     }
                     if(buyerPlayer.isOnline())
                     {
-                        Messages.sendMessage(buyerPlayer.getPlayer(), RealEstate.instance.messages.msgErrorClaimDoesNotExist);
+                        Messages.sendMessage(buyerPlayer.getPlayer(), RealEstate.instance.messages.msgErrorClaimDoesNotExistAuction);
                     }
                     RealEstate.transactionsStore.cancelTransaction(claim);
                 }
-                else if(Utils.makePayment(owner, null, price, false, false)) {
-                    // TODO: send message to owner
+                else if(!Utils.makePayment(owner, null, price, false, false))
+                {
+                    RealEstate.instance.log.warning("Couldn't pay " + price + " to " + claim.getOwnerName() + " for the auction of a claim");
+                    if(buyerPlayer.isOnline())
+                    {
+                        Messages.sendMessage(buyerPlayer.getPlayer(), RealEstate.instance.messages.msgErrorAuctionCouldntPayOwner);
+                    }
+                    if(owner != null && ownerPlayer.isOnline())
+                    {
+                        Messages.sendMessage(ownerPlayer.getPlayer(), RealEstate.instance.messages.msgErrorAuctionCouldntReceiveOwner);
+                    }
+                    RealEstate.transactionsStore.cancelTransaction(claim);
                 }
                 else
                 {
@@ -90,7 +101,7 @@ public class ClaimAuction extends ClaimTransaction {
                     Utils.transferClaim(claim, buyer, owner);
                     if(getHolder().getState() instanceof Sign)
                     {
-                        Sign sign = (Sign) getHolder();
+                        Sign sign = (Sign) getHolder().getState();
                         sign.setLine(0, "");
                         sign.setLine(1, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionWon, false));
                         sign.setLine(2, buyerPlayer.getName());
@@ -102,7 +113,7 @@ public class ClaimAuction extends ClaimTransaction {
             }
             if(getHolder().getState() instanceof Sign)
             {
-                Sign sign = (Sign) getHolder();
+                Sign sign = (Sign) getHolder().getState();
                 sign.setLine(0, "");
                 sign.setLine(1, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionEnded, false));
                 sign.setLine(2, "");
@@ -227,17 +238,94 @@ public class ClaimAuction extends ClaimTransaction {
         }
         buyer = player.getUniqueId();
         this.price = price;
+        update();
+        RealEstate.transactionsStore.saveData();
     }
 
     @Override
     public void preview(Player player) {
-        // TODO Auto-generated method stub
-        
+        IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
+		if(player.hasPermission("realestate.info"))
+		{
+			String claimType = claim.isParentClaim() ? "claim" : "subclaim";
+			String claimTypeDisplay = claim.isParentClaim() ? 
+				RealEstate.instance.messages.keywordClaim :
+				RealEstate.instance.messages.keywordSubclaim;
+			String msg;
+			msg = Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoAuctionHeader) + "\n";
+            if(buyer == null)
+            {
+                msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoAuctionNoBidder, 
+                    claimTypeDisplay,
+                    RealEstate.econ.format(price)) + "\n";
+            }
+            else
+            {
+                OfflinePlayer buyer = Bukkit.getOfflinePlayer(this.buyer);
+                msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoAuctionHighestBidder, 
+                    claimTypeDisplay,
+                    buyer.getName(),
+                    RealEstate.econ.format(price)) + "\n";
+            }
+
+            int days = Period.between(LocalDate.now(), endDate.toLocalDate()).getDays();
+            Duration hours = Duration.between(LocalTime.now(), endDate.toLocalTime());
+            if(hours.isNegative() && !hours.isZero())
+            {
+                hours = hours.plusHours(24);
+                days--;
+            }
+
+            if(days < 0)
+            {
+                Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimInfoAuctionEnded, claimTypeDisplay);
+                update();// update will end the auction properly
+                return;
+            }
+
+            msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoAuctionTimeRemaining, 
+                Utils.getTime(days, hours, true)) + "\n";
+            
+            msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoAuctionBidStep, 
+                RealEstate.econ.format(bidStep)) + "\n";
+
+            if(claimType.equalsIgnoreCase("claim"))
+            {
+                msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoOwner,
+                        claim.getOwnerName()) + "\n";
+            }
+            else
+            {
+                msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoMainOwner,
+                        claim.getParent().getOwnerName()) + "\n";
+            }
+
+            Messages.sendMessage(player, msg, false);
+        }
     }
 
     @Override
-    public void msgInfo(CommandSender cs) {
-        // TODO Auto-generated method stub
-        
+    public void msgInfo(CommandSender cs)
+    {
+		IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
+		String location = "[" + claim.getWorld().getName() + ", " +
+		"X: " + claim.getX() + ", " +
+		"Y: " + claim.getY() + ", " +
+		"Z: " + claim.getZ() + "]";
+
+        int days = Period.between(LocalDate.now(), endDate.toLocalDate()).getDays();
+        Duration hours = Duration.between(LocalTime.now(), endDate.toLocalTime());
+        if(hours.isNegative() && !hours.isZero())
+        {
+            hours = hours.plusHours(24);
+            days--;
+        }
+
+		Messages.sendMessage(cs, RealEstate.instance.messages.msgInfoClaimInfoAuctionOneline,
+				claim.getArea() + "",
+				location,
+				RealEstate.econ.format(price),
+				Utils.getTime(days, hours, true),
+                RealEstate.econ.format(bidStep));
     }
 }
