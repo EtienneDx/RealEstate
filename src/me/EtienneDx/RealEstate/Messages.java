@@ -453,6 +453,9 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Info.Claim.Info.Auction.Ended", comment = "0: claim type")
     public String msgInfoClaimInfoAuctionEnded = "$bThe auction for the {0} has ended.";
 
+    @ConfigField(name="RealEstate.Info.Claim.Info.Auction.Cancelled", comment = "0: claim type")
+    public String msgInfoClaimInfoAuctionCancelled = "$bThe auction for the {0} has been cancelled. You have been reimbursed.";
+
     @ConfigField(name="RealEstate.Info.Claim.Info.Owner", comment = "0: owner name")
     public String msgInfoClaimInfoOwner = "$bThe current owner is $a{0}";
 

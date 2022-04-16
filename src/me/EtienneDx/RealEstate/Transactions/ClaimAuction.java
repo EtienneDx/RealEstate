@@ -88,6 +88,14 @@ public class ClaimAuction extends ClaimTransaction {
                     if(buyerPlayer.isOnline())
                     {
                         Messages.sendMessage(buyerPlayer.getPlayer(), RealEstate.instance.messages.msgErrorAuctionCouldntPayOwner);
+                        if(!Utils.makePayment(buyer, null, price, false, false))
+                        {
+                            RealEstate.instance.log.warning("Couldn't reimburse " + price + " to " + buyerPlayer.getName() + " for the cancellation of an auction");
+                        }
+                        if(buyerPlayer.isOnline())
+                        {
+                            Messages.sendMessage(buyerPlayer.getPlayer(), RealEstate.instance.messages.msgInfoClaimInfoAuctionCancelled);
+                        }
                     }
                     if(owner != null && ownerPlayer.isOnline())
                     {
@@ -153,8 +161,20 @@ public class ClaimAuction extends ClaimTransaction {
 
     @Override
     public boolean tryCancelTransaction(Player p, boolean force) {
-        if(buyer == null || force || p.hasPermission("realestate.admin"))
+        if(buyer == null || RealEstate.instance.config.cfgCancelAuction || force || p.hasPermission("realestate.admin"))
         {
+            if(buyer != null)
+            {
+                OfflinePlayer buyerPlayer = Bukkit.getOfflinePlayer(buyer);
+                if(!Utils.makePayment(buyer, null, price, false, false))
+                {
+                    RealEstate.instance.log.warning("Couldn't reimburse " + price + " to " + buyerPlayer.getName() + " for the cancellation of an auction");
+                }
+                if(buyerPlayer.isOnline())
+                {
+                    Messages.sendMessage(buyerPlayer.getPlayer(), RealEstate.instance.messages.msgInfoClaimInfoAuctionCancelled);
+                }
+            }
             RealEstate.transactionsStore.cancelTransaction(this);
             return true;
         }
