@@ -1,13 +1,27 @@
 # Changelog
 
-## 1.5.0
+## 1.5.0 - Unreleased
 
 ### Added
 * Support for GriefDefender 2.0.0
+* Added possibility to create auctions
+    * Auctions last a given duration
+    * Players can bid a specific amount or raise their bid by a `bidStep` defined by the auctioneer
+    * Format for new auctions is:
+        ```
+        [auction]
+        <starting price>
+        <bid step>
+        <duration>
+        ```
+    * An auction with no bid won't change owner and will expire
 
 ### Removed
 * Remove confusing *rent period* behavior
 * Remove logs whenever a sign is interacted with
+
+### Fixed
+* Fixed typo in config
 
 ## 1.4.1
 
