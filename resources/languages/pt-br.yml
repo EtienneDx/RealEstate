@@ -5,7 +5,7 @@
 RealEstate:
   Keywords:
     # Keywords used within other messages but with a longer text at
-      # the end just because i need to test some stuff
+      # the end just because I need to test some stuff
     Enabled: ativado
     Disabled: desativado
     Claim: reivindicação
@@ -32,7 +32,7 @@ RealEstate:
     NotPartOfTransaction: $cVocê não faz parte desta transação!
     RentOnly: $cEste comando aplica-se apenas a sinistros alugados!
     ValueGreaterThanZero: $cO valor deve ser maior que zero!
-    InvalidOption: $cOpção inválida fornecida!
+    InvalidOption: $cA opção fornecida é inválida!
     ClaimInTransaction:
       CantOwner: $cEsta reivindicação está atualmente envolvida em uma transação, você não pode modificar
          isto!
