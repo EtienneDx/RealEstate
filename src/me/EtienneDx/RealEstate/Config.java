@@ -167,7 +167,7 @@ public class Config extends AnnotationConfig
     @Override
     public void loadConfig()
     {
-        //YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(this.configFilePath));
+        // YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(this.configFilePath));
         this.loadConfig(this.configFilePath);
     }
 }

@@ -60,7 +60,7 @@ RealEstate:
     # 0: price
     NegativePrice: $cO preço deve ser maior que zero!
     # 0: price
-    NonIntegerPrice: $cThe price must be an integer!
+    NonIntegerPrice: $cO preço precisa ser um número!
     # 0: duration, 1:
       # example of duration format, 2: example, 3:
       # example

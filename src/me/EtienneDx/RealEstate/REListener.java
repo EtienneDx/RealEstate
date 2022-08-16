@@ -412,7 +412,7 @@ public class REListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && Objects.equals(event.getHand(), EquipmentSlot.HAND) &&
                 event.getClickedBlock().getState() instanceof Sign sign) {
-            // it is a real estate sign
+            //  it is a real estate sign
             if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase(ChatColor.stripColor(
                     Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false)))) {
                 Player player = event.getPlayer();

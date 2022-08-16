@@ -13,7 +13,7 @@ import net.milkbowl.vault.economy.EconomyResponse;
 
 public class Utils {
     public static boolean makePayment(UUID receiver, UUID giver, double amount, boolean msgReceiver, boolean msgGiver) {
-        // seller might be null if it is the server
+        //  seller might be null if it is the server
         OfflinePlayer giveTo = receiver != null ? Bukkit.getOfflinePlayer(receiver) : null;
         OfflinePlayer takeFrom = giver != null ? Bukkit.getOfflinePlayer(giver) : null;
         if (takeFrom != null && !RealEstate.econ.has(takeFrom, amount)) {
