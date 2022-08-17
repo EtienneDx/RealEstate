@@ -386,14 +386,25 @@ public class REListener implements Listener {
     }
 
     private int parseDuration(String line) {
-        Pattern p = Pattern.compile("^(?:(?<" + RealEstate.instance.config.cfgDatesWeeks.toLowerCase() + ">\\d{1,2}) ?" + RealEstate.instance.config.cfgDatesWeeks.toLowerCase().charAt(0) + "(?:" + RealEstate.instance.config.cfgDatesWeeks.toLowerCase().substring(1, RealEstate.instance.config.cfgDatesWeeks.length()) + "?)?)? ?(?:(?<" + RealEstate.instance.config.cfgDatesDay.toLowerCase() + "s>\\d{1,2}) ?" + RealEstate.instance.config.cfgDatesDays.toLowerCase().charAt(0) + "(?:" + RealEstate.instance.config.cfgDatesDays.toLowerCase().substring(1, RealEstate.instance.config.cfgDatesDays.length()) + "?)?)?$", Pattern.CASE_INSENSITIVE);
+        Pattern p = Pattern.compile("^(?:(?<"
+                + RealEstate.instance.config.cfgDatesWeeks.toLowerCase() +
+                ">\\d{1,2}) ?"
+                + RealEstate.instance.config.cfgDatesWeeks.toLowerCase().charAt(0) +
+                "(?:"
+                + RealEstate.instance.config.cfgDatesWeeks.toLowerCase().substring(1, RealEstate.instance.config.cfgDatesWeeks.length()) +
+                "?)?)? ?(?:(?<"
+                + RealEstate.instance.config.cfgDatesDay.toLowerCase() +
+                "s>\\d{1,2}) ?"
+                + RealEstate.instance.config.cfgDatesDays.toLowerCase().charAt(0) +
+                "(?:"
+                + RealEstate.instance.config.cfgDatesDays.toLowerCase().substring(1, RealEstate.instance.config.cfgDatesDays.length()) +
+                "?)?)?$", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(line);
-        if(!line.isEmpty() && m.matches())
-        {
+        if (!line.isEmpty() && m.matches()) {
             int ret = 0;
-            if(m.group(RealEstate.instance.config.cfgDatesWeeks.toLowerCase()) != null)
+            if (m.group(RealEstate.instance.config.cfgDatesWeeks.toLowerCase()) != null)
                 ret += 7 * Integer.parseInt(m.group(RealEstate.instance.config.cfgDatesWeeks.toLowerCase()));
-            if(m.group(RealEstate.instance.config.cfgDatesDays.toLowerCase()) != null)
+            if (m.group(RealEstate.instance.config.cfgDatesDays.toLowerCase()) != null)
                 ret += Integer.parseInt(m.group(RealEstate.instance.config.cfgDatesDays.toLowerCase()));
             return ret;
         }
