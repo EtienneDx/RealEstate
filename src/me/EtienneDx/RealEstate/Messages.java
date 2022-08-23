@@ -36,6 +36,9 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Keywords.TheServer")
     public String keywordTheServer = "The server";
 
+    @ConfigField(name="RealEstate.TimeRemaining")
+    public String signTimeremaining = "$fTime remaining:";
+
     @ConfigField(name="RealEstate.NoTransactionFound")
     public String msgNoTransactionFound = "$cNo transaction found!";
 
@@ -53,37 +56,38 @@ public class Messages extends AnnotationConfig
 
     @ConfigField(name="RealEstate.RenewRentCurrently", comment = "0: enabled/disabled; 1: type of claim")
     public String msgRenewRentCurrently = "$bAutomatic renew is currently $a{0} $bfor this {1}";
-    
+
     @ConfigField(name="RealEstate.Errors.OutOfClaim")
     public String msgErrorOutOfClaim = "$cYou must stand inside of a claim to use this command!";
-    
+
     @ConfigField(name="RealEstate.Errors.PlayerOnlyCmd")
     public String msgErrorPlayerOnly = "$cOnly Players can perform this command!";
-    
+
     @ConfigField(name="RealEstate.Errors.NoOngoingTransaction")
     public String msgErrorNoOngoingTransaction = "$cThis claim has no ongoing transactions!";
-    
+
     @ConfigField(name="RealEstate.Errors.NotRentNorLease")
     public String msgErrorNotRentNorLease = "$cThis claim is neither to rent or to lease!";
-    
+
     @ConfigField(name="RealEstate.Errors.AlreadyBought")
     public String msgErrorAlreadyBought = "$cThis claim already has a buyer!";
-    
+
     @ConfigField(name="RealEstate.Errors.NotPartOfTransaction")
     public String msgErrorNotPartOfTransaction = "$cYou are not part of this transaction!";
-    
+
     @ConfigField(name="RealEstate.Errors.RentOnly")
     public String msgErrorRentOnly = "$cThis command only applies to rented claims!";
 
     @ConfigField(name="RealEstate.Errors.AuctionOnly")
     public String msgErrorAuctionOnly = "$cThis command only applies to auctioned claims!";
-    
+
     @ConfigField(name="RealEstate.Errors.ValueGreaterThanZero")
     public String msgErrorValueGreaterThanZero = "$cThe value must be greater than zero!";
-    
+
     @ConfigField(name="RealEstate.Errors.InvalidOption")
     public String msgErrorInvalidOption = "$cInvalid option provided!";
 
+    @SuppressWarnings("unused")
     @ConfigField(name="RealEstate.Errors.ClaimInTransaction.CantOwner")
     public String msgErrorClaimInTransactionCantOwner = "$cThis claim is currently involved in a transaction, you can't modify it!";
 
@@ -104,7 +108,7 @@ public class Messages extends AnnotationConfig
 
     @ConfigField(name="RealEstate.Errors.ClaimInTransaction.Subclaim")
     public String msgErrorSubclaimInTransaction = "$cA subclaim is currently involved in a transaction, you can't edit or manage the parent claim!";
-    
+
     @ConfigField(name="RealEstate.Errors.Command.Usage", comment = "0: command usage")
     public String msgErrorCommandUsage = "$cUsage: {0}";
 
@@ -117,6 +121,7 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Errors.InvalidNumber", comment = "0: number")
     public String msgErrorInvalidNumber = "$c{0} is not a valid number!";
 
+    @SuppressWarnings("unused")
     @ConfigField(name="RealEstate.Errors.NegativeNumber", comment = "0: number")
     public String msgErrorNegativeNumber = "$c{0} is a negative number!";
 
@@ -417,6 +422,7 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Info.Claim.Info.Rent.PaymentBuyerCancelled", comment = "0: claim type, 1: location, 2: formatted price")
     public String msgInfoClaimInfoRentPaymentBuyerCancelled = "$bCouldn't pay the rent for the {0} at $a{1} $bfor $a{2}$b. The rent has been cancelled.";
 
+    @SuppressWarnings("unused")
     @ConfigField(name="RealEstate.Info.Claim.Info.Rent.PaymentOwnerCancelled", comment = "0: player name, 1: claim type, 2: location, 3: formatted price")
     public String msgInfoClaimInfoRentPaymentOwnerCancelled = "$a{0} $bcouldn't pay the rent for the {1} at $a{2} $bfor $a{3}$b. The rent has been cancelled.";
 
@@ -491,7 +497,7 @@ public class Messages extends AnnotationConfig
 
     @ConfigField(name="RealEstate.List.Header", comment = "0: RE Offers|Sell Offers|Rent Offers|Lease Offers; 1: Page number; 2: Page count")
     public String msgListTransactionsHeader = "$1----= $f[ $6{0} page $2 {1} $6/ $2{2} $f] $1=----";
-    
+
     @ConfigField(name="RealEstate.List.NextPage", comment="0: all|sell|rent|lease; 1: next page number")
     public String msgListNextPage = "$6To see the next page, type $a/re list {0} {1}";
 
@@ -534,6 +540,7 @@ public class Messages extends AnnotationConfig
 
         for (int i = 0; i < args.length; i++) {
             String param = args[i];
+            //noinspection RegExpRedundantEscape
             msgTemplate = msgTemplate.replaceAll("\\{" + i + "\\}", Matcher.quoteReplacement(param));
         }
 

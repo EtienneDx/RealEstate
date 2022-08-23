@@ -13,6 +13,7 @@ RealEstate:
     AdminClaimPrefix: um administrador
     ClaimPrefix: um
     TheServer: Servidor
+  TimeRemaining: 'Tempo restante: '
   NoTransactionFound: $cNenhuma transação encontrada!
   NoTransactionFoundHere: $cNenhuma transação encontrada em sua localização!
   PageMustBePositive: $cA página deve ser uma opção positiva
