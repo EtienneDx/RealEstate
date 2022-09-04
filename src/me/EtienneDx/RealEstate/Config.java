@@ -50,6 +50,25 @@ public class Config extends AnnotationConfig
     @ConfigField(name="RealEstate.Keywords.Replace.ContainerRent", comment = "What is displayed on the third line of the sign when renting container access only.")
     public String cfgContainerRentLine = ChatColor.BLUE + "Containers only";
 
+    @ConfigField(name="RealEstate.Keywords.Dates.Week", comment = "Format for rent and messages in week")
+    public String cfgDatesWeek = "Week";
+
+    @ConfigField(name="RealEstate.Keywords.Dates.Weeks", comment = "Format for rent and messages in weeks")
+    public String cfgDatesWeeks = "Weeks";
+
+    @ConfigField(name="RealEstate.Keywords.Dates.Day", comment = "Format for rent and messages in day")
+    public String cfgDatesDay = "Day";
+
+    @ConfigField(name="RealEstate.Keywords.Dates.Days", comment = "Format for rent and messages in days")
+    public String cfgDatesDays = "Days";
+
+    @ConfigField(name="RealEstate.Keywords.Dates.Hour", comment = "Format for rent and messages in hour")
+    public String cfgDatesHour = "Hour";
+
+    @SuppressWarnings("unused")
+    @ConfigField(name="RealEstate.Keywords.Dates.Hours", comment = "Format for rent and messages in hours")
+    public String cfgDatesHours = "Hours";
+
     @ConfigField(name="RealEstate.Rules.Sell", comment = "Is selling claims enabled?")
     public boolean cfgEnableSell = true;
     @ConfigField(name="RealEstate.Rules.Rent", comment = "Is renting claims enabled?")
@@ -106,6 +125,7 @@ public class Config extends AnnotationConfig
     public String cfgRentTime = "7D";
     @ConfigField(name="RealEstate.Default.Duration.Lease", comment = "How long is a lease period by default")
     public String cfgLeaseTime = "7D";
+    @SuppressWarnings("unused")
     @ConfigField(name="RealEstate.Default.Duration.Auction", comment = "How long is an auction period by default")
     public String cfgAuctionTime = "7D";
 
@@ -123,16 +143,19 @@ public class Config extends AnnotationConfig
         this.pdf = RealEstate.instance.getDescription();
     }
     
+    @SuppressWarnings("unused")
     public String getString(List<String> li)
     {
     	return String.join(";", li);
     }
     
+    @SuppressWarnings("unused")
     public List<String> getList(String str)
     {
     	return Arrays.asList(str.split(";"));
     }
     
+    @SuppressWarnings("unused")
     List<String> getConfigList(YamlConfiguration config, String path, List<String> defVal)
     {
     	config.addDefault(path, defVal);
@@ -144,7 +167,7 @@ public class Config extends AnnotationConfig
     @Override
     public void loadConfig()
     {
-        //YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(this.configFilePath));
+        // YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(this.configFilePath));
         this.loadConfig(this.configFilePath);
     }
 }

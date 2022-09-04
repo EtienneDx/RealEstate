@@ -5,7 +5,7 @@
 RealEstate:
   Keywords:
     # Keywords used within other messages but with a longer text at
-      # the end just because i need to test some stuff
+      # the end just because I need to test some stuff
     Enabled: ativado
     Disabled: desativado
     Claim: reivindicação
@@ -13,6 +13,7 @@ RealEstate:
     AdminClaimPrefix: um administrador
     ClaimPrefix: um
     TheServer: Servidor
+  TimeRemaining: 'Tempo restante: '
   NoTransactionFound: $cNenhuma transação encontrada!
   NoTransactionFoundHere: $cNenhuma transação encontrada em sua localização!
   PageMustBePositive: $cA página deve ser uma opção positiva
@@ -32,7 +33,7 @@ RealEstate:
     NotPartOfTransaction: $cVocê não faz parte desta transação!
     RentOnly: $cEste comando aplica-se apenas a sinistros alugados!
     ValueGreaterThanZero: $cO valor deve ser maior que zero!
-    InvalidOption: $cOpção inválida fornecida!
+    InvalidOption: $cA opção fornecida é inválida!
     ClaimInTransaction:
       CantOwner: $cEsta reivindicação está atualmente envolvida em uma transação, você não pode modificar
          isto!
@@ -60,7 +61,7 @@ RealEstate:
     # 0: price
     NegativePrice: $cO preço deve ser maior que zero!
     # 0: price
-    NonIntegerPrice: $cThe price must be an integer!
+    NonIntegerPrice: $cO preço precisa ser um número!
     # 0: duration, 1:
       # example of duration format, 2: example, 3:
       # example
