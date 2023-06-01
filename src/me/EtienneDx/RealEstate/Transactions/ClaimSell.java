@@ -122,6 +122,11 @@ public class ClaimSell extends ClaimTransaction
 				(area - remaining) + "");
             return;			
 		}
+		// AtlazLP - Check if the player is under the claim limit by at least one
+		if(GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId()).getClaims().size() > 9) {
+			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimNoBuyPermission, claimTypeDisplay);
+            return;
+		}
 		// the player has the right to buy, let's make the payment
 		
 		if(Utils.makePayment(owner, player.getUniqueId(), price, false, true))// if payment succeed
