@@ -351,6 +351,11 @@ public class ClaimLease extends BoughtTransaction
 			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimAlreadyLeased, claimTypeDisplay);
             return;
 		}
+		// AtlazLP - Check if the player is under the claim limit by at least one
+		if(GriefPrevention.instance.dataStore.getPlayerData(player.getUniqueId()).getClaims().size() > 19) {
+			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimLimitReached, claimTypeDisplay);
+            return;
+		}
 		
 		if(Utils.makePayment(owner, player.getUniqueId(), price, false, true))// if payment succeed
 		{
