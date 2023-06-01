@@ -427,7 +427,7 @@ public class Messages extends AnnotationConfig
     public String msgListNextPage = "$6To see the next page, type $a/re list {0} {1}";
 
     // AtlazLP New error message when claim limit is reached
-    @ConfigField(name="RealEstate.Errors.Claim.msgErrorClaimLimitReached", comment = "0: claim type")
+    @ConfigField(name="RealEstate.Errors.Claim.msgErrorClaimLimitReached", comment = "Mensagem avisando que bateu o limite de terrenos")
     public String msgErrorClaimLimitReached = "$cVocê atingiu o limite máximo de terrenos!";
     
 

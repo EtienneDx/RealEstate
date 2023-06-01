@@ -17,7 +17,7 @@ public class Config extends AnnotationConfig
     public PluginDescriptionFile pdf;
 
     public final String configFilePath = RealEstate.pluginDirPath + "config.yml";
-    public final String logFilePath = RealEstate.pluginDirPath + "GriefProtection_RealEstate.log";
+    public final String logFilePath = RealEstate.pluginDirPath + "Logs_Vendas_Alugueis.log";
 
     @ConfigField(name="RealEstate.Keywords.ChatPrefix", comment="What is displayed before any chat message")
     public String chatPrefix = "$f[$6RealEstate$f] ";

@@ -4,8 +4,8 @@ import org.bukkit.command.CommandSender;
 
 class SendPlayerMessageTask implements Runnable
 {
-	private CommandSender player;
-	private String message;
+	private final CommandSender player;
+	private final String message;
 
 
 	public SendPlayerMessageTask(CommandSender player, String message)

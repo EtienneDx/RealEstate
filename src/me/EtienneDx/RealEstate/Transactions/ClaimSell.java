@@ -146,12 +146,12 @@ public class ClaimSell extends ClaimTransaction
 						
                 RealEstate.instance.addLogEntry(
                         "[" + RealEstate.transactionsStore.dateFormat.format(RealEstate.transactionsStore.date) + "] " + player.getName() + 
-                        " has purchased a " + claimType + " at " +
+                        " comprou um " + claimType + " em " +
                                 "[" + player.getLocation().getWorld() + ", " +
                                 "X: " + player.getLocation().getBlockX() + ", " +
                                 "Y: " + player.getLocation().getBlockY() + ", " +
                                 "Z: " + player.getLocation().getBlockZ() + "] " +
-                                "Price: " + price + " " + RealEstate.econ.currencyNamePlural());
+                                "Preço: " + price + " " + RealEstate.econ.currencyNamePlural());
                 
                 if(RealEstate.instance.config.cfgMessageOwner && owner != null)
                 {

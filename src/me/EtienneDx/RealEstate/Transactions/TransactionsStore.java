@@ -190,12 +190,12 @@ public class TransactionsStore
 		saveData();
 		
 		RealEstate.instance.addLogEntry("[" + this.dateFormat.format(this.date) + "] " + (player == null ? "The Server" : player.getName()) + 
-				" has made " + (claim.isAdminClaim() ? "an admin" : "a") + " " + (claim.parent == null ? "claim" : "subclaim") + " for sale at " +
+				" colocou " + (claim.isAdminClaim() ? "uma admin" : "uma") + " " + (claim.parent == null ? "claim" : "subclaim") + " a venda por " +
                 "[" + claim.getGreaterBoundaryCorner().getWorld() + ", " +
                 "X: " + claim.getGreaterBoundaryCorner().getBlockX() + ", " +
                 "Y: " + claim.getGreaterBoundaryCorner().getBlockY() + ", " +
                 "Z: " + claim.getGreaterBoundaryCorner().getBlockZ() + "] " +
-                "Price: " + price + " " + RealEstate.econ.currencyNamePlural());
+                "Preço: " + price + " " + RealEstate.econ.currencyNamePlural());
 	
 		String claimPrefix = claim.isAdminClaim() ? RealEstate.instance.messages.keywordAdminClaimPrefix :
 				RealEstate.instance.messages.keywordClaimPrefix;

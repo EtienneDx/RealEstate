@@ -52,7 +52,7 @@ public class Utils
         		{
 					Messages.sendMessage(b.getPlayer(), RealEstate.instance.messages.msgErrorNoDepositOther, s.getName());
         		}
-        		if(s != null && s.isOnline() && msgSeller)
+        		if(s.isOnline() && msgSeller)
         		{
 					Messages.sendMessage(b.getPlayer(), RealEstate.instance.messages.msgErrorNoDepositSelf, b.getName());
         		}
