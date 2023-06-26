@@ -6,7 +6,7 @@
 	<artifactId>real-estate</artifactId>
 	<version>1.5.1</version>
 	<name>RevoRealEstate</name>
-	<description>Plugin para vender e alugar terrenos do GriefPrevention</description>
+	<description>Plugin para vender e alugar terrenos do GriefPrevention.</description>
 	<build>
         <finalName>${project.name}</finalName>
 		<sourceDirectory>src</sourceDirectory>
