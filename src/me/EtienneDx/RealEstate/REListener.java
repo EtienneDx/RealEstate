@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -468,6 +470,23 @@ public class REListener implements Listener
 		return Double.parseDouble(event.getLine(line));
 	}
 
+	private boolean isRealEstateSign(Sign sign) {
+		String header = ChatColor.stripColor(Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
+
+		SignSide front = sign.getSide(Side.FRONT);
+		SignSide back = sign.getSide(Side.BACK);
+
+		if(ChatColor.stripColor(front.getLine(0)).equalsIgnoreCase(header)) {
+				return true;
+		}
+
+		if(ChatColor.stripColor(back.getLine(0)).equalsIgnoreCase(header)) {
+				return true;
+		}
+
+		return false;
+	}
+
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event)
 	{
@@ -476,8 +495,7 @@ public class REListener implements Listener
 		{
 			Sign sign = (Sign)event.getClickedBlock().getState();
 			// it is a real estate sign
-			if(ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase(ChatColor.stripColor(
-				Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false))))
+			if(isRealEstateSign(sign))
 			{
 				Player player = event.getPlayer();
 				IClaim claim = RealEstate.claimAPI.getClaimAt(event.getClickedBlock().getLocation());

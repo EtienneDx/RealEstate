@@ -11,6 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -65,33 +67,42 @@ public class ClaimLease extends BoughtTransaction
 			if(sign.getBlock().getState() instanceof Sign)
 			{
 				Sign s = (Sign)sign.getBlock().getState();
-				s.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
-				s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceLease);
+                SignSide front = s.getSide(Side.FRONT);
+                SignSide back = s.getSide(Side.BACK);
+				front.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
+				back.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
+				front.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceLease);
+				back.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceLease);
 				//s.setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
 				//s.setLine(2, paymentsLeft + "x " + price + " " + RealEstate.econ.currencyNamePlural());
 				if(RealEstate.instance.config.cfgUseCurrencySymbol)
 				{
 					if(RealEstate.instance.config.cfgUseDecimalCurrency == false)
 					{
-						s.setLine(2, paymentsLeft + "x " + RealEstate.instance.config.cfgCurrencySymbol + " " + (int)Math.round(price));
+						front.setLine(2, paymentsLeft + "x " + RealEstate.instance.config.cfgCurrencySymbol + " " + (int)Math.round(price));
+						back.setLine(2, paymentsLeft + "x " + RealEstate.instance.config.cfgCurrencySymbol + " " + (int)Math.round(price));
 					}
 					else
 					{
-						s.setLine(2, paymentsLeft + "x " + RealEstate.instance.config.cfgCurrencySymbol + " " + price);
+						front.setLine(2, paymentsLeft + "x " + RealEstate.instance.config.cfgCurrencySymbol + " " + price);
+						back.setLine(2, paymentsLeft + "x " + RealEstate.instance.config.cfgCurrencySymbol + " " + price);
 					}
 				}
 				else
 				{
 					if(RealEstate.instance.config.cfgUseDecimalCurrency == false)
 					{
-						s.setLine(2, paymentsLeft + "x " + (int)Math.round(price) + " " + RealEstate.econ.currencyNamePlural());
+						front.setLine(2, paymentsLeft + "x " + (int)Math.round(price) + " " + RealEstate.econ.currencyNamePlural());
+						back.setLine(2, paymentsLeft + "x " + (int)Math.round(price) + " " + RealEstate.econ.currencyNamePlural());
 					}
 					else
 					{
-						s.setLine(2, paymentsLeft + "x " + price + " " + RealEstate.econ.currencyNamePlural());
+						front.setLine(2, paymentsLeft + "x " + price + " " + RealEstate.econ.currencyNamePlural());
+						back.setLine(2, paymentsLeft + "x " + price + " " + RealEstate.econ.currencyNamePlural());
 					}
 				}
-				s.setLine(3, Utils.getTime(frequency, null, false));
+				front.setLine(3, Utils.getTime(frequency, null, false));
+				back.setLine(3, Utils.getTime(frequency, null, false));
 				s.update(true);
 			}
 			else
@@ -155,7 +166,7 @@ public class ClaimLease extends BoughtTransaction
 				
 				if(owner != null)
 				{
-					if(seller.isOnline() && RealEstate.instance.config.cfgMessageOwner)
+					if(seller != null && seller.isOnline() && RealEstate.instance.config.cfgMessageOwner)
 					{
 						Messages.sendMessage(seller.getPlayer(), RealEstate.instance.messages.msgInfoClaimInfoLeasePaymentOwner, 
 								buyerPlayer.getName(),
@@ -194,7 +205,7 @@ public class ClaimLease extends BoughtTransaction
 							RealEstate.econ.format(price)));
 	        	}
 				
-				if(seller.isOnline() && RealEstate.instance.config.cfgMessageOwner)
+				if(seller != null && seller.isOnline() && RealEstate.instance.config.cfgMessageOwner)
 				{
 					Messages.sendMessage(seller.getPlayer(), RealEstate.instance.messages.msgInfoClaimInfoLeasePaymentOwnerFinal, 
 							buyerPlayer.getName(),
@@ -256,7 +267,7 @@ public class ClaimLease extends BoughtTransaction
 						location,
 						RealEstate.econ.format(price)));
 	    	}
-			if(seller.isOnline() && RealEstate.instance.config.cfgMessageOwner)
+			if(seller != null && seller.isOnline() && RealEstate.instance.config.cfgMessageOwner)
 			{
 				Messages.sendMessage(seller.getPlayer(), RealEstate.instance.messages.msgInfoClaimInfoLeasePaymentOwnerCancelled, 
 						buyerPlayer.getName(),

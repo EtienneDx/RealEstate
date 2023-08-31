@@ -13,6 +13,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -97,7 +99,7 @@ public class ClaimAuction extends ClaimTransaction {
                             Messages.sendMessage(buyerPlayer.getPlayer(), RealEstate.instance.messages.msgInfoClaimInfoAuctionCancelled);
                         }
                     }
-                    if(owner != null && ownerPlayer.isOnline())
+                    if(owner != null && ownerPlayer != null && ownerPlayer.isOnline())
                     {
                         Messages.sendMessage(ownerPlayer.getPlayer(), RealEstate.instance.messages.msgErrorAuctionCouldntReceiveOwner);
                     }
@@ -110,10 +112,16 @@ public class ClaimAuction extends ClaimTransaction {
                     if(getHolder().getState() instanceof Sign)
                     {
                         Sign sign = (Sign) getHolder().getState();
-                        sign.setLine(0, "");
-                        sign.setLine(1, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionWon, false));
-                        sign.setLine(2, buyerPlayer.getName());
-                        sign.setLine(3, "");
+                        SignSide front = sign.getSide(Side.FRONT);
+                        SignSide back = sign.getSide(Side.BACK);
+                        front.setLine(0, "");
+                        front.setLine(1, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionWon, false));
+                        front.setLine(2, buyerPlayer.getName());
+                        front.setLine(3, "");
+                        back.setLine(0, "");
+                        back.setLine(1, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionWon, false));
+                        back.setLine(2, buyerPlayer.getName());
+                        back.setLine(3, "");
                         sign.update();
                     }
                     return true;
@@ -122,10 +130,16 @@ public class ClaimAuction extends ClaimTransaction {
             if(getHolder().getState() instanceof Sign)
             {
                 Sign sign = (Sign) getHolder().getState();
-                sign.setLine(0, "");
-                sign.setLine(1, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionEnded, false));
-                sign.setLine(2, "");
-                sign.setLine(3, "");
+                SignSide front = sign.getSide(Side.FRONT);
+                SignSide back = sign.getSide(Side.BACK);
+                front.setLine(0, "");
+                front.setLine(1, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionEnded, false));
+                front.setLine(2, "");
+                front.setLine(3, "");
+                back.setLine(0, "");
+                back.setLine(1, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionEnded, false));
+                back.setLine(2, "");
+                back.setLine(3, "");
                 sign.update();
             }
             return true;
@@ -136,18 +150,25 @@ public class ClaimAuction extends ClaimTransaction {
             if(sign.getBlock().getState() instanceof Sign)
             {
                 Sign s = (Sign) sign.getBlock().getState();
-                s.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
-                s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceAuction);
+                SignSide front = s.getSide(Side.FRONT);
+                SignSide back = s.getSide(Side.BACK);
+                front.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
+                back.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
+                front.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceAuction);
+                back.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceAuction);
                 String remaining = Utils.getTime(days, hours, false);
-                s.setLine(2, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionRemainingTime, false, remaining));
+                front.setLine(2, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionRemainingTime, false, remaining));
+                back.setLine(2, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionRemainingTime, false, remaining));
                 if(buyer != null)
                 {
                     String name = Bukkit.getOfflinePlayer(buyer).getName();
-                    s.setLine(3, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionHighestBidder, false, name, RealEstate.econ.format(price)));
+                    front.setLine(3, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionHighestBidder, false, name, RealEstate.econ.format(price)));
+                    back.setLine(3, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionHighestBidder, false, name, RealEstate.econ.format(price)));
                 }
                 else
                 {
-                    s.setLine(3, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionNoBider, false));
+                    front.setLine(3, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionNoBider, false));
+                    back.setLine(3, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionNoBider, false));
                 }
                 s.update(true);
             }
