@@ -8,13 +8,19 @@ import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 import me.EtienneDx.RealEstate.ClaimAPI.IClaimAPI;
 import me.EtienneDx.RealEstate.ClaimAPI.IPlayerData;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.ryanhamshire.GriefPrevention.Claim;
 
 public class GriefPreventionAPI implements IClaimAPI
 {
-
     @Override
     public IClaim getClaimAt(Location location) {
-        return new GPClaim(GriefPrevention.instance.dataStore.getClaimAt(location, false, null));
+        Claim gpclaim = GriefPrevention.instance.dataStore.getClaimAt(location, false, null);
+
+        if (gpclaim == null) {
+            return null;
+        }
+
+        return new GPClaim(gpclaim);
     }
 
     @Override

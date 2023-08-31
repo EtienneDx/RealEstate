@@ -55,7 +55,7 @@ public class Utils
         		{
 					Messages.sendMessage(giveTo.getPlayer(), RealEstate.instance.messages.msgErrorNoDepositOther, giveTo.getName());
         		}
-        		if(giveTo != null && giveTo.isOnline() && msgReceiver)
+        		if(takeFrom != null && giveTo != null && giveTo.isOnline() && msgReceiver)
         		{
 					Messages.sendMessage(takeFrom.getPlayer(), RealEstate.instance.messages.msgErrorNoDepositSelf, takeFrom.getName());
         		}

@@ -16,6 +16,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
 import org.bukkit.command.CommandSender;
 
 public class ClaimSell extends ClaimTransaction
@@ -36,29 +38,38 @@ public class ClaimSell extends ClaimTransaction
 		if(sign.getBlock().getState() instanceof Sign)
 		{
 			Sign s = (Sign) sign.getBlock().getState();
-			s.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
-			s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceSell);
-			s.setLine(2, owner != null ? Utils.getSignString(Bukkit.getOfflinePlayer(owner).getName()) : "SERVER");
+			SignSide front = s.getSide(Side.FRONT);
+			SignSide back = s.getSide(Side.BACK);
+			front.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
+			back.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
+			front.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceSell);
+			back.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceSell);
+			front.setLine(2, owner != null ? Utils.getSignString(Bukkit.getOfflinePlayer(owner).getName()) : "SERVER");
+			back.setLine(2, owner != null ? Utils.getSignString(Bukkit.getOfflinePlayer(owner).getName()) : "SERVER");
 			if(RealEstate.instance.config.cfgUseCurrencySymbol)
 			{
 				if(RealEstate.instance.config.cfgUseDecimalCurrency == false)
 				{
-					s.setLine(3, RealEstate.instance.config.cfgCurrencySymbol + " " + (int)Math.round(price));
+					front.setLine(3, RealEstate.instance.config.cfgCurrencySymbol + " " + (int)Math.round(price));
+					back.setLine(3, RealEstate.instance.config.cfgCurrencySymbol + " " + (int)Math.round(price));
 				}
 				else
 				{
-					s.setLine(3, RealEstate.instance.config.cfgCurrencySymbol + " " + price);
+					front.setLine(3, RealEstate.instance.config.cfgCurrencySymbol + " " + price);
+					back.setLine(3, RealEstate.instance.config.cfgCurrencySymbol + " " + price);
 				}
 			}
 			else
 			{
 				if(RealEstate.instance.config.cfgUseDecimalCurrency == false)
 				{
-					s.setLine(3, (int)Math.round(price) + " " + RealEstate.econ.currencyNamePlural());
+					front.setLine(3, (int)Math.round(price) + " " + RealEstate.econ.currencyNamePlural());
+					back.setLine(3, (int)Math.round(price) + " " + RealEstate.econ.currencyNamePlural());
 				}
 				else
 				{
-					s.setLine(3, price + " " + RealEstate.econ.currencyNamePlural());
+					front.setLine(3, price + " " + RealEstate.econ.currencyNamePlural());
+					back.setLine(3, price + " " + RealEstate.econ.currencyNamePlural());
 				}
 			}
 			s.update(true);
