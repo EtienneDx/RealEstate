@@ -11,8 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Sign;
-import org.bukkit.block.sign.Side;
-import org.bukkit.block.sign.SignSide;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -21,6 +19,7 @@ import com.earth2me.essentials.User;
 import me.EtienneDx.RealEstate.Messages;
 import me.EtienneDx.RealEstate.RealEstate;
 import me.EtienneDx.RealEstate.Utils;
+import me.EtienneDx.RealEstate.RealEstateSign;
 import me.EtienneDx.RealEstate.ClaimAPI.ClaimPermission;
 import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 import net.md_5.bungee.api.ChatColor;
@@ -74,13 +73,9 @@ public class ClaimRent extends BoughtTransaction
 		{
 			if(sign.getBlock().getState() instanceof Sign)
 			{
-				Sign s = (Sign) sign.getBlock().getState();
-                SignSide front = s.getSide(Side.FRONT);
-                SignSide back = s.getSide(Side.BACK);
-				front.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
-				back.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
-				front.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceRent);
-				back.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceRent);
+				RealEstateSign s = new RealEstateSign((Sign) sign.getBlock().getState());
+				s.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
+				s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceRent);
 				//s.setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
 				String price_line = "";
 				if(RealEstate.instance.config.cfgUseCurrencySymbol)
@@ -108,15 +103,11 @@ public class ClaimRent extends BoughtTransaction
 				}
 				String period = Utils.getTime(duration, null, false);
 				if(this.buildTrust) {
-					front.setLine(2, price_line);
-					back.setLine(2, price_line);
-					front.setLine(3, period);
-					back.setLine(3, period);
+					s.setLine(2, price_line);
+					s.setLine(3, period);
 				} else {
-					front.setLine(2, RealEstate.instance.config.cfgContainerRentLine);
-					back.setLine(2, RealEstate.instance.config.cfgContainerRentLine);
-					front.setLine(3, price_line + " - " + period);
-					back.setLine(3, price_line + " - " + period);
+					s.setLine(2, RealEstate.instance.config.cfgContainerRentLine);
+					s.setLine(3, price_line + " - " + period);
 				}
 				s.update(true);
 			}
@@ -141,21 +132,15 @@ public class ClaimRent extends BoughtTransaction
 			}
 			else if(sign.getBlock().getState() instanceof Sign)
 			{
-				Sign s = (Sign) sign.getBlock().getState();
-                SignSide front = s.getSide(Side.FRONT);
-                SignSide back = s.getSide(Side.BACK);
-				front.setLine(0, ChatColor.GOLD + RealEstate.instance.config.cfgReplaceOngoingRent); //Changed the header to "[Rented]" so that it won't waste space on the next line and allow the name of the player to show underneath.
-				back.setLine(0, ChatColor.GOLD + RealEstate.instance.config.cfgReplaceOngoingRent); //Changed the header to "[Rented]" so that it won't waste space on the next line and allow the name of the player to show underneath.
-				front.setLine(1, Utils.getSignString(Bukkit.getOfflinePlayer(buyer).getName()));//remove "Rented by"
-				back.setLine(1, Utils.getSignString(Bukkit.getOfflinePlayer(buyer).getName()));//remove "Rented by"
-				front.setLine(2, "Time remaining : ");
-				back.setLine(2, "Time remaining : ");
+				RealEstateSign s = new RealEstateSign((Sign) sign.getBlock().getState());
+				s.setLine(0, ChatColor.GOLD + RealEstate.instance.config.cfgReplaceOngoingRent); //Changed the header to "[Rented]" so that it won't waste space on the next line and allow the name of the player to show underneath.
+				s.setLine(1, Utils.getSignString(Bukkit.getOfflinePlayer(buyer).getName()));//remove "Rented by"
+				s.setLine(2, "Time remaining : ");
 				
 				int daysLeft = duration - days - 1;// we need to remove the current day
 				Duration timeRemaining = Duration.ofHours(24).minus(hours);
 				
-				front.setLine(3, Utils.getTime(daysLeft, timeRemaining, false));
-				back.setLine(3, Utils.getTime(daysLeft, timeRemaining, false));
+				s.setLine(3, Utils.getTime(daysLeft, timeRemaining, false));
 				s.update(true);
 			}
 		}
