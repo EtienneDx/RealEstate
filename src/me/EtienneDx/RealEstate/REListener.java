@@ -3,11 +3,8 @@ package me.EtienneDx.RealEstate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
-import org.bukkit.block.sign.Side;
-import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -470,32 +467,15 @@ public class REListener implements Listener
 		return Double.parseDouble(event.getLine(line));
 	}
 
-	private boolean isRealEstateSign(Sign sign) {
-		String header = ChatColor.stripColor(Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
-
-		SignSide front = sign.getSide(Side.FRONT);
-		SignSide back = sign.getSide(Side.BACK);
-
-		if(ChatColor.stripColor(front.getLine(0)).equalsIgnoreCase(header)) {
-				return true;
-		}
-
-		if(ChatColor.stripColor(back.getLine(0)).equalsIgnoreCase(header)) {
-				return true;
-		}
-
-		return false;
-	}
-
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event)
 	{
 		if(event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && event.getHand().equals(EquipmentSlot.HAND) &&
 				event.getClickedBlock().getState() instanceof Sign)
 		{
-			Sign sign = (Sign)event.getClickedBlock().getState();
+			RealEstateSign s = new RealEstateSign((Sign) event.getClickedBlock().getState());
 			// it is a real estate sign
-			if(isRealEstateSign(sign))
+			if(s.isRealEstateSign())
 			{
 				Player player = event.getPlayer();
 				IClaim claim = RealEstate.claimAPI.getClaimAt(event.getClickedBlock().getLocation());
