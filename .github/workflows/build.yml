@@ -1,0 +1,40 @@
+name: build
+
+on: 
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 'Checkout source code'
+        uses: actions/checkout@v4
+      - name: 'Set up JDK'
+        uses: actions/setup-java@v3
+        with:
+          java-version: '16'
+          distribution: 'adopt'
+
+      - name: 'Cache dependencies'
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: 'Build, test, and package'
+        run: mvn -B package --file pom.xml
+
+      - name: 'Get artifact version'
+        id:   pomVersion
+        run: |
+          VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
+          echo "::set-output name=version::$VERSION"
+
+      - name: 'Upload artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: RealEstate-${{ steps.pomVersion.outputs.version }}.jar
+          path: target/RealEstate-${{ steps.pomVersion.outputs.version }}.jar
