@@ -127,6 +127,7 @@ public class ClaimAuction extends ClaimTransaction {
                 s.setLine(1, Messages.getMessage(RealEstate.instance.messages.msgSignAuctionEnded, false));
                 s.setLine(2, "");
                 s.setLine(3, "");
+                s.update(true);
             }
             return true;
         }
