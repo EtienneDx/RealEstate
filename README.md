@@ -10,4 +10,4 @@ Please feel free to report any issue in the [GitHub Issue section](https://githu
 
 This plugin is dependent on GriefPrevention version 16.18 and up.
 
-GriefPrevention plugin can be found [here](https://github.com/TechFortress/GriefPrevention).
+GriefPrevention plugin can be found [here](https://github.com/GriefPrevention/GriefPrevention).

@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -399,9 +400,10 @@ public class REListener implements Listener
 				event.getClickedBlock().getState() instanceof Sign)
 		{
 			Sign sign = (Sign)event.getClickedBlock().getState();
-			RealEstate.instance.log.info(sign.getLine(0));
+			//RealEstate.instance.log.info(sign.getLine(0));
+			RealEstate.instance.log.info(sign.getSide(Side.FRONT).getLine(0));
 			// it is a real estate sign
-			if(ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase(ChatColor.stripColor(
+			if(ChatColor.stripColor(sign.getSide(Side.FRONT).getLine(0)).equalsIgnoreCase(ChatColor.stripColor(
 				Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false))))
 			{
 				Player player = event.getPlayer();

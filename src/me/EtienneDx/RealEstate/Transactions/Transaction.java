@@ -8,13 +8,18 @@ import org.bukkit.entity.Player;
 
 public interface Transaction
 {
-	public Block getHolder();
-	public UUID getOwner();
-	public void setOwner(UUID newOwner);
-	public void interact(Player player);
-	public void preview(Player player);
-	public boolean update();
-	public boolean tryCancelTransaction(Player p);
-	public boolean tryCancelTransaction(Player p, boolean force);
-	public void msgInfo(CommandSender cs);
+    public Block getHolder();
+    public UUID getOwner();
+    public void setOwner(UUID newOwner);
+    public void interact(Player player);
+    public void preview(Player player);
+    public boolean update();
+    public boolean tryCancelTransaction(Player p);
+    public boolean tryCancelTransaction(Player p, boolean force);
+    public void msgInfo(CommandSender cs);
+
+    // Add this method to differentiate rental transactions
+    public default boolean isRental() {
+        return false; // Override this in rental-related transactions
+    }
 }

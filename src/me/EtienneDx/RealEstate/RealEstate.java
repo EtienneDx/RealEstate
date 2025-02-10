@@ -54,7 +54,7 @@ public class RealEstate extends JavaPlugin
     
     public static TransactionsStore transactionsStore = null;
 	
-	@SuppressWarnings("deprecation")
+	//@SuppressWarnings("deprecation")
 	public void onEnable()
 	{
 		RealEstate.instance = this;
@@ -110,7 +110,7 @@ public class RealEstate extends JavaPlugin
         new ClaimPermissionListener().registerEvents();
         
         manager = new BukkitCommandManager(this);
-        manager.enableUnstableAPI("help");
+        
         registerConditions();
         manager.registerCommand(new RECommand());
 

@@ -11,7 +11,7 @@ import me.EtienneDx.AnnotationConfig.AnnotationConfig;
 import me.EtienneDx.AnnotationConfig.ConfigField;
 import me.EtienneDx.AnnotationConfig.ConfigFile;
 
-@ConfigFile(header = "RealEstate wiki and newest versions are available at http://www.github.com/EtienneDx/RealEstate")
+@ConfigFile(header = "RealEstate wiki and newest versions are available at https://github.com/msburgess3200/RealEstate")
 public class Config extends AnnotationConfig
 {
     public PluginDescriptionFile pdf;
@@ -101,6 +101,24 @@ public class Config extends AnnotationConfig
     
     @ConfigField(name="RealEstate.Settings.MessagesFiles", comment="Language file to be used. You can see all languages files in the languages directory. If the language file does not exist, it will be created and you'll be able to modify it later on.")
     public String languageFile = "en.yml";
+    
+    @ConfigField(name="RealEstate.Settings.DebugMode", comment="Enable/Disable Debug Logs")
+    public boolean DebugMode = true;
+    
+    @ConfigField(name="RealEstate.Settings.Database.Type", comment="Database Type: Possible values: Serial, MySQL, SQLite")
+    public String databaseType = "Serial";
+
+    @ConfigField(name="RealEstate.Settings.Database.Username", comment="Database Username (MySQL)")
+    public String Username = "";
+
+    @ConfigField(name="RealEstate.Settings.Database.Password", comment="Database Password (MySQL)")
+    public String Password = "";
+
+    @ConfigField(name="RealEstate.Settings.Database.DatabaseName", comment="Database Name (MySQL)")
+    public String DatabaseName = "";
+
+    @ConfigField(name="RealEstate.Settings.Database.Port", comment="Database Port (MySQL)")
+    public int Port = 3306;
     
     public Config()
     {
