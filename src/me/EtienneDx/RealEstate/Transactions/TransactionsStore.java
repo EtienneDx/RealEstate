@@ -26,7 +26,7 @@ import me.ryanhamshire.GriefPrevention.GriefPrevention;
 
 public class TransactionsStore
 {
-    public final String dataFilePath = RealEstate.pluginDirPath + "transactions.data";
+    public final String dataFilePath = RealEstate.pluginDirPath + "transactions.yml";
     DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     Date date = new Date();
 

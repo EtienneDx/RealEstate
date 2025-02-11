@@ -69,21 +69,18 @@ public class ClaimLease extends BoughtTransaction
 				Sign s = (Sign)sign.getBlock().getState();
 				s.getSide(Side.FRONT).setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader));
 				s.getSide(Side.FRONT).setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceLease);
-				//s.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
-				//s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceLease);
-				//s.setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
-				//s.setLine(2, paymentsLeft + "x " + price + " " + RealEstate.econ.currencyNamePlural());
+				s.getSide(Side.FRONT).setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
+				s.getSide(Side.FRONT).setLine(3, paymentsLeft + "x " + price + " " + RealEstate.econ.currencyNamePlural());
+				
 				if(RealEstate.instance.config.cfgUseCurrencySymbol)
 				{
 					if(RealEstate.instance.config.cfgUseDecimalCurrency == false)
 					{
 						s.getSide(Side.FRONT).setLine(2, paymentsLeft + "x " + RealEstate.instance.config.cfgCurrencySymbol + " " + (int)Math.round(price));
-						//s.setLine(2, paymentsLeft + "x " + RealEstate.instance.config.cfgCurrencySymbol + " " + (int)Math.round(price));
 					}
 					else
 					{
 						s.getSide(Side.FRONT).setLine(2, paymentsLeft + "x " + RealEstate.instance.config.cfgCurrencySymbol + " " + price);
-						//s.setLine(2, paymentsLeft + "x " + RealEstate.instance.config.cfgCurrencySymbol + " " + price);
 					}
 				}
 				else
@@ -91,23 +88,19 @@ public class ClaimLease extends BoughtTransaction
 					if(RealEstate.instance.config.cfgUseDecimalCurrency == false)
 					{
 						s.getSide(Side.FRONT).setLine(2, paymentsLeft + "x " + (int)Math.round(price) + " " + RealEstate.econ.currencyNamePlural());
-						//s.setLine(2, paymentsLeft + "x " + (int)Math.round(price) + " " + RealEstate.econ.currencyNamePlural());
 					}
 					else
 					{
 						s.getSide(Side.FRONT).setLine(2, paymentsLeft + "x " + price + " " + RealEstate.econ.currencyNamePlural());
-						//s.setLine(2, paymentsLeft + "x " + price + " " + RealEstate.econ.currencyNamePlural());
 					}
 				}
 				s.getSide(Side.FRONT).setLine(3, Utils.getTime(frequency, null, false));
-				//s.setLine(3, Utils.getTime(frequency, null, false));
 				s.update(true);
 			}
 			else
 			{
 				return true;
 			}
-			
 		}
 		else
 		{
@@ -288,7 +281,7 @@ public class ClaimLease extends BoughtTransaction
 		}
 		else
 		{
-			getHolder().breakNaturally();// the sign should still be there since the lease has netver begun
+			getHolder().breakNaturally();// the sign should still be there since the lease has never begun
 		}
 		RealEstate.transactionsStore.cancelTransaction(this);
 	}

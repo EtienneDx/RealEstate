@@ -45,13 +45,12 @@ public class ClaimPermissionListener implements Listener {
 	    	RealEstate.instance.getLogger().info("isAdmin: " + isAdmin);
 	    	RealEstate.instance.getLogger().info("isAdminClaim: " + event.getClaim().isAdminClaim());
 	    	RealEstate.instance.getLogger().info("Player has GP.AdminClaims: " + event.getCheckedPlayer().hasPermission("griefprevention.adminclaims"));
-	    	RealEstate.instance.getLogger().info("isRental: " + transaction.isRental());
 	    	RealEstate.instance.getLogger().info("User Who Triggered: " + event.getCheckedUUID());
 	    	RealEstate.instance.getLogger().info("Reason for Denial: " + event.getDenialReason());
 	    }
 	    
 	    // Ensure it's a valid "BoughtTransaction" with an actual buyer, but NOT a rental
-	    if ((isOwner || isAdmin) && transaction instanceof BoughtTransaction && !transaction.isRental()) {
+	    if ((isOwner || isAdmin) && transaction instanceof BoughtTransaction) {
 	        BoughtTransaction boughtTransaction = (BoughtTransaction) transaction;
 	        if (boughtTransaction.getBuyer() != null) {
 	            switch (event.getRequiredPermission()) {
@@ -82,7 +81,7 @@ public class ClaimPermissionListener implements Listener {
 	            if (child == null) continue; // Avoid potential null references
 
 	            Transaction childTransaction = RealEstate.transactionsStore.getTransaction(child);
-	            if (childTransaction instanceof BoughtTransaction && !childTransaction.isRental()) {
+	            if (childTransaction instanceof BoughtTransaction) {
 	                BoughtTransaction boughtTransaction = (BoughtTransaction) childTransaction;
 	                if (boughtTransaction.getBuyer() != null) {
 	                    event.setDenialReason(() -> Messages.getMessage(RealEstate.instance.messages.msgErrorSubclaimInTransaction));

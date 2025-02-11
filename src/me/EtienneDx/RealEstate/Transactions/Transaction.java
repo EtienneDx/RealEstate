@@ -17,9 +17,4 @@ public interface Transaction
     public boolean tryCancelTransaction(Player p);
     public boolean tryCancelTransaction(Player p, boolean force);
     public void msgInfo(CommandSender cs);
-
-    // Add this method to differentiate rental transactions
-    public default boolean isRental() {
-        return false; // Override this in rental-related transactions
-    }
 }

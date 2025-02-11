@@ -84,10 +84,8 @@ public class ClaimRent extends BoughtTransaction
 				Sign s = (Sign) sign.getBlock().getState();
 				s.getSide(Side.FRONT).setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
 				s.getSide(Side.FRONT).setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceRent);
+				s.getSide(Side.FRONT).setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
 				
-				//s.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
-				//s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceRent);
-				//s.setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
 				String price_line = "";
 				if(RealEstate.instance.config.cfgUseCurrencySymbol)
 				{
@@ -116,15 +114,9 @@ public class ClaimRent extends BoughtTransaction
 				if(this.buildTrust) {
 					s.getSide(Side.FRONT).setLine(2, price_line);
 					s.getSide(Side.FRONT).setLine(3, period);
-					
-					//s.setLine(2, price_line);
-					//s.setLine(3, period);
 				} else {
 					s.getSide(Side.FRONT).setLine(2, RealEstate.instance.config.cfgContainerRentLine);
 					s.getSide(Side.FRONT).setLine(3, price_line + " - " + period);
-					
-					//s.setLine(2, RealEstate.instance.config.cfgContainerRentLine);
-					//s.setLine(3, price_line + " - " + period);
 				}
 				s.update(true);
 			}
@@ -153,16 +145,11 @@ public class ClaimRent extends BoughtTransaction
 				s.getSide(Side.FRONT).setLine(0, ChatColor.GOLD + RealEstate.instance.config.cfgReplaceOngoingRent);
 				s.getSide(Side.FRONT).setLine(1, Utils.getSignString(Bukkit.getOfflinePlayer(buyer).getName()));
 				s.getSide(Side.FRONT).setLine(2, "Time remaining : ");
-				//s.setLine(0, ChatColor.GOLD + RealEstate.instance.config.cfgReplaceOngoingRent); //Changed the header to "[Rented]" so that it won't waste space on the next line and allow the name of the player to show underneath.
-				//s.setLine(1, Utils.getSignString(Bukkit.getOfflinePlayer(buyer).getName()));//remove "Rented by"
-				//s.setLine(2, "Time remaining : ");
 				
 				int daysLeft = duration - days - 1;// we need to remove the current day
 				Duration timeRemaining = Duration.ofHours(24).minus(hours);
 				
 				s.getSide(Side.FRONT).setLine(3, Utils.getTime(daysLeft, timeRemaining, false));
-				
-				//s.setLine(3, Utils.getTime(daysLeft, timeRemaining, false));
 				s.update(true);
 			}
 		}

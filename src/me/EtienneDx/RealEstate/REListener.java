@@ -400,7 +400,6 @@ public class REListener implements Listener
 				event.getClickedBlock().getState() instanceof Sign)
 		{
 			Sign sign = (Sign)event.getClickedBlock().getState();
-			//RealEstate.instance.log.info(sign.getLine(0));
 			RealEstate.instance.log.info(sign.getSide(Side.FRONT).getLine(0));
 			// it is a real estate sign
 			if(ChatColor.stripColor(sign.getSide(Side.FRONT).getLine(0)).equalsIgnoreCase(ChatColor.stripColor(
