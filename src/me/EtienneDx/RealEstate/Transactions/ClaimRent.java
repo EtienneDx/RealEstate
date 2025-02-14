@@ -11,7 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Sign;
-import org.bukkit.block.sign.Side;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -20,9 +19,9 @@ import com.earth2me.essentials.User;
 import me.EtienneDx.RealEstate.Messages;
 import me.EtienneDx.RealEstate.RealEstate;
 import me.EtienneDx.RealEstate.Utils;
-import me.ryanhamshire.GriefPrevention.Claim;
-import me.ryanhamshire.GriefPrevention.ClaimPermission;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.EtienneDx.RealEstate.RealEstateSign;
+import me.EtienneDx.RealEstate.ClaimAPI.ClaimPermission;
+import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 import net.md_5.bungee.api.ChatColor;
 
 public class ClaimRent extends BoughtTransaction
@@ -31,8 +30,6 @@ public class ClaimRent extends BoughtTransaction
 	int duration;
 	public boolean autoRenew = false;
 	public boolean buildTrust = true;
-	public int periodCount = 0;
-	public int maxPeriod;
 	
 	public ClaimRent(Map<String, Object> map)
 	{
@@ -41,8 +38,6 @@ public class ClaimRent extends BoughtTransaction
 			startDate = LocalDateTime.parse((String) map.get("startDate"), DateTimeFormatter.ISO_DATE_TIME);
 		duration = (int)map.get("duration");
 		autoRenew = (boolean) map.get("autoRenew");
-		periodCount = (int) map.get("periodCount");
-		maxPeriod = (int) map.get("maxPeriod");
 		try {
 			buildTrust = (boolean) map.get("buildTrust");
 		}
@@ -51,11 +46,10 @@ public class ClaimRent extends BoughtTransaction
 		}
 	}
 	
-	public ClaimRent(Claim claim, Player player, double price, Location sign, int duration, int rentPeriods, boolean buildTrust)
+	public ClaimRent(IClaim claim, Player player, double price, Location sign, int duration, boolean buildTrust)
 	{
 		super(claim, player, price, sign);
 		this.duration = duration;
-		this.maxPeriod = RealEstate.instance.config.cfgEnableRentPeriod ? rentPeriods : 1;
 		this.buildTrust = buildTrust;
 	}
 
@@ -67,8 +61,6 @@ public class ClaimRent extends BoughtTransaction
 			map.put("startDate", startDate.format(DateTimeFormatter.ISO_DATE_TIME));
 		map.put("duration", duration);
 		map.put("autoRenew",  autoRenew);
-		map.put("periodCount", periodCount);
-		map.put("maxPeriod", maxPeriod);
 		map.put("buildTrust", buildTrust);
 		
 		return map;
@@ -81,11 +73,9 @@ public class ClaimRent extends BoughtTransaction
 		{
 			if(sign.getBlock().getState() instanceof Sign)
 			{
-				Sign s = (Sign) sign.getBlock().getState();
-				s.getSide(Side.FRONT).setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
-				s.getSide(Side.FRONT).setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceRent);
-				s.getSide(Side.FRONT).setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
-				
+				RealEstateSign s = new RealEstateSign((Sign) sign.getBlock().getState());
+				s.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
+				s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceRent);
 				String price_line = "";
 				if(RealEstate.instance.config.cfgUseCurrencySymbol)
 				{
@@ -110,13 +100,13 @@ public class ClaimRent extends BoughtTransaction
 						price_line = price + " " + RealEstate.econ.currencyNamePlural();
 					}
 				}
-				String period = (maxPeriod > 1 ? maxPeriod + "x " : "") + Utils.getTime(duration, null, false);
+				String period = Utils.getTime(duration, null, false);
 				if(this.buildTrust) {
-					s.getSide(Side.FRONT).setLine(2, price_line);
-					s.getSide(Side.FRONT).setLine(3, period);
+					s.setLine(2, price_line);
+					s.setLine(3, period);
 				} else {
-					s.getSide(Side.FRONT).setLine(2, RealEstate.instance.config.cfgContainerRentLine);
-					s.getSide(Side.FRONT).setLine(3, price_line + " - " + period);
+					s.setLine(2, RealEstate.instance.config.cfgContainerRentLine);
+					s.setLine(3, price_line + " - " + period);
 				}
 				s.update(true);
 			}
@@ -141,15 +131,15 @@ public class ClaimRent extends BoughtTransaction
 			}
 			else if(sign.getBlock().getState() instanceof Sign)
 			{
-				Sign s = (Sign) sign.getBlock().getState();
-				s.getSide(Side.FRONT).setLine(0, ChatColor.GOLD + RealEstate.instance.config.cfgReplaceOngoingRent);
-				s.getSide(Side.FRONT).setLine(1, Utils.getSignString(Bukkit.getOfflinePlayer(buyer).getName()));
-				s.getSide(Side.FRONT).setLine(2, "Time remaining : ");
+				RealEstateSign s = new RealEstateSign((Sign) sign.getBlock().getState());
+				s.setLine(0, ChatColor.GOLD + RealEstate.instance.config.cfgReplaceOngoingRent); //Changed the header to "[Rented]" so that it won't waste space on the next line and allow the name of the player to show underneath.
+				s.setLine(1, Utils.getSignString(Bukkit.getOfflinePlayer(buyer).getName()));//remove "Rented by"
+				s.setLine(2, "Time remaining : ");
 				
 				int daysLeft = duration - days - 1;// we need to remove the current day
 				Duration timeRemaining = Duration.ofHours(24).minus(hours);
 				
-				s.getSide(Side.FRONT).setLine(3, Utils.getTime(daysLeft, timeRemaining, false));
+				s.setLine(3, Utils.getTime(daysLeft, timeRemaining, false));
 				s.update(true);
 			}
 		}
@@ -159,16 +149,16 @@ public class ClaimRent extends BoughtTransaction
 
 	private void unRent(boolean msgBuyer)
 	{
-		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
-		claim.dropPermission(buyer.toString());
-		claim.managers.remove(buyer.toString());
-		claim.setSubclaimRestrictions(false);
-		GriefPrevention.instance.dataStore.saveClaim(claim);
+		IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
+		claim.dropPlayerPermissions(buyer);
+		claim.removeManager(buyer);
+		claim.setInheritPermissions(true);
+		RealEstate.claimAPI.saveClaim(claim);
 		if(msgBuyer && Bukkit.getOfflinePlayer(buyer).isOnline() && RealEstate.instance.config.cfgMessageBuyer)
 		{
 			String location = "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + 
 					sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]";
-			String claimType = claim.parent == null ?
+			String claimType = claim.isParentClaim() ?
 					RealEstate.instance.messages.keywordClaim :
 					RealEstate.instance.messages.keywordSubclaim;
 
@@ -188,15 +178,14 @@ public class ClaimRent extends BoughtTransaction
 		OfflinePlayer buyerPlayer = Bukkit.getOfflinePlayer(this.buyer);
 		OfflinePlayer seller = owner == null ? null : Bukkit.getOfflinePlayer(owner);
 		
-		String claimType = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null).parent == null ?
+		String claimType = RealEstate.claimAPI.getClaimAt(sign).isParentClaim() ?
 				RealEstate.instance.messages.keywordClaim :
 				RealEstate.instance.messages.keywordSubclaim;
 		String location = "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + 
 				sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]";
 		
-		if((autoRenew || periodCount + 1 < maxPeriod) && Utils.makePayment(owner, this.buyer, price, false, false))
+		if(autoRenew && Utils.makePayment(owner, this.buyer, price, false, false))
 		{
-			periodCount = (periodCount + 1) % maxPeriod;
 			startDate = LocalDateTime.now();
 			if(buyerPlayer.isOnline() && RealEstate.instance.config.cfgMessageBuyer)
 			{
@@ -270,7 +259,7 @@ public class ClaimRent extends BoughtTransaction
 	{
 		if(buyer != null)
 		{
-			if(p.hasPermission("realestate.admin") && force == true)
+			if(p.hasPermission("realestate.admin") || force == true)
 			{
 				this.unRent(true);
 				RealEstate.transactionsStore.cancelTransaction(this);
@@ -278,10 +267,10 @@ public class ClaimRent extends BoughtTransaction
 			}
 			else
 			{
-				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
 				if(p != null) {
+					IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
 					Messages.sendMessage(p, RealEstate.instance.messages.msgErrorCantCancelAlreadyRented,
-						claim.parent == null ?
+						claim.isParentClaim() ?
 							RealEstate.instance.messages.keywordClaim :
 							RealEstate.instance.messages.keywordSubclaim
 						);
@@ -299,15 +288,15 @@ public class ClaimRent extends BoughtTransaction
 	@Override
 	public void interact(Player player)
 	{
-		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);// getting by id creates errors for subclaims
-		if(claim == null)
+		IClaim claim = RealEstate.claimAPI.getClaimAt(sign);// getting by id creates errors for subclaims
+		if(claim == null || claim.isWilderness())
 		{
 			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimDoesNotExist);
             RealEstate.transactionsStore.cancelTransaction(claim);
             return;
 		}
-		String claimType = claim.parent == null ? "claim" : "subclaim";
-		String claimTypeDisplay = claim.parent == null ? 
+		String claimType = claim.isParentClaim() ? "claim" : "subclaim";
+		String claimTypeDisplay = claim.isParentClaim() ? 
 			RealEstate.instance.messages.keywordClaim : RealEstate.instance.messages.keywordSubclaim;
 		
 		if (owner != null && owner.equals(player.getUniqueId()))
@@ -315,7 +304,7 @@ public class ClaimRent extends BoughtTransaction
 			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimAlreadyOwner, claimTypeDisplay);
             return;
         }
-		if(claim.parent == null && owner != null && !owner.equals(claim.ownerID))
+		if(claim.isParentClaim() && owner != null && !owner.equals(claim.getOwner()))
 		{
 			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimNotRentedByOwner, claimTypeDisplay);
             RealEstate.transactionsStore.cancelTransaction(claim);
@@ -332,17 +321,16 @@ public class ClaimRent extends BoughtTransaction
             return;
 		}
 		
-		if(Utils.makePayment(owner, player.getUniqueId(), price, false, true))// if payment succeed
+		if(Utils.makePayment(owner, player.getUniqueId(), price, false, true)) // if payment succeed
 		{
 			buyer = player.getUniqueId();
 			startDate = LocalDateTime.now();
 			autoRenew = false;
-			periodCount = 0;
-			claim.setPermission(buyer.toString(), buildTrust ? ClaimPermission.Build : ClaimPermission.Inventory);
-			claim.setPermission(player.getUniqueId().toString(), ClaimPermission.Manage);
-			claim.managers.add(player.getUniqueId().toString());
-			claim.setSubclaimRestrictions(true);
-			GriefPrevention.instance.dataStore.saveClaim(claim);
+			claim.addPlayerPermissions(buyer, buildTrust ? ClaimPermission.BUILD : ClaimPermission.CONTAINER);
+			claim.addPlayerPermissions(player.getUniqueId(), ClaimPermission.MANAGE);
+			claim.addManager(player.getUniqueId());
+			claim.setInheritPermissions(false);
+			RealEstate.claimAPI.saveClaim(claim);
 			update();
 			RealEstate.transactionsStore.saveData();
 			
@@ -393,11 +381,11 @@ public class ClaimRent extends BoughtTransaction
 	@Override
 	public void preview(Player player)
 	{
-		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
+		IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
 		if(player.hasPermission("realestate.info"))
 		{
-			String claimType = claim.parent == null ? "claim" : "subclaim";
-			String claimTypeDisplay = claim.parent == null ? 
+			String claimType = claim.isParentClaim() ? "claim" : "subclaim";
+			String claimTypeDisplay = claim.isParentClaim() ? 
 				RealEstate.instance.messages.keywordClaim :
 				RealEstate.instance.messages.keywordSubclaim;
 			String msg;
@@ -408,11 +396,6 @@ public class ClaimRent extends BoughtTransaction
 						claimTypeDisplay,
 						RealEstate.econ.format(price),
 						Utils.getTime(duration, null, true)) + "\n";
-				if(maxPeriod > 1)
-				{
-					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoRentMaxPeriod,
-							maxPeriod + "") + "\n";
-				}
 
 				if(claimType.equalsIgnoreCase("claim"))
 				{
@@ -422,7 +405,7 @@ public class ClaimRent extends BoughtTransaction
 	            else
 	            {
 					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoMainOwner,
-	            			claim.parent.getOwnerName()) + "\n";
+	            			claim.getParent().getOwnerName()) + "\n";
 					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoNote) + "\n";
 	            }
 			}
@@ -445,12 +428,6 @@ public class ClaimRent extends BoughtTransaction
 						Utils.getTime(daysLeft, timeRemaining, true),
 						Utils.getTime(duration, null, true)) + "\n";
 				
-				if(maxPeriod > 1 && maxPeriod - periodCount > 0)
-				{
-					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoRentRemainingPeriods,
-							(maxPeriod - periodCount) + "") + "\n";
-				}
-
 				if((owner != null && owner.equals(player.getUniqueId()) || buyer.equals(player.getUniqueId())) && RealEstate.instance.config.cfgEnableAutoRenew)
 				{
 					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoRentAutoRenew,
@@ -466,7 +443,7 @@ public class ClaimRent extends BoughtTransaction
 				else
 				{
 					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoMainOwner,
-							claim.parent.getOwnerName()) + "\n";
+							claim.getParent().getOwnerName()) + "\n";
 				}
 			}
 			Messages.sendMessage(player, msg, false);
@@ -480,11 +457,11 @@ public class ClaimRent extends BoughtTransaction
 	@Override
 	public void msgInfo(CommandSender cs)
 	{
-		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
-		String location = "[" + claim.getLesserBoundaryCorner().getWorld().getName() + ", " +
-		"X: " + claim.getLesserBoundaryCorner().getBlockX() + ", " +
-		"Y: " + claim.getLesserBoundaryCorner().getBlockY() + ", " +
-		"Z: " + claim.getLesserBoundaryCorner().getBlockZ() + "]";
+		IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
+		String location = "[" + claim.getWorld().getName() + ", " +
+		"X: " + claim.getX() + ", " +
+		"Y: " + claim.getY() + ", " +
+		"Z: " + claim.getZ() + "]";
 
 		Messages.sendMessage(cs, RealEstate.instance.messages.msgInfoClaimInfoRentOneline,
 				claim.getArea() + "",

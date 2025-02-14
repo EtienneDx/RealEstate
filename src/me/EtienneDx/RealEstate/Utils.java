@@ -6,57 +6,61 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
-import me.ryanhamshire.GriefPrevention.Claim;
-import me.ryanhamshire.GriefPrevention.ClaimPermission;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import me.ryanhamshire.GriefPrevention.PlayerData;
+import me.EtienneDx.RealEstate.ClaimAPI.ClaimPermission;
+import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
+import me.EtienneDx.RealEstate.ClaimAPI.IPlayerData;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 public class Utils
 {
-    public static boolean makePayment(UUID receiver, UUID giver, double amount, boolean msgSeller, boolean msgBuyer)
+    public static boolean makePayment(UUID receiver, UUID giver, double amount, boolean msgReceiver, boolean msgGiver)
     {
     	// seller might be null if it is the server
-    	OfflinePlayer s = receiver != null ? Bukkit.getOfflinePlayer(receiver) : null, b = Bukkit.getOfflinePlayer(giver);
-    	if(!RealEstate.econ.has(b, amount))
+    	OfflinePlayer giveTo = receiver != null ? Bukkit.getOfflinePlayer(receiver) : null;
+		OfflinePlayer takeFrom = giver != null ? Bukkit.getOfflinePlayer(giver) : null;
+    	if(takeFrom != null && !RealEstate.econ.has(takeFrom, amount))
     	{
-    		if(b.isOnline() && msgBuyer)
+    		if(takeFrom.isOnline() && msgGiver)
     		{
-				Messages.sendMessage(b.getPlayer(), RealEstate.instance.messages.msgErrorNoMoneySelf);
+				Messages.sendMessage(takeFrom.getPlayer(), RealEstate.instance.messages.msgErrorNoMoneySelf);
     		}
-    		if(s != null && s.isOnline() && msgSeller)
+    		if(giveTo != null && giveTo.isOnline() && msgReceiver)
     		{
-				Messages.sendMessage(s.getPlayer(), RealEstate.instance.messages.msgErrorNoMoneyOther, b.getName());
+				Messages.sendMessage(giveTo.getPlayer(), RealEstate.instance.messages.msgErrorNoMoneyOther, takeFrom.getName());
     		}
     		return false;
     	}
-    	EconomyResponse resp = RealEstate.econ.withdrawPlayer(b, amount);
-    	if(!resp.transactionSuccess())
+		if(takeFrom != null)
+		{
+			EconomyResponse resp = RealEstate.econ.withdrawPlayer(takeFrom, amount);
+			if(!resp.transactionSuccess())
+			{
+				if(takeFrom.isOnline() && msgGiver)
+				{
+					Messages.sendMessage(takeFrom.getPlayer(), RealEstate.instance.messages.msgErrorNoWithdrawSelf);
+				}
+				if(giveTo != null && giveTo.isOnline() && msgReceiver)
+				{
+					Messages.sendMessage(giveTo.getPlayer(), RealEstate.instance.messages.msgErrorNoWithdrawOther);
+				}
+				return false;
+			}
+		}
+    	if(giveTo != null)
     	{
-    		if(b.isOnline() && msgBuyer)
-    		{
-				Messages.sendMessage(b.getPlayer(), RealEstate.instance.messages.msgErrorNoWithdrawSelf);
-    		}
-    		if(s != null && s.isOnline() && msgSeller)
-    		{
-				Messages.sendMessage(b.getPlayer(), RealEstate.instance.messages.msgErrorNoWithdrawOther);
-    		}
-    		return false;
-    	}
-    	if(s != null)
-    	{
-    		resp = RealEstate.econ.depositPlayer(s, amount);
+    		EconomyResponse resp = RealEstate.econ.depositPlayer(giveTo, amount);
     		if(!resp.transactionSuccess())
     		{
-    			if(b.isOnline() && msgBuyer)
+    			if(takeFrom != null && takeFrom.isOnline() && msgGiver)
         		{
-					Messages.sendMessage(b.getPlayer(), RealEstate.instance.messages.msgErrorNoDepositOther, s.getName());
+					Messages.sendMessage(giveTo.getPlayer(), RealEstate.instance.messages.msgErrorNoDepositOther, giveTo.getName());
         		}
-        		if(s != null && s.isOnline() && msgSeller)
+        		if(takeFrom != null && giveTo != null && giveTo.isOnline() && msgReceiver)
         		{
-					Messages.sendMessage(b.getPlayer(), RealEstate.instance.messages.msgErrorNoDepositSelf, b.getName());
+					Messages.sendMessage(takeFrom.getPlayer(), RealEstate.instance.messages.msgErrorNoDepositSelf, takeFrom.getName());
         		}
-        		RealEstate.econ.depositPlayer(b, amount);
+				// refund
+        		RealEstate.econ.depositPlayer(takeFrom, amount);
         		return false;
     		}
     	}
@@ -87,18 +91,18 @@ public class Utils
 		return time;
 	}
 	
-	public static void transferClaim(Claim claim, UUID buyer, UUID seller)
+	public static void transferClaim(IClaim claim, UUID buyer, UUID seller)
 	{
 		// blocks transfer :
 		// if transfert is true, the seller will lose the blocks he had
 		// and the buyer will get them
 		// (that means the buyer will keep the same amount of remaining blocks after the transaction)
-		if(claim.parent == null && RealEstate.instance.config.cfgTransferClaimBlocks)
+		if(claim.isParentClaim() && RealEstate.instance.config.cfgTransferClaimBlocks)
 		{
-			PlayerData buyerData = GriefPrevention.instance.dataStore.getPlayerData(buyer);
+			IPlayerData buyerData = RealEstate.claimAPI.getPlayerData(buyer);
 			if(seller != null)
 			{
-				PlayerData sellerData = GriefPrevention.instance.dataStore.getPlayerData(seller);
+				IPlayerData sellerData = RealEstate.claimAPI.getPlayerData(seller);
 				
 				// the seller has to provide the blocks
 				sellerData.setBonusClaimBlocks(sellerData.getBonusClaimBlocks() - claim.getArea());
@@ -114,21 +118,23 @@ public class Utils
 		}
 		
 		// start to change owner
-		if(claim.parent == null)
-			for(Claim child : claim.children)
+		if(claim.isParentClaim())
+		{
+			for(IClaim child : claim.getChildren())
 			{
-				child.clearPermissions();
-				child.managers.clear();
+				child.clearPlayerPermissions();
+				child.clearManagers();
 			}
-		claim.clearPermissions();
+		}
+		claim.clearPlayerPermissions();
 		
 		try
 		{
-			if(claim.parent == null)
-				GriefPrevention.instance.dataStore.changeClaimOwner(claim, buyer);
+			if(claim.isParentClaim())
+				RealEstate.claimAPI.changeClaimOwner(claim, buyer);
 			else
 			{
-				claim.setPermission(buyer.toString(), ClaimPermission.Build);
+				claim.addPlayerPermissions(buyer, ClaimPermission.BUILD);
 			}
 		}
 		catch (Exception e)// error occurs when trying to change subclaim owner
@@ -136,7 +142,7 @@ public class Utils
 			e.printStackTrace();
 			return;
 		}
-		GriefPrevention.instance.dataStore.saveClaim(claim);
+		RealEstate.claimAPI.saveClaim(claim);
 					
 	}
 	

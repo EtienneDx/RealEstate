@@ -1,19 +1,30 @@
----
 name: RealEstate
 main: me.EtienneDx.RealEstate.RealEstate
 version: ${project.version}
+api-version: 1.21.4
 authors:
   - EtienneDx
   - DmitryRendov
   - SkyWalker3200
   - Tadhunt
-load: POSTWORLD
-depend:
-  - Vault
-softdepend:
-  - GriefPrevention
-  - GriefDefender
-api-version: 1.21.4
+dependencies:
+  server:
+    Vault:
+      load: BEFORE
+      required: true
+      join-classpath: true
+    Essentials:
+      load: BEFORE
+      required: true
+      join-classpath: true
+    GriefPrevention:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    GriefDefender:
+      load: BEFORE
+      required: false
+      join-classpath: true
 commands:
   re:
     description: Access to the claim transaction information.
@@ -24,7 +35,7 @@ commands:
     permission-message: You do not have access to that command!
 permissions:
   realestate.*:
-    description: Gives access to all Real Estate permissions (including admin!)
+    description: Gives access to all Real Estate permissions
     default: op
     children:
       realestate.info: true
@@ -34,14 +45,10 @@ permissions:
       realestate.claim.sell: true
       realestate.claim.rent: true
       realestate.claim.lease: true
-      realestate.claim.auction: true
-      realestate.claim.bid: true
       realestate.subclaim.buy: true
       realestate.subclaim.sell: true
       realestate.subclaim.rent: true
       realestate.subclaim.lease: true
-      realestate.subclaim.auction: true
-      realestate.subclaim.bid: true
       realestate.autorenew: true
   realestate.claim.*:
     description: Allows the player full access over claims
@@ -51,8 +58,6 @@ permissions:
       realestate.claim.sell: true
       realestate.claim.rent: true
       realestate.claim.lease: true
-      realestate.claim.auction: true
-      realestate.claim.bid: true
   realestate.subclaim.*:
     description: Allows the player full access over subclaims
     default: op
@@ -61,28 +66,10 @@ permissions:
       realestate.subclaim.sell: true
       realestate.subclaim.rent: true
       realestate.subclaim.lease: true
-      realestate.subclaim.auction: true
-      realestate.subclaim.bid: true
   realestate.admin:
     description: Allows the player to sell and lease admin claims, as well as see
       plugin informations
     default: op
-    children:
-      realestate.info: true
-      realestate.destroysigns: true
-      realestate.claim.buy: true
-      realestate.claim.sell: true
-      realestate.claim.rent: true
-      realestate.claim.lease: true
-      realestate.claim.auction: true
-      realestate.claim.bid: true
-      realestate.subclaim.buy: true
-      realestate.subclaim.sell: true
-      realestate.subclaim.rent: true
-      realestate.subclaim.lease: true
-      realestate.subclaim.auction: true
-      realestate.subclaim.bid: true
-      realestate.autorenew: true
   realestate.info:
     description: Allow the player to get informations about the claim
     default: true
@@ -98,12 +85,6 @@ permissions:
   realestate.claim.lease:
     description: Allows the player to lease claims
     default: true
-  realestate.claim.auction:
-    description: Allows the player to auction claims
-    default: true
-  realestate.claim.bid:
-    description: Allows the player to bid on claims
-    default: true
   realestate.subclaim.buy:
     description: Allows the player to buy subclaims (buying, paying rents)
     default: true
@@ -115,12 +96,6 @@ permissions:
     default: true
   realestate.subclaim.lease:
     description: Allows the player to lease subclaims
-    default: false
-  realestate.subclaim.auction:
-    description: Allows the player to auction subclaims
-    default: false
-  realestate.subclaim.bid:
-    description: Allows the player to bid on subclaims
     default: false
   realestate.destroysigns:
     description: Allows the player to destroy any sign representing a transaction

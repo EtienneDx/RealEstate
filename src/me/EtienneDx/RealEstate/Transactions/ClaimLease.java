@@ -11,7 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Sign;
-import org.bukkit.block.sign.Side;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -20,9 +19,9 @@ import com.earth2me.essentials.User;
 import me.EtienneDx.RealEstate.Messages;
 import me.EtienneDx.RealEstate.RealEstate;
 import me.EtienneDx.RealEstate.Utils;
-import me.ryanhamshire.GriefPrevention.Claim;
-import me.ryanhamshire.GriefPrevention.ClaimPermission;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.EtienneDx.RealEstate.RealEstateSign;
+import me.EtienneDx.RealEstate.ClaimAPI.ClaimPermission;
+import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 import net.md_5.bungee.api.ChatColor;
 
 public class ClaimLease extends BoughtTransaction
@@ -40,7 +39,7 @@ public class ClaimLease extends BoughtTransaction
 		paymentsLeft = (int)map.get("paymentsLeft");
 	}
 	
-	public ClaimLease(Claim claim, Player player, double price, Location sign, int frequency, int paymentsLeft)
+	public ClaimLease(IClaim claim, Player player, double price, Location sign, int frequency, int paymentsLeft)
 	{
 		super(claim, player, price, sign);
 		this.frequency = frequency;
@@ -66,41 +65,39 @@ public class ClaimLease extends BoughtTransaction
 		{
 			if(sign.getBlock().getState() instanceof Sign)
 			{
-				Sign s = (Sign)sign.getBlock().getState();
-				s.getSide(Side.FRONT).setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader));
-				s.getSide(Side.FRONT).setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceLease);
-				s.getSide(Side.FRONT).setLine(2, owner != null ? Bukkit.getOfflinePlayer(owner).getName() : "SERVER");
-				s.getSide(Side.FRONT).setLine(3, paymentsLeft + "x " + price + " " + RealEstate.econ.currencyNamePlural());
-				
+				RealEstateSign s = new RealEstateSign((Sign) sign.getBlock().getState());
+				s.setLine(0, Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false));
+				s.setLine(1, ChatColor.DARK_GREEN + RealEstate.instance.config.cfgReplaceLease);
 				if(RealEstate.instance.config.cfgUseCurrencySymbol)
 				{
 					if(RealEstate.instance.config.cfgUseDecimalCurrency == false)
 					{
-						s.getSide(Side.FRONT).setLine(2, paymentsLeft + "x " + RealEstate.instance.config.cfgCurrencySymbol + " " + (int)Math.round(price));
+						s.setLine(2, paymentsLeft + "x " + RealEstate.instance.config.cfgCurrencySymbol + " " + (int)Math.round(price));
 					}
 					else
 					{
-						s.getSide(Side.FRONT).setLine(2, paymentsLeft + "x " + RealEstate.instance.config.cfgCurrencySymbol + " " + price);
+						s.setLine(2, paymentsLeft + "x " + RealEstate.instance.config.cfgCurrencySymbol + " " + price);
 					}
 				}
 				else
 				{
 					if(RealEstate.instance.config.cfgUseDecimalCurrency == false)
 					{
-						s.getSide(Side.FRONT).setLine(2, paymentsLeft + "x " + (int)Math.round(price) + " " + RealEstate.econ.currencyNamePlural());
+						s.setLine(2, paymentsLeft + "x " + (int)Math.round(price) + " " + RealEstate.econ.currencyNamePlural());
 					}
 					else
 					{
-						s.getSide(Side.FRONT).setLine(2, paymentsLeft + "x " + price + " " + RealEstate.econ.currencyNamePlural());
+						s.setLine(2, paymentsLeft + "x " + price + " " + RealEstate.econ.currencyNamePlural());
 					}
 				}
-				s.getSide(Side.FRONT).setLine(3, Utils.getTime(frequency, null, false));
+				s.setLine(3, Utils.getTime(frequency, null, false));
 				s.update(true);
 			}
 			else
 			{
 				return true;
 			}
+			
 		}
 		else
 		{
@@ -126,7 +123,7 @@ public class ClaimLease extends BoughtTransaction
 		OfflinePlayer buyerPlayer = Bukkit.getOfflinePlayer(buyer);
 		OfflinePlayer seller = owner == null ? null : Bukkit.getOfflinePlayer(owner);
 		
-		String claimType = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null).parent == null ?
+		String claimType = RealEstate.claimAPI.getClaimAt(sign).isParentClaim() ?
 				RealEstate.instance.messages.keywordClaim : RealEstate.instance.messages.keywordSubclaim;
 		String location = "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + 
 				", Y: " + sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]";
@@ -157,7 +154,7 @@ public class ClaimLease extends BoughtTransaction
 				
 				if(owner != null)
 				{
-					if(seller.isOnline() && RealEstate.instance.config.cfgMessageOwner)
+					if(seller != null && seller.isOnline() && RealEstate.instance.config.cfgMessageOwner)
 					{
 						Messages.sendMessage(seller.getPlayer(), RealEstate.instance.messages.msgInfoClaimInfoLeasePaymentOwner, 
 								buyerPlayer.getName(),
@@ -196,7 +193,7 @@ public class ClaimLease extends BoughtTransaction
 							RealEstate.econ.format(price)));
 	        	}
 				
-				if(seller.isOnline() && RealEstate.instance.config.cfgMessageOwner)
+				if(seller != null && seller.isOnline() && RealEstate.instance.config.cfgMessageOwner)
 				{
 					Messages.sendMessage(seller.getPlayer(), RealEstate.instance.messages.msgInfoClaimInfoLeasePaymentOwnerFinal, 
 							buyerPlayer.getName(),
@@ -213,7 +210,7 @@ public class ClaimLease extends BoughtTransaction
 							location,
 							RealEstate.econ.format(price)));
 	        	}
-				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
+				IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
 				
 				Utils.transferClaim(claim, buyer, owner);
 				RealEstate.transactionsStore.cancelTransaction(this);// the transaction is finished
@@ -234,9 +231,9 @@ public class ClaimLease extends BoughtTransaction
 			OfflinePlayer buyerPlayer = Bukkit.getOfflinePlayer(buyer);
 			OfflinePlayer seller = owner == null ? null : Bukkit.getOfflinePlayer(owner);
 			
-			Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
+			IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
 			
-			String claimType = claim.parent == null ? 
+			String claimType = claim.isParentClaim() ? 
 					RealEstate.instance.messages.keywordClaim :
 					RealEstate.instance.messages.keywordSubclaim;
 			String location = "[" + sign.getWorld().getName() + ", X: " + 
@@ -258,7 +255,7 @@ public class ClaimLease extends BoughtTransaction
 						location,
 						RealEstate.econ.format(price)));
 	    	}
-			if(seller.isOnline() && RealEstate.instance.config.cfgMessageOwner)
+			if(seller != null && seller.isOnline() && RealEstate.instance.config.cfgMessageOwner)
 			{
 				Messages.sendMessage(seller.getPlayer(), RealEstate.instance.messages.msgInfoClaimInfoLeasePaymentOwnerCancelled, 
 						buyerPlayer.getName(),
@@ -276,12 +273,12 @@ public class ClaimLease extends BoughtTransaction
 						RealEstate.econ.format(price)));
 	    	}
 			
-			claim.managers.remove(buyer.toString());
-			claim.dropPermission(buyer.toString());
+			claim.removeManager(buyer);
+			claim.dropPlayerPermissions(buyer);
 		}
 		else
 		{
-			getHolder().breakNaturally();// the sign should still be there since the lease has never begun
+			getHolder().breakNaturally();// the sign should still be there since the lease has netver begun
 		}
 		RealEstate.transactionsStore.cancelTransaction(this);
 	}
@@ -298,10 +295,10 @@ public class ClaimLease extends BoughtTransaction
 			}
 			else
 			{
-				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
+				IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
 				if(p != null) {
 					Messages.sendMessage(p, RealEstate.instance.messages.msgErrorCantCancelAlreadyLeased,
-						claim.parent == null ?
+						claim.isParentClaim() ?
 							RealEstate.instance.messages.keywordClaim :
 							RealEstate.instance.messages.keywordSubclaim
 						);
@@ -319,15 +316,15 @@ public class ClaimLease extends BoughtTransaction
 	@Override
 	public void interact(Player player)
 	{
-		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);// getting by id creates errors for subclaims
-		if(claim == null)
+		IClaim claim = RealEstate.claimAPI.getClaimAt(sign);// getting by id creates errors for subclaims
+		if(claim == null || claim.isWilderness())
 		{
 			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimDoesNotExist);
             RealEstate.transactionsStore.cancelTransaction(claim);
             return;
 		}
-		String claimType = claim.parent == null ? "claim" : "subclaim";
-		String claimTypeDisplay = claim.parent == null ? 
+		String claimType = claim.isParentClaim() ? "claim" : "subclaim";
+		String claimTypeDisplay = claim.isParentClaim() ? 
 			RealEstate.instance.messages.keywordClaim :
 			RealEstate.instance.messages.keywordSubclaim;
 		
@@ -336,7 +333,7 @@ public class ClaimLease extends BoughtTransaction
 			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimAlreadyOwner, claimTypeDisplay);
             return;
         }
-		if(claim.parent == null && owner != null && !owner.equals(claim.ownerID))
+		if(claim.isParentClaim() && owner != null && !owner.equals(claim.getOwner()))
 		{
 			Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimNotLeasedByOwner, claimTypeDisplay);
             RealEstate.transactionsStore.cancelTransaction(claim);
@@ -358,9 +355,9 @@ public class ClaimLease extends BoughtTransaction
 			buyer = player.getUniqueId();
 			lastPayment = LocalDateTime.now();
 			paymentsLeft--;
-			claim.setPermission(buyer.toString(), ClaimPermission.Build);
-			claim.setPermission(player.getUniqueId().toString(), ClaimPermission.Manage);
-			GriefPrevention.instance.dataStore.saveClaim(claim);
+			claim.addPlayerPermissions(buyer, ClaimPermission.BUILD);
+			claim.addPlayerPermissions(player.getUniqueId(), ClaimPermission.MANAGE);
+			RealEstate.claimAPI.saveClaim(claim);
 			getHolder().breakNaturally();// leases don't have signs indicating the remaining time
 			update();
 			RealEstate.transactionsStore.saveData();
@@ -410,11 +407,11 @@ public class ClaimLease extends BoughtTransaction
 	@Override
 	public void preview(Player player)
 	{
-		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
+		IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
 		if(player.hasPermission("realestate.info"))
 		{
-			String claimType = claim.parent == null ? "claim" : "subclaim";
-			String claimTypeDisplay = claim.parent == null ? 
+			String claimType = claim.isParentClaim() ? "claim" : "subclaim";
+			String claimTypeDisplay = claim.isParentClaim() ? 
 				RealEstate.instance.messages.keywordClaim :
 				RealEstate.instance.messages.keywordSubclaim;
 			String msg;
@@ -435,7 +432,7 @@ public class ClaimLease extends BoughtTransaction
 	            else
 	            {
 					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoMainOwner,
-	            			claim.parent.getOwnerName()) + "\n";
+	            			claim.getParent().getOwnerName()) + "\n";
 					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoNote) + "\n";
 	            }
 			}
@@ -466,7 +463,7 @@ public class ClaimLease extends BoughtTransaction
 				else
 				{
 					msg += Messages.getMessage(RealEstate.instance.messages.msgInfoClaimInfoMainOwner,
-							claim.parent.getOwnerName()) + "\n";
+							claim.getParent().getOwnerName()) + "\n";
 				}
 			}
 			Messages.sendMessage(player, msg, false);
@@ -480,17 +477,24 @@ public class ClaimLease extends BoughtTransaction
 	@Override
 	public void msgInfo(CommandSender cs)
 	{
-		Claim claim = GriefPrevention.instance.dataStore.getClaimAt(sign, false, null);
-		String location = "[" + claim.getLesserBoundaryCorner().getWorld().getName() + ", " +
-		"X: " + claim.getLesserBoundaryCorner().getBlockX() + ", " +
-		"Y: " + claim.getLesserBoundaryCorner().getBlockY() + ", " +
-		"Z: " + claim.getLesserBoundaryCorner().getBlockZ() + "]";
+		IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
+		String location = "[" + claim.getWorld().getName() + ", " +
+		"X: " + claim.getX() + ", " +
+		"Y: " + claim.getY() + ", " +
+		"Z: " + claim.getZ() + "]";
 
 		Messages.sendMessage(cs, RealEstate.instance.messages.msgInfoClaimInfoLeaseOneline,
 				claim.getArea() + "",
 				location,
 				RealEstate.econ.format(price),
 				paymentsLeft + "");
+	}
+	public int getFrequency() {
+	    return this.frequency;
+	}
+
+	public int getPaymentsLeft() {
+	    return this.paymentsLeft;
 	}
 
 }

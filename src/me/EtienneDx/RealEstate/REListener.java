@@ -3,10 +3,8 @@ package me.EtienneDx.RealEstate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
-import org.bukkit.block.sign.Side;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,9 +15,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.PluginManager;
 
+import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 import me.EtienneDx.RealEstate.Transactions.Transaction;
-import me.ryanhamshire.GriefPrevention.Claim;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
 
 public class REListener implements Listener
 {
@@ -28,7 +25,6 @@ public class REListener implements Listener
 		PluginManager pm = RealEstate.instance.getServer().getPluginManager();
 
 		pm.registerEvents(this, RealEstate.instance);
-		//RealEstate.instance.getCommand("re").setExecutor(this);
 	}
 
 	@EventHandler
@@ -37,13 +33,14 @@ public class REListener implements Listener
 		if(RealEstate.instance.config.cfgSellKeywords.contains(event.getLine(0).toLowerCase()) || 
 				RealEstate.instance.config.cfgLeaseKeywords.contains(event.getLine(0).toLowerCase()) || 
 				RealEstate.instance.config.cfgRentKeywords.contains(event.getLine(0).toLowerCase()) || 
-				RealEstate.instance.config.cfgContainerRentKeywords.contains(event.getLine(0).toLowerCase()))
+				RealEstate.instance.config.cfgContainerRentKeywords.contains(event.getLine(0).toLowerCase()) ||
+				RealEstate.instance.config.cfgAuctionKeywords.contains(event.getLine(0).toLowerCase()))
 		{
 			Player player = event.getPlayer();
 			Location loc = event.getBlock().getLocation();
 
-			Claim claim = GriefPrevention.instance.dataStore.getClaimAt(loc, false, null);
-			if(claim == null)// must have something to sell
+			IClaim claim = RealEstate.claimAPI.getClaimAt(loc);
+			if(claim == null || claim.isWilderness())// must have something to sell
 			{
 				Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotInClaim);
 				event.setCancelled(true);
@@ -57,14 +54,14 @@ public class REListener implements Listener
 				event.getBlock().breakNaturally();
 				return;
 			}
-			if(RealEstate.transactionsStore.anyTransaction(claim.parent))
+			if(RealEstate.transactionsStore.anyTransaction(claim.getParent()))
 			{
 				Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignParentOngoingTransaction);
 				event.setCancelled(true);
 				event.getBlock().breakNaturally();
 				return;
 			}
-			for(Claim c : claim.children)
+			for(IClaim c : claim.getChildren())
 			{
 				if(RealEstate.transactionsStore.anyTransaction(c))
 				{
@@ -86,8 +83,8 @@ public class REListener implements Listener
 					return;
 				}
 
-				String type = claim.parent == null ? "claim" : "subclaim";
-				String typeDisplay = claim.parent == null ?
+				String type = claim.isParentClaim() ? "claim" : "subclaim";
+				String typeDisplay = claim.isParentClaim() ?
 						RealEstate.instance.messages.keywordClaim : RealEstate.instance.messages.keywordSubclaim;
 				if(!RealEstate.perms.has(player, "realestate." + type + ".sell"))
 				{
@@ -135,7 +132,7 @@ public class REListener implements Listener
 						return;
 					}
 				}
-				else if(type.equals("claim") && !player.getUniqueId().equals(claim.ownerID))// only the owner may sell his claim
+				else if(type.equals("claim") && !player.getUniqueId().equals(claim.getOwner()))// only the owner may sell his claim
 				{
 					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotOwner, typeDisplay);
 					event.setCancelled(true);
@@ -157,8 +154,8 @@ public class REListener implements Listener
 					event.getBlock().breakNaturally();
 					return;
 				}
-				String type = claim.parent == null ? "claim" : "subclaim";
-				String typeDisplay = claim.parent == null ?
+				String type = claim.isParentClaim() ? "claim" : "subclaim";
+				String typeDisplay = claim.isParentClaim() ?
 						RealEstate.instance.messages.keywordClaim : RealEstate.instance.messages.keywordSubclaim;
 				if(!RealEstate.perms.has(player, "realestate." + type + ".rent"))
 				{
@@ -211,32 +208,6 @@ public class REListener implements Listener
 					event.getBlock().breakNaturally();
 					return;
 				}
-				int rentPeriods = 1;
-				if(RealEstate.instance.config.cfgEnableRentPeriod)
-				{
-					if(event.getLine(3).isEmpty())
-					{
-						event.setLine(3, "1");
-					}
-					try
-					{
-						rentPeriods = Integer.parseInt(event.getLine(3));
-					}
-					catch (NumberFormatException e)
-					{
-						Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidNumber, event.getLine(3));
-						event.setCancelled(true);
-						event.getBlock().breakNaturally();
-						return;
-					}
-					if(rentPeriods <= 0)
-					{
-						Messages.sendMessage(player, RealEstate.instance.messages.msgErrorNegativeNumber, event.getLine(3));
-						event.setCancelled(true);
-						event.getBlock().breakNaturally();
-						return;
-					}
-				}
 
 				if(claim.isAdminClaim())
 				{
@@ -248,7 +219,7 @@ public class REListener implements Listener
 						return;
 					}
 				}
-				else if(type.equals("claim") && !player.getUniqueId().equals(claim.ownerID))// only the owner may sell his claim
+				else if(type.equals("claim") && !player.getUniqueId().equals(claim.getOwner()))// only the owner may sell his claim
 				{
 					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotOwner, typeDisplay);
 					event.setCancelled(true);
@@ -258,7 +229,7 @@ public class REListener implements Listener
 
 				// all should be good, we can create the rent
 				event.setCancelled(true);
-				RealEstate.transactionsStore.rent(claim, player, price, event.getBlock().getLocation(), duration, rentPeriods,
+				RealEstate.transactionsStore.rent(claim, player, price, event.getBlock().getLocation(), duration,
 						RealEstate.instance.config.cfgRentKeywords.contains(event.getLine(0).toLowerCase()));
 			}
 			else if(RealEstate.instance.config.cfgLeaseKeywords.contains(event.getLine(0).toLowerCase()))// we want to rent it
@@ -270,8 +241,8 @@ public class REListener implements Listener
 					event.getBlock().breakNaturally();
 					return;
 				}
-				String type = claim.parent == null ? "claim" : "subclaim";
-				String typeDisplay = claim.parent == null ?
+				String type = claim.isParentClaim() ? "claim" : "subclaim";
+				String typeDisplay = claim.isParentClaim() ?
 					RealEstate.instance.messages.keywordClaim :
 					RealEstate.instance.messages.keywordSubclaim;
 				if(!RealEstate.perms.has(player, "realestate." + type + ".lease"))
@@ -353,7 +324,7 @@ public class REListener implements Listener
 						return;
 					}
 				}
-				else if(type.equals("claim") && !player.getUniqueId().equals(claim.ownerID))// only the owner may sell his claim
+				else if(type.equals("claim") && !player.getUniqueId().equals(claim.getOwner()))// only the owner may sell his claim
 				{
 					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotOwner, typeDisplay);
 					event.setCancelled(true);
@@ -364,6 +335,108 @@ public class REListener implements Listener
 				// all should be good, we can create the rent
 				event.setCancelled(true);
 				RealEstate.transactionsStore.lease(claim, player, price, event.getBlock().getLocation(), frequency, paymentsCount);
+			}
+			else if(RealEstate.instance.config.cfgAuctionKeywords.contains(event.getLine(0).toLowerCase()))
+			{
+				if(!RealEstate.instance.config.cfgEnableAuction)
+				{
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignAuctionDisabled);
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+				String type = claim.isParentClaim() ? "claim" : "subclaim";
+				String typeDisplay = claim.isParentClaim() ?
+					RealEstate.instance.messages.keywordClaim :
+					RealEstate.instance.messages.keywordSubclaim;
+				if(!RealEstate.perms.has(player, "realestate." + type + ".auction"))
+				{
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNoAuctionPermission, typeDisplay);
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+
+				// check for a valid price
+				double price;
+				try
+				{
+					price = getDouble(event, 1, RealEstate.instance.config.cfgPriceAuctionPerBlock * claim.getArea());
+				}
+				catch (NumberFormatException e)
+				{
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidNumber, event.getLine(1));
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+				if(price <= 0)
+				{
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorNegativePrice, event.getLine(1));
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+
+				// check for a valid bid step
+				double bidStep;
+				try
+				{
+					bidStep = getDouble(event, 2, RealEstate.instance.config.cfgPriceAuctionBidStep);
+				}
+				catch (NumberFormatException e)
+				{
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidNumber, event.getLine(2));
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+				if(bidStep <= 0)
+				{
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorNegativeBidStep, event.getLine(2));
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+
+				// check for a valid duration
+				if(event.getLine(3).isEmpty())
+				{
+					event.setLine(3, RealEstate.instance.config.cfgLeaseTime);
+				}
+				int duration = parseDuration(event.getLine(3));
+				if(duration == 0)
+				{
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorInvalidDuration, event.getLine(3),
+						"10 weeks",
+						"3 days",
+						"1 week 3 days");
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+
+				if(claim.isAdminClaim())
+				{
+					if(!RealEstate.perms.has(player, "realestate.admin"))// admin may sell admin claims
+					{
+						Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNoAdminAuctionPermission, typeDisplay);
+						event.setCancelled(true);
+						event.getBlock().breakNaturally();
+						return;
+					}
+				}
+				else if(type.equals("claim") && !player.getUniqueId().equals(claim.getOwner()))// only the owner may sell his claim
+				{
+					Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotOwner, typeDisplay);
+					event.setCancelled(true);
+					event.getBlock().breakNaturally();
+					return;
+				}
+
+				// all should be good, we can create the auction
+				event.setCancelled(true);
+				RealEstate.transactionsStore.auction(claim, player, price, event.getBlock().getLocation(), duration, bidStep);
 			}
 		}
 	}
@@ -386,7 +459,7 @@ public class REListener implements Listener
 
 	private double getDouble(SignChangeEvent event, int line, double defaultValue) throws NumberFormatException
 	{
-		if(event.getLine(line).isEmpty())// if no price precised, make it the default one
+		if(event.getLine(line).isEmpty())// if no price specified, make it the default one
 		{
 			event.setLine(line, Double.toString(defaultValue));
 		}
@@ -399,14 +472,12 @@ public class REListener implements Listener
 		if(event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && event.getHand().equals(EquipmentSlot.HAND) &&
 				event.getClickedBlock().getState() instanceof Sign)
 		{
-			Sign sign = (Sign)event.getClickedBlock().getState();
-			RealEstate.instance.log.info(sign.getSide(Side.FRONT).getLine(0));
+			RealEstateSign s = new RealEstateSign((Sign) event.getClickedBlock().getState());
 			// it is a real estate sign
-			if(ChatColor.stripColor(sign.getSide(Side.FRONT).getLine(0)).equalsIgnoreCase(ChatColor.stripColor(
-				Messages.getMessage(RealEstate.instance.config.cfgSignsHeader, false))))
+			if(s.isRealEstateSign())
 			{
 				Player player = event.getPlayer();
-				Claim claim = GriefPrevention.instance.dataStore.getClaimAt(event.getClickedBlock().getLocation(), false, null);
+				IClaim claim = RealEstate.claimAPI.getClaimAt(event.getClickedBlock().getLocation());
 
 				if(!RealEstate.transactionsStore.anyTransaction(claim))
 				{
@@ -430,8 +501,8 @@ public class REListener implements Listener
 	{
 		if(event.getBlock().getState() instanceof Sign)
 		{
-			Claim claim = GriefPrevention.instance.dataStore.getClaimAt(event.getBlock().getLocation(), false, null);
-			if(claim != null)
+			IClaim claim = RealEstate.claimAPI.getClaimAt(event.getBlock().getLocation());
+			if(claim != null && !claim.isWilderness())
 			{
 				Transaction tr = RealEstate.transactionsStore.getTransaction(claim);
 				if(tr != null && event.getBlock().equals(tr.getHolder()))

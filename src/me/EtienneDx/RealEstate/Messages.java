@@ -74,6 +74,9 @@ public class Messages extends AnnotationConfig
     
     @ConfigField(name="RealEstate.Errors.RentOnly")
     public String msgErrorRentOnly = "$cThis command only applies to rented claims!";
+
+    @ConfigField(name="RealEstate.Errors.AuctionOnly")
+    public String msgErrorAuctionOnly = "$cThis command only applies to auctioned claims!";
     
     @ConfigField(name="RealEstate.Errors.ValueGreaterThanZero")
     public String msgErrorValueGreaterThanZero = "$cThe value must be greater than zero!";
@@ -120,6 +123,9 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Errors.NegativePrice", comment = "0: price")
     public String msgErrorNegativePrice = "$cThe price must be greater than zero!";
 
+    @ConfigField(name="RealEstate.Errors.NegativeBidStep", comment = "0: bid step")
+    public String msgErrorNegativeBidStep = "$cThe bid step must be greater than zero!";
+
     @ConfigField(name="RealEstate.Errors.NonIntegerPrice", comment = "0: price")
     public String msgErrorNonIntegerPrice = "$cThe price must be an integer!";
 
@@ -149,6 +155,18 @@ public class Messages extends AnnotationConfig
 
     @ConfigField(name="RealEstate.Errors.CantCancelAlreadyRented", comment = "0: claim type")
     public String msgErrorCantCancelAlreadyRented = "$cThis {0} is currently being rented, you can't cancel the transaction!";
+
+    @ConfigField(name="RealEstate.Errors.CantCancelAuction")
+    public String msgErrorCantCancelAuction = "$cThis claim is currently being auctioned, you can't cancel the transaction!";
+
+    @ConfigField(name="RealEstate.Errors.CouldntReimburseSelf", comment = "0: formatted price")
+    public String msgErrorCouldntReimburseSelf = "$cCould not reimburse you, refunding {0}!";
+
+    @ConfigField(name="RealEstate.Errors.CouldntReimburseOther", comment = "0: formatted price")
+    public String msgErrorCouldntReimburseOther = "$cCould not reimburse {0} to another player, the action has been cancelled!";
+
+    @ConfigField(name="RealEstate.Errors.ContactAdmin")
+    public String msgErrorContactAdmin = "$cAn unexpected error occured, please contact an admin to resolve this issue!";
 
     @ConfigField(name="RealEstate.Errors.AutoRenew.Disabled")
     public String msgErrorAutoRenewDisabled = "$cAutomatic renew is disabled!";
@@ -192,6 +210,9 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Errors.Sign.RentingDisabled")
     public String msgErrorSignRentingDisabled = "$cRenting is disabled!";
 
+    @ConfigField(name="RealEstate.Errors.Sign.AuctionDisabled")
+    public String msgErrorSignAuctionDisabled = "$cAuctioning is disabled!";
+
     @ConfigField(name="RealEstate.Errors.Sign.NoSellPermission", comment = "0: claim type")
     public String msgErrorSignNoSellPermission = "$cYou don't have permission to sell this {0}!";
 
@@ -201,6 +222,9 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Errors.Sign.NoRentPermission", comment = "0: claim type")
     public String msgErrorSignNoRentPermission = "$cYou don't have permission to rent this {0}!";
 
+    @ConfigField(name="RealEstate.Errors.Sign.NoAuctionPermission", comment = "0: claim type")
+    public String msgErrorSignNoAuctionPermission = "$cYou don't have permission to auction this {0}!";
+
     @ConfigField(name="RealEstate.Errors.Sign.NoAdminSellPermission", comment = "0: claim type")
     public String msgErrorSignNoAdminSellPermission = "$cYou don't have permission to sell this admin {0}!";
 
@@ -209,6 +233,9 @@ public class Messages extends AnnotationConfig
 
     @ConfigField(name="RealEstate.Errors.Sign.NoAdminRentPermission", comment = "0: claim type")
     public String msgErrorSignNoAdminRentPermission = "$cYou don't have permission to rent this admin {0}!";
+
+    @ConfigField(name="RealEstate.Errors.Sign.NoAdminAuctionPermission", comment = "0: claim type")
+    public String msgErrorSignNoAdminAuctionPermission = "$cYou don't have permission to auction this admin {0}!";
 
     @ConfigField(name="RealEstate.Errors.Sign.NotOwner", comment = "0: claim type")
     public String msgErrorSignNotOwner = "$cYou can only sell/rent/lease {0} you own!";
@@ -225,6 +252,9 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Errors.Claim.DoesNotExist")
     public String msgErrorClaimDoesNotExist = "$cThis claim does not exist!";
 
+    @ConfigField(name="RealEstate.Errors.Claim.DoesNotExistAuction")
+    public String msgErrorClaimDoesNotExistAuction = "$cThis auctioned claim does not exist!";
+
     @ConfigField(name="RealEstate.Errors.Claim.AlreadyOwner", comment = "0: claim type")
     public String msgErrorClaimAlreadyOwner = "$cYou are already the owner of this {0}!";
 
@@ -237,6 +267,9 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Errors.Claim.NotRentedByOwner", comment = "0: claim type")
     public String msgErrorClaimNotRentedByOwner = "$cThis {0} is not rented by its owner!";
 
+    @ConfigField(name="RealEstate.Errors.Claim.NotAuctionedByOwner", comment = "0: claim type")
+    public String msgErrorClaimNotAuctionedByOwner = "$cThis {0} is not auctioned by its owner!";
+
     @ConfigField(name="RealEstate.Errors.Claim.NoBuyPermission", comment = "0: claim type")
     public String msgErrorClaimNoBuyPermission = "$cYou don't have permission to buy this {0}!";
 
@@ -246,17 +279,29 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Errors.Claim.NoRentPermission", comment = "0: claim type")
     public String msgErrorClaimNoRentPermission = "$cYou don't have permission to rent this {0}!";
 
+    @ConfigField(name="RealEstate.Errors.Claim.NoAuctionPermission", comment = "0: claim type")
+    public String msgErrorClaimNoAuctionPermission = "$cYou don't have permission to auction this {0}!";
+
     @ConfigField(name="RealEstate.Errors.Claim.AlreadyLeased", comment = "0: claim type")
     public String msgErrorClaimAlreadyLeased = "$cThis {0} is already leased!";
 
     @ConfigField(name="RealEstate.Errors.Claim.AlreadyRented", comment = "0: claim type")
     public String msgErrorClaimAlreadyRented = "$cThis {0} is already rented!";
 
+    @ConfigField(name="RealEstate.Errors.Claim.AlreadyHighestBidder", comment = "0: claim type")
+    public String msgErrorClaimAlreadyHighestBidder = "$cYou are already the highest bidder of this {0}!";
+
     @ConfigField(name="RealEstate.Errors.Claim.NoInfoPermission")
     public String msgErrorClaimNoInfoPermission = "$cYou don't have permission to view this real estate informations!";
 
     @ConfigField(name="RealEstate.Errors.Claim.NoClaimBlocks", comment = "0: area; 1: claim blocks remaining; 2: missing claim blocks")
     public String msgErrorClaimNoClaimBlocks = "$cYou don't have enough claim blocks! You need $a{2}$c more claim blocks to claim this area. The claim requires $a{0}$c claim blocks, you only have $a{1}$c claim blocks left.";
+
+    @ConfigField(name="RealEstate.Errors.Auction.CouldntPayOwner")
+    public String msgErrorAuctionCouldntPayOwner = "$cCouldn't pay the owner of this auction! The auction is being cancelled.";
+
+    @ConfigField(name="RealEstate.Errors.Auction.CouldntReceiveOwner")
+    public String msgErrorAuctionCouldntReceiveOwner = "$cCouldn't receive the payment of this auction! The auction is being cancelled.";
 
     @ConfigField(name="RealEstate.Info.ExitOffer.None")
     public String msgInfoExitOfferNone = "$bThere is currently no exit offer for this claim!";
@@ -357,12 +402,6 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Info.Claim.Info.Rent.GeneralBuyer", comment = "0: claim type, 1: buyer name, 2: formatted price, 3: time left in current period, 4: duration of a period")
     public String msgInfoClaimInfoGeneralRentBuyer = "$bThis {0} is currently rented by $a{1}$b for $a{2}$b. The {0} is rented for another $a{3}$b. The rent period is $a{4}";
 
-    @ConfigField(name="RealEstate.Info.Claim.Info.Rent.MaxPeriod", comment = "0: max periods")
-    public String msgInfoClaimInfoRentMaxPeriod = "$bIt can be rented for a maximum of $a{0}$b periods.";
-
-    @ConfigField(name="RealEstate.Info.Claim.Info.Rent.RemainingPeriods", comment = "0: periods left")
-    public String msgInfoClaimInfoRentRemainingPeriods = "$bThe contract will end after another $a{0}$b periods.";
-
     @ConfigField(name="RealEstate.Info.Claim.Info.Rent.AutoRenew", comment = "0: enabled / disabled")
     public String msgInfoClaimInfoRentAutoRenew = "$bAutomatic renew is currently $a{0}$b.";
 
@@ -393,6 +432,30 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Info.Claim.Info.Sell.Oneline", comment = "0: claim area, 1: location, 2: formatted price")
     public String msgInfoClaimInfoSellOneline = "$2{0} $bblocks to $2Sell $bat $2{1} $bfor $a{2}";
 
+    @ConfigField(name="RealEstate.Info.Claim.Info.Auction.Header")
+    public String msgInfoClaimInfoAuctionHeader = "$9-----= $f[$6RealEstate Auction Info$f]$9 =-----";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Auction.NoBidder", comment = "0: claim type, 1: formatted price")
+    public String msgInfoClaimInfoAuctionNoBidder = "$bThis {0} is currently being auctioned for $a{1}$b.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Auction.HighestBidder", comment = "0: claim type, 1: bidder name, 2: formatted price")
+    public String msgInfoClaimInfoAuctionHighestBidder = "$bThis {0} is currently being auctioned. The highest bidder is $a{1}$b for $a{2}$b.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Auction.TimeRemaining", comment = "0: time remaining")
+    public String msgInfoClaimInfoAuctionTimeRemaining = "$bThe auction will end in $a{0}$b.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Auction.BidStep", comment = "0: Bid Step")
+    public String msgInfoClaimInfoAuctionBidStep = "$bThe bid step is $a{0}$b.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Auction.Oneline", comment = "0: claim area, 1: location, 2: formatted price, 3: time remaining, 4: bid step")
+    public String msgInfoClaimInfoAuctionOneline = "$2{0} $bblocks to $2Auction $bat $2{1}$b. Current highest bid is $a{2}$b. The auction will end in $a{3}$b. The bid step is $a{4}";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Auction.Ended", comment = "0: claim type")
+    public String msgInfoClaimInfoAuctionEnded = "$bThe auction for the {0} has ended.";
+
+    @ConfigField(name="RealEstate.Info.Claim.Info.Auction.Cancelled", comment = "0: claim type")
+    public String msgInfoClaimInfoAuctionCancelled = "$bThe auction for the {0} has been cancelled. You have been reimbursed.";
+
     @ConfigField(name="RealEstate.Info.Claim.Info.Owner", comment = "0: owner name")
     public String msgInfoClaimInfoOwner = "$bThe current owner is $a{0}";
 
@@ -411,6 +474,9 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Info.Claim.Created.Rent", comment = "0: claim prefix, 1: claim type, 2: formatted price, 3: duration")
     public String msgInfoClaimCreatedRent = "$bYou have successfully created {0} {1} rent for $a{2}$b per $a{3}";
 
+    @ConfigField(name="RealEstate.Info.Claim.Created.Auction", comment = "0: claim prefix, 1: claim type, 2: formatted price, 3: formatted bid step, 4: time remaining")
+    public String msgInfoClaimCreatedAuction = "$bYou have successfully created {0} {1} auction for $a{2}$b. The bid step is $a{3}$b. The auction will end in $a{4}";
+
     @ConfigField(name="RealEstate.Info.Claim.Created.SellBroadcast", comment = "0: player name, 1: claim prefix, 2: claim type, 3: formatted price")
     public String msgInfoClaimCreatedSellBroadcast = "$a{0} $bhas created {1} {2} sale for $a{3}";
 
@@ -420,12 +486,29 @@ public class Messages extends AnnotationConfig
     @ConfigField(name="RealEstate.Info.Claim.Created.RentBroadcast", comment = "0: player name, 1: claim prefix, 2: claim type, 3: formatted price, 4: duration")
     public String msgInfoClaimCreatedRentBroadcast = "$a{0} $bhas created {1} {2} rent for $a{3}$b per $a{4}";
 
+    @ConfigField(name="RealEstate.Info.Claim.Created.AuctionBroadcast", comment = "0: player name, 1: claim prefix, 2: claim type, 3: formatted price, 4: formatted bid step, 5: time remaining")
+    public String msgInfoClaimCreatedAuctionBroadcast = "$a{0} $bhas created {1} {2} auction for $a{3}$b. The bid step is $a{4}$b. The auction will end in $a{5}";
+
     @ConfigField(name="RealEstate.List.Header", comment = "0: RE Offers|Sell Offers|Rent Offers|Lease Offers; 1: Page number; 2: Page count")
     public String msgListTransactionsHeader = "$1----= $f[ $6{0} page $2 {1} $6/ $2{2} $f] $1=----";
     
     @ConfigField(name="RealEstate.List.NextPage", comment="0: all|sell|rent|lease; 1: next page number")
     public String msgListNextPage = "$6To see the next page, type $a/re list {0} {1}";
-    
+
+    @ConfigField(name="RealEstate.Sign.Auction.HighestBidder", comment="0: player name, 1: formatted price")
+    public String msgSignAuctionHighestBidder = "$b{0}: $a{1}";
+
+    @ConfigField(name="RealEstate.Sign.Auction.NoBider")
+    public String msgSignAuctionNoBider = "$bNo bidder";
+
+    @ConfigField(name="RealEstate.Sign.Auction.RemainingTime", comment="0: formatted time")
+    public String msgSignAuctionRemainingTime = "$b$a{0}";
+
+    @ConfigField(name="RealEstate.Sign.Auction.Ended")
+    public String msgSignAuctionEnded = "$bAuction ended";
+
+    @ConfigField(name="RealEstate.Sign.Auction.Won", comment="next line: winner")
+    public String msgSignAuctionWon = "$bAuction won by";
 
     public Messages()
     {

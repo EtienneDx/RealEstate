@@ -1,3 +1,4 @@
+.DS_Store
 .classpath
 .project
 .idea
@@ -8,3 +9,5 @@ build.bat
 /bin/
 /target/
 .vscode
+report.cmd
+report.txt
