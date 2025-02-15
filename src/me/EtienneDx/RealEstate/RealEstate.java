@@ -99,21 +99,17 @@ public class RealEstate extends JavaPlugin
 			return;
 		}
 
-		if(setupGriefPreventionAPI())
-		{
-			this.log.info("RealEstate is using GriefPrevention as a claim management plugin.");
-		}
-		else if(setupGriefDefenderAPI())
-		{
-			this.log.info("RealEstate is using GriefDefender as a claim management plugin.");
-		}
-		/**Insert alternate claim APIs here**/
-		else
-		{
-			this.log.warning("No compatible Claim API detected. Please install GriefPrevention or GriefDefender.");
-			this.log.warning("Disabling RealEstate...");
-			getPluginLoader().disablePlugin(this);
-			return;
+		if(setupGriefPreventionAPI()) {
+		    this.log.info("RealEstate is using GriefPrevention as a claim management plugin.");
+		} else if(setupGriefDefenderAPI()) {
+		    this.log.info("RealEstate is using GriefDefender as a claim management plugin.");
+		} else if(setupWorldGuardAPI()) {
+		    this.log.info("RealEstate is using WorldGuard as a claim management plugin.");
+		} else {
+		    this.log.severe("No compatible Claim API detected. Please install GriefPrevention, GriefDefender, or WorldGuard.");
+		    this.log.severe("Disabling RealEstate...");
+		    getPluginLoader().disablePlugin(this);
+		    return;
 		}
 
         if((ess = (Essentials)getServer().getPluginManager().getPlugin("Essentials")) != null)
@@ -362,6 +358,14 @@ public class RealEstate extends JavaPlugin
         RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
         perms = (Permission)rsp.getProvider();
         return perms != null;
+    }
+    
+    private boolean setupWorldGuardAPI() {
+        if(getServer().getPluginManager().getPlugin("WorldGuard") != null) {
+            claimAPI = new me.EtienneDx.RealEstate.ClaimAPI.WorldGuard.WorldGuardAPI();
+            return true;
+        }
+        return false;
     }
 
 	private void copyResourcesIntoPluginDirectory()

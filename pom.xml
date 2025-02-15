@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>Me.EtienneDx</groupId>
 	<artifactId>real-estate</artifactId>
-	<version>1.4.2</version>
+	<version>1.4.3</version>
 
 	<name>RealEstate</name>
 	<description>A spigot plugin for selling, renting, leasing and auctioning GriefPrevention and GriefDefender claims</description>
@@ -129,6 +129,14 @@
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
+        <repository>
+        	<id>sk89q-repo</id>
+        	<url>https://maven.enginehub.org/repo/</url>
+    	</repository>
+	    <repository>
+	      <id>glaremasters repo</id>
+	      <url>https://repo.glaremasters.me/repository/towny/</url>
+	    </repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -183,5 +191,23 @@
             <version>1.21.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+  			<groupId>com.sk89q.worldguard</groupId>
+  			<artifactId>worldguard-bukkit</artifactId>
+  			<version>7.0.5</version>
+  			<scope>provided</scope>
+		</dependency>
+		<dependency>
+  			<groupId>com.sk89q.worldedit</groupId>
+  			<artifactId>worldedit-bukkit</artifactId>
+  			<version>7.2.0</version>
+  			<scope>provided</scope>
+		</dependency>
+		<dependency>
+      		<groupId>com.palmergames.bukkit.towny</groupId>
+      		<artifactId>towny</artifactId>
+      		<version>0.101.1.0</version>
+     	 	<scope>provided</scope>
+    	</dependency>
 	</dependencies>
 </project>

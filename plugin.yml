@@ -13,6 +13,9 @@ depend:
 softdepend:
   - GriefPrevention
   - GriefDefender
+  - WorldGuard
+  - WorldEdit
+  - Towny
 api-version: 1.21.4
 commands:
   re:

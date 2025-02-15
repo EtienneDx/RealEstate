@@ -3,7 +3,6 @@ package me.EtienneDx.RealEstate.Transactions;
 import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Location;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 

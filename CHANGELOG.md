@@ -1,5 +1,43 @@
 # Changelog
 
+# Version 1.4.3 (2025-02-14)
+
+## New Features
+
+- **Admin Claim Detection:**
+  - Improved the WorldGuard integration so that claims with no owner (i.e. an empty owner field) are now treated as admin claims.
+  - In such cases, the claim’s owner is set to a constant `SERVER_UUID` (and displayed as "SERVER") for consistency in sign updates and transaction validations.
+
+- **Instant Sign Update for Rent/Lease:**
+  - Modified the ClaimRent and ClaimLease update logic to update signs instantly—bringing their behavior in line with ClaimSell—so that players see the correct information immediately after placement.
+
+## Bug Fixes
+
+- **Owner Verification Issue:**
+  - Fixed an issue where players were incorrectly receiving the “You can only sell/rent/lease claim you own!” message on sign interaction.
+  - The plugin now correctly determines claim ownership (including admin claims) using the updated WGClaim methods.
+
+- **Database Migration for Admin Claims:**
+  - Updated the SQL insert logic so that if a claim is detected as an admin claim, the owner field is set to the SERVER identifier.
+  - This change ensures consistent behavior when loading data from the database.
+
+- **WorldGuard Integration Problems:**
+  - Resolved compatibility issues with WorldGuard and WorldEdit by updating our WGClaim implementation and adjusting our import statements.
+  - The plugin now properly retrieves regions and their flags using the latest WorldGuard API.
+
+## Improvements
+
+- **Code Refactoring:**
+  - Cleaned up various sections of the code for better readability and maintainability.
+  - Improved error handling and logging to make troubleshooting easier.
+
+- **Build & Dependency Updates:**
+  - Updated the `pom.xml` to ensure proper integration with the latest versions of WorldGuard, WorldEdit, Vault, and other dependencies.
+
+- **Documentation & Messaging:**
+  - Revised in-game messages and log outputs to provide clearer feedback for both players and administrators.
+
+
 # Version 1.4.2 (2025-02-13)
 ### Admin Claim Support Improvements:
 * When processing ClaimRent transactions, if a claim is identified as an admin claim, its owner is now set to "SERVER" (using a fixed UUID or identifier) to ensure correct behavior.
