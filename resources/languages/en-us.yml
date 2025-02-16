@@ -1,0 +1,421 @@
+# Use a YAML editor like NotepadPlusPlus to edit this file.  
+# After editing, back up your changes before reloading the server in case you made a syntax error.  
+# Use dollar signs ($) for formatting codes, which are documented here: http://minecraft.gamepedia.com/Formatting_codes.
+#  You can use {0}, {1} to include the different values indicated in the comments
+RealEstate:
+  Keywords:
+    # Keywords used within other messages but with a longer text at
+      # the end just because i need to test some stuff
+    Enabled: enabled
+    Disabled: disabled
+    Claim: claim
+    Subclaim: subclaim
+    AdminClaimPrefix: an admin
+    ClaimPrefix: a
+    TheServer: The server
+  NoTransactionFound: $cNo transaction found!
+  NoTransactionFoundHere: $cNo transaction found at your location!
+  PageMustBePositive: $cPage must be a positive option
+  PageNotExists: $cThis page does not exist!
+  # 0: enabled/disabled; 1:
+    # type of claim
+  RenewRentNow: $bAutomatic renew is now $a{0} $bfor this {1}
+  # 0: enabled/disabled;
+    # 1: type of claim
+  RenewRentCurrently: $bAutomatic renew is currently $a{0} $bfor this {1}
+  Errors:
+    OutOfClaim: $cYou must stand inside of a claim to use this command!
+    PlayerOnlyCmd: $cOnly Players can perform this command!
+    NoOngoingTransaction: $cThis claim has no ongoing transactions!
+    NotRentNorLease: $cThis claim is neither to rent or to lease!
+    AlreadyBought: $cThis claim already has a buyer!
+    NotPartOfTransaction: $cYou are not part of this transaction!
+    RentOnly: $cThis command only applies to rented claims!
+    AuctionOnly: $cThis command only applies to auctioned claims!
+    ValueGreaterThanZero: $cThe value must be greater than zero!
+    InvalidOption: $cInvalid option provided!
+    ClaimInTransaction:
+      CantOwner: $cThis claim is currently involved in a transaction, you can't modify
+        it!
+      CantEdit: $cThis claim is currently involved in a transaction, you can't edit
+        it!
+      CantAccess: $cThis claim is currently involved in a transaction, you can't access
+        it!
+      CantBuild: $cThis claim is currently involved in a transaction, you can't build
+        on it!
+      CantInventory: $cThis claim is currently involved in a transaction, you can't
+        access its containers!
+      CantManage: $cThis claim is currently involved in a transaction, you can't manage
+        it!
+      Subclaim: $cA subclaim is currently involved in a transaction, you can't edit
+        or manage the parent claim!
+    Command:
+      # 0: command usage
+      Usage: '$cUsage: {0}'
+    BuyerOnly: $cOnly the buyer can perform this command!
+    Unexpected: $cAn unexpected error has occured!
+    # 0: number
+    InvalidNumber: $c{0} is not a valid number!
+    # 0: number
+    NegativeNumber: $c{0} is a negative number!
+    # 0: price
+    NegativePrice: $cThe price must be greater than zero!
+    # 0: bid step
+    NegativeBidStep: $cThe bid step must be greater than zero!
+    # 0: price
+    NonIntegerPrice: $cThe price must be an integer!
+    # 0: duration, 1:
+      # example of duration format, 2: example, 3:
+      # example
+    InvalidDuration: $c{0} is not a valid duration! Durations must be in the format
+      $a{1}$c or $a{2}$c or $a{3}$c!
+    NoMoneySelf: $cYou don't have enough money to make this transaction!
+    # 0: Other player
+    NoMoneyOther: $c{0} doesn't have enough money to make this transaction!
+    NoWithdrawSelf: $cCould not withdraw the money!
+    # 0: Other player
+    NoWithdrawOther: $cCould not withdraw the money from {0}!
+    # 0: Other player
+    NoDepositSelf: $cCould not deposit the money to you, refunding {0}!
+    # 0: Other player
+    NoDepositOther: $cCould not deposit the money to {0}, refunding you!
+    # 0: claim type
+    CantCancelAlreadyLeased: $cThis {0} is currently being leased, you can't cancel
+      the transaction!
+    # 0: claim type
+    CantCancelAlreadyRented: $cThis {0} is currently being rented, you can't cancel
+      the transaction!
+    CantCancelAuction: $cThis claim is currently being auctioned, you can't cancel
+      the transaction!
+    # 0: formatted price
+    CouldntReimburseSelf: $cCould not reimburse you, refunding {0}!
+    # 0: formatted price
+    CouldntReimburseOther: $cCould not reimburse {0} to another player, the action
+      has been cancelled!
+    ContactAdmin: $cAn unexpected error occured, please contact an admin to resolve
+      this issue!
+    AutoRenew:
+      Disabled: $cAutomatic renew is disabled!
+    ExitOffer:
+      AlreadyExists: $cThere is already an exit proposition for this transaction!
+      NoBuyer: $cNo one is engaged by this transaction yet!
+      None: $cThere is currently no exit offer for this claim!
+      CantAcceptSelf: $cYou can't accept your own exit offer!
+      CantRefuseSelf: $cYou can't refuse your own exit offer!
+      CantCancelOther: $cOnly the player who created this exit proposition may cancel
+        it!
+    Sign:
+      NotInClaim: $cThe sign you placed is not inside a claim!
+      OngoingTransaction: $cThis claim already has an ongoing transaction!
+      ParentOngoingTransaction: $cThis claim's parent already has an ongoing transaction!
+      SubclaimOngoingTransaction: $cThis claim has subclaims with ongoing transactions!
+      SellingDisabled: $cSelling is disabled!
+      LeasingDisabled: $cLeasing is disabled!
+      RentingDisabled: $cRenting is disabled!
+      AuctionDisabled: $cAuctioning is disabled!
+      # 0: claim type
+      NoSellPermission: $cYou don't have permission to sell this {0}!
+      # 0: claim type
+      NoLeasePermission: $cYou don't have permission to lease this {0}!
+      # 0: claim type
+      NoRentPermission: $cYou don't have permission to rent this {0}!
+      # 0: claim type
+      NoAuctionPermission: $cYou don't have permission to auction this {0}!
+      # 0: claim type
+      NoAdminSellPermission: $cYou don't have permission to sell this admin {0}!
+      # 0: claim type
+      NoAdminLeasePermission: $cYou don't have permission to lease this admin {0}!
+      # 0: claim type
+      NoAdminRentPermission: $cYou don't have permission to rent this admin {0}!
+      # 0: claim type
+      NoAdminAuctionPermission: $cYou don't have permission to auction this admin
+        {0}!
+      # 0: claim type
+      NotOwner: $cYou can only sell/rent/lease {0} you own!
+      NotAuthor: $cOnly the author of the sell/rent/lease sign is allowed to destroy
+        it!
+      NotAdmin: $cOnly an admin is allowed to destroy this sign!
+      NoTransaction: $cThis claim is no longer for rent, sell or lease, sorry...
+    Claim:
+      DoesNotExist: $cThis claim does not exist!
+      DoesNotExistAuction: $cThis auctioned claim does not exist!
+      # 0: claim type
+      AlreadyOwner: $cYou are already the owner of this {0}!
+      # 0: claim type
+      NotSoldByOwner: $cThis {0} is not sold by its owner!
+      # 0: claim type
+      NotLeasedByOwner: $cThis {0} is not leased by its owner!
+      # 0: claim type
+      NotRentedByOwner: $cThis {0} is not rented by its owner!
+      # 0: claim type
+      NotAuctionedByOwner: $cThis {0} is not auctioned by its owner!
+      # 0: claim type
+      NoBuyPermission: $cYou don't have permission to buy this {0}!
+      # 0: claim type
+      NoLeasePermission: $cYou don't have permission to lease this {0}!
+      # 0: claim type
+      NoRentPermission: $cYou don't have permission to rent this {0}!
+      # 0: claim type
+      NoAuctionPermission: $cYou don't have permission to auction this {0}!
+      # 0: claim type
+      AlreadyLeased: $cThis {0} is already leased!
+      # 0: claim type
+      AlreadyRented: $cThis {0} is already rented!
+      # 0: claim type
+      AlreadyHighestBidder: $cYou are already the highest bidder of this {0}!
+      NoInfoPermission: $cYou don't have permission to view this real estate informations!
+      # 0: area; 1:
+        # claim blocks remaining; 2: missing claim blocks
+      NoClaimBlocks: $cYou don't have enough claim blocks! You need $a{2}$c more claim
+        blocks to claim this area. The claim requires $a{0}$c claim blocks, you only
+        have $a{1}$c claim blocks left.
+    Auction:
+      CouldntPayOwner: $cCouldn't pay the owner of this auction! The auction is being
+        cancelled.
+      CouldntReceiveOwner: $cCouldn't receive the payment of this auction! The auction
+        is being cancelled.
+  Info:
+    ExitOffer:
+      None: $bThere is currently no exit offer for this claim!
+      # 0: formatted price
+      MadeByStatus: $bYou offered to exit the contract for $a{0}$b, but your offer
+        hasn't been accepted or denied yet...
+      # 0: player who made the
+        # offer; 1: formatted price
+      MadeToStatus: $a{0} $boffered to exit the contract for $a{1}
+      # 0: cancel command
+      Cancel: $bTo cancel your offer, use $d{0}
+      # 0: accept command
+      Accept: $bTo accept this offer, use $d{0}
+      # 0: reject command
+      Reject: $bTo reject this offer, use $d{0}
+      # 0: formatted price
+      CreatedBySelf: $bThe offer has been successfully created for $a{0}
+      # 0: player name, 1:
+        # claim type, 2: formatted price, 3:
+        # claim location
+      CreatedByOther: $a{0} $bhas created an offer to exit the transaction for the
+        {1} at $a{3} $bfor $a{2}
+      # 0: claim type, 1:formatted
+        # price
+      AcceptedBySelf: $bThe {0} is no longer rented or leased, you have been charged
+        $a{1}
+      # 0: player name, 1:
+        # claim type, 2: formatted price, 3:
+        # claim location
+      AcceptedByOther: $a{0} $bhas accepted the offer to exit the transaction for
+        the {1} at $a{3} $bfor $a{2}. It is no longer leased or rented.
+      RejectedBySelf: $bThe exit offer has been refused.
+      # 0: player name, 1:
+        # claim type, 2: claim location
+      RejectedByOther: $a{0} $bhas refused the offer to exit the transaction for the
+        {1} at $a{2}
+      CancelledBySelf: $bThe exit offer has been cancelled.
+      # 0: player name, 1:
+        # claim type, 2: claim location
+      CancelledByOther: $a{0} $bhas cancelled the offer to exit the transaction for
+        the {1} at $a{2}
+    Claim:
+      # 0: buyer name, 1:
+        # claim type, 2: formatted price, 3:
+        # claim location
+      OwnerSold: $a{0} $bhas bought the {1} at $a{3} $bfor $a{2}
+      # 0: buyer name, 1:
+        # claim type, 2: formatted price, 3:
+        # claim location, 4: payments left
+      OwnerLeaseStarted: $a{0} $bhas leased the {1} at $a{3} $bfor $a{2} with $a{4}
+        $bpayments left
+      # 0: buyer name, 1:
+        # claim type, 2: formatted price, 3:
+        # claim location
+      OwnerRented: $a{0} $bhas rented the {1} at $a{3} $bfor $a{2}
+      # 0: claim type, 1:
+        # formatted price
+      BuyerBought: $bYou have bought the {0} for $a{1}
+      # 0: claim type, 1:
+        # formatted price, 2: payments left
+      BuyerLeaseStarted: $bYou have leased the {0} for $a{1} with $a{2} $bpayments
+        left
+      # 0: claim type, 1:
+        # formatted price
+      BuyerRented: $bYou have rented the {0} for $a{1}
+      Info:
+        Lease:
+          Header: $9-----= $f[$6RealEstate Lease Info$f]$9 =-----
+          # 0: claim type, 1:
+            # payments left, 2: formatted price, 3:
+            # frequency
+          GeneralNoBuyer: $bThis {0} is for lease for $a{1} $bpayments of $a{2} each.
+            Payments are due every $a{3}
+          # 0: claim type, 1:
+            # buyer name, 2: formatted price, 3:
+            # payments left, 4: next payment due, 5:
+            # frequency
+          GeneralBuyer: $bThis {0} is currently leased by $a{1}$b for $a{2}$b. There
+            is $a{3} $bpayments left. Next payment is in $a{4}$b. Payments are due
+            every $a{5}
+          # 0: claim area, 1:
+            # location, 2: payments left, 3:
+            # period, 4: formatted price
+          Oneline: $2{0} $bblocks to $2Lease $bat $2{1} $bfor $a{2} periods of $a{3}$b,
+            each period costs $a{4}
+          # 0: claim type, 1:
+            # location, 2: formatted price, 3:
+            # payments left
+          PaymentBuyer: $bPaid lease for the {0} at $a{1} $bfor $a{2}$b. There are
+            $a{3} $bpayments left.
+          # 0: player name, 1:
+            # claim type, 2: location, 3:
+            # formatted price, 4: payments left
+          PaymentOwner: $a{0} $bpaid lease for the {1} at $a{2} $bfor $a{3}$b. There
+            are $a{4} $bpayments left.
+          # 0: claim type,
+            # 1: location, 2:
+            # formatted price
+          PaymentBuyerFinal: $bPaid final lease for the {0} at $a{1} $bfor $a{2}$b.
+            The {0} is now your property.
+          # 0: player name,
+            # 1: claim type, 2:
+            # location, 3: formatted price
+          PaymentOwnerFinal: $a{0} $bpaid final lease for the {1} at $a{2} $bfor $a{3}$b.
+            The {1} is now $a{0}$b's property.
+          # 0: claim
+            # type, 1: location, 2:
+            # formatted price
+          PaymentBuyerCancelled: $bCouldn't pay the lease for the {0} at $a{1} $bfor
+            $a{2}$b. The lease has been cancelled.
+          # 0: player
+            # name, 1: claim type, 2:
+            # location, 3: formatted price
+          PaymentOwnerCancelled: $a{0} $bcouldn't pay the lease for the {1} at $a{2}
+            $bfor $a{3}$b. The lease has been cancelled.
+        Rent:
+          Header: $9-----= $f[$6RealEstate Rent Info$f]$9 =-----
+          # 0: claim type, 1:
+            # formatted price, 2: duration
+          GeneralNoBuyer: $bThis {0} is for rent for $a{1}$b per $a{2}$b.
+          # 0: claim type, 1:
+            # buyer name, 2: formatted price, 3:
+            # time left in current period, 4: duration
+            # of a period
+          GeneralBuyer: $bThis {0} is currently rented by $a{1}$b for $a{2}$b. The
+            {0} is rented for another $a{3}$b. The rent period is $a{4}
+          # 0: enabled / disabled
+          AutoRenew: $bAutomatic renew is currently $a{0}$b.
+          # 0: claim area, 1:
+            # location, 2: formatted price, 3:
+            # duration
+          Oneline: $2{0} $bblocks to $2Rent $bat $2{1} $bfor $a{2}$b per $a{3}
+          # 0: claim type, 1:
+            # location, 2: formatted price
+          PaymentBuyer: $bPaid rent for the {0} at $a{1} $bfor $a{2}$b.
+          # 0: player name, 1:
+            # claim type, 2: location, 3:
+            # formatted price
+          PaymentOwner: $a{0} $bpaid rent for the {1} at $a{2} $bfor $a{3}$b.
+          # 0: claim
+            # type, 1: location, 2:
+            # formatted price
+          PaymentBuyerCancelled: $bCouldn't pay the rent for the {0} at $a{1} $bfor
+            $a{2}$b. The rent has been cancelled.
+          # 0: player
+            # name, 1: claim type, 2:
+            # location, 3: formatted price
+          PaymentOwnerCancelled: $a{0} $bcouldn't pay the rent for the {1} at $a{2}
+            $bfor $a{3}$b. The rent has been cancelled.
+          # 0: claim type, 1:
+            # location
+          RentCancelled: $bThe rent for the {0} at $a{1} $bis now over, your access
+            has been revoked.
+        Sell:
+          Header: $9-----= $f[$6RealEstate Sale Info$f]$9 =-----
+          # 0: claim type, 1:
+            # formatted price
+          General: $bThis {0} is for sale for $a{1}
+          # 0: claim area, 1:
+            # location, 2: formatted price
+          Oneline: $2{0} $bblocks to $2Sell $bat $2{1} $bfor $a{2}
+        Auction:
+          Header: $9-----= $f[$6RealEstate Auction Info$f]$9 =-----
+          # 0: claim type, 1:
+            # formatted price
+          NoBidder: $bThis {0} is currently being auctioned for $a{1}$b.
+          # 0: claim type, 1:
+            # bidder name, 2: formatted price
+          HighestBidder: $bThis {0} is currently being auctioned. The highest bidder
+            is $a{1}$b for $a{2}$b.
+          # 0: time remaining
+          TimeRemaining: $bThe auction will end in $a{0}$b.
+          # 0: Bid Step
+          BidStep: $bThe bid step is $a{0}$b.
+          # 0: claim area, 1:
+            # location, 2: formatted price, 3:
+            # time remaining, 4: bid step
+          Oneline: $2{0} $bblocks to $2Auction $bat $2{1}$b. Current highest bid is
+            $a{2}$b. The auction will end in $a{3}$b. The bid step is $a{4}
+          # 0: claim type
+          Ended: $bThe auction for the {0} has ended.
+          # 0: claim type
+          Cancelled: $bThe auction for the {0} has been cancelled. You have been reimbursed.
+        # 0: owner name
+        Owner: $bThe current owner is $a{0}
+        # 0: owner name
+        MainOwner: $bThe main claim's owner is $a{0}
+        Note: '$dNote: You will only get access to this subclaim.'
+      Created:
+        # 0: claim prefix, 1:
+          # claim type, 2: formatted price
+        Sell: $bYou have successfully created {0} {1} sale for $a{2}
+        # 0: claim prefix, 1:
+          # claim type, 2: formatted price, 3:
+          # payments count, 4: frequency
+        Lease: $bYou have successfully created {0} {1} lease for $a{3}$b payments
+          of $a{2}$b each. Payments are due every $a{4}
+        # 0: claim prefix, 1:
+          # claim type, 2: formatted price, 3:
+          # duration
+        Rent: $bYou have successfully created {0} {1} rent for $a{2}$b per $a{3}
+        # 0: claim prefix, 1:
+          # claim type, 2: formatted price, 3:
+          # formatted bid step, 4: time remaining
+        Auction: $bYou have successfully created {0} {1} auction for $a{2}$b. The
+          bid step is $a{3}$b. The auction will end in $a{4}
+        # 0: player name, 1:
+          # claim prefix, 2: claim type, 3:
+          # formatted price
+        SellBroadcast: $a{0} $bhas created {1} {2} sale for $a{3}
+        # 0: player name, 1:
+          # claim prefix, 2: claim type, 3:
+          # formatted price, 4: payments count, 5:
+          # frequency
+        LeaseBroadcast: $a{0} $bhas created {1} {2} lease for $a{4}$b payments of
+          $a{3}$b each. Payments are due every $a{5}
+        # 0: player name, 1:
+          # claim prefix, 2: claim type, 3:
+          # formatted price, 4: duration
+        RentBroadcast: $a{0} $bhas created {1} {2} rent for $a{3}$b per $a{4}
+        # 0: player name,
+          # 1: claim prefix, 2:
+          # claim type, 3: formatted price, 4:
+          # formatted bid step, 5: time remaining
+        AuctionBroadcast: $a{0} $bhas created {1} {2} auction for $a{3}$b. The bid
+          step is $a{4}$b. The auction will end in $a{5}
+  List:
+    # 0: RE Offers|Sell Offers|Rent
+      # Offers|Lease Offers; 1: Page number; 2:
+      # Page count
+    Header: $1----= $f[ $6{0} page $2 {1} $6/ $2{2} $f] $1=----
+    # 0: all|sell|rent|lease; 1:
+      # next page number
+    NextPage: $6To see the next page, type $a/re list {0} {1}
+  Sign:
+    Auction:
+      # 0: player name, 1:
+        # formatted price
+      HighestBidder: '$b{0}: $a{1}'
+      NoBider: $bNo bidder
+      # 0: formatted time
+      RemainingTime: $b$a{0}
+      Ended: $bAuction ended
+      # next line: winner
+      Won: $bAuction won by
