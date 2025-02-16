@@ -3,8 +3,6 @@
 # Use dollar signs ($) for formatting codes, which are documented here: http://minecraft.gamepedia.com/Formatting_codes.
 #  You can use {0}, {1} to include the different values indicated in the comments
 RealEstate:
-  lang:
-	version: 1.0
   Keywords:
     # Keywords used within other messages but with a longer text at
       # the end just because i need to test some stuff
