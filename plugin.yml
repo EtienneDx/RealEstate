@@ -8,6 +8,7 @@ authors:
   - SkyWalker3200
   - Tadhunt
 load: POSTWORLD
+folia-supported: false # prevent Folia from loading this plugin. It's not ready yet.
 depend:
   - Vault
 softdepend:

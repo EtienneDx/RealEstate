@@ -10,25 +10,42 @@ import com.griefdefender.api.event.RemoveClaimEvent;
 import com.griefdefender.lib.kyori.adventure.text.Component;
 import com.griefdefender.lib.kyori.event.EventBus;
 import com.griefdefender.lib.kyori.event.EventSubscriber;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
 import me.EtienneDx.RealEstate.ClaimEvents;
 import me.EtienneDx.RealEstate.ClaimAPI.ClaimPermission;
 
-public class GDPermissionListener
-{
+/**
+ * Listens for GriefDefender claim events and delegates them to the RealEstate claim event logic.
+ * <p>
+ * This listener handles trust events, claim changes, and claim deletions to enforce RealEstate's
+ * restrictions on claim modifications.
+ * </p>
+ */
+public class GDPermissionListener {
 
+    /**
+     * Constructs a new GDPermissionListener and registers its event subscribers.
+     */
     public GDPermissionListener() {
         new ProcessTrustUserEventListener();
         new ChangeClaimEventListener();
         new RemoveClaimEventListener();
     }
 
+    /**
+     * Handles ProcessTrustUserEvent events from GriefDefender.
+     * <p>
+     * This inner class subscribes to trust events and checks if a player's trust action is permitted.
+     * It uses RealEstate's ClaimEvents logic to determine if the action should be denied.
+     * </p>
+     */
     private class ProcessTrustUserEventListener {
 
+        /**
+         * Constructs and subscribes to the ProcessTrustUserEvent.
+         */
         public ProcessTrustUserEventListener() {
             final EventBus<Event> eventBus = GriefDefender.getEventManager().getBus();
 
@@ -45,16 +62,13 @@ public class GDPermissionListener
                         return;
                     }
                     ClaimPermission permission = null;
-                    if(event.getTrustType().equals(TrustTypes.ACCESSOR)) {
+                    if (event.getTrustType().equals(TrustTypes.ACCESSOR)) {
                         permission = ClaimPermission.ACCESS;
-                    }
-                    else if(event.getTrustType().equals(TrustTypes.BUILDER)) {
+                    } else if (event.getTrustType().equals(TrustTypes.BUILDER)) {
                         permission = ClaimPermission.BUILD;
-                    }
-                    else if(event.getTrustType().equals(TrustTypes.CONTAINER)) {
+                    } else if (event.getTrustType().equals(TrustTypes.CONTAINER)) {
                         permission = ClaimPermission.CONTAINER;
-                    }
-                    else if(event.getTrustType().equals(TrustTypes.MANAGER)) {
+                    } else if (event.getTrustType().equals(TrustTypes.MANAGER)) {
                         permission = ClaimPermission.MANAGE;
                     }
                     String denialReason = ClaimEvents.onClaimPermission(
@@ -71,8 +85,18 @@ public class GDPermissionListener
         }
     }
 
+    /**
+     * Handles ChangeClaimEvent events from GriefDefender.
+     * <p>
+     * This inner class subscribes to claim change events and verifies if a claim change is allowed.
+     * It uses RealEstate's claim event logic for validation.
+     * </p>
+     */
     private class ChangeClaimEventListener {
 
+        /**
+         * Constructs and subscribes to the ChangeClaimEvent.
+         */
         public ChangeClaimEventListener() {
             final EventBus<Event> eventBus = GriefDefender.getEventManager().getBus();
 
@@ -102,8 +126,17 @@ public class GDPermissionListener
         }
     }
 
+    /**
+     * Handles RemoveClaimEvent events from GriefDefender.
+     * <p>
+     * This inner class subscribes to claim deletion events and ensures that any ongoing transactions are cancelled.
+     * </p>
+     */
     private class RemoveClaimEventListener {
 
+        /**
+         * Constructs and subscribes to the RemoveClaimEvent.
+         */
         public RemoveClaimEventListener() {
             final EventBus<Event> eventBus = GriefDefender.getEventManager().getBus();
 

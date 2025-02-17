@@ -35,40 +35,21 @@
 					<target>16</target>
 				</configuration>
 			</plugin>
-			<!--<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-					<createDependencyReducedPom>false</createDependencyReducedPom>
-					<filters>
-						<filter>
-							<artifact>*:*</artifact>
-							<excludes>
-								<exclude>META-INF/MANIFEST.MF</exclude>
-							</excludes>
-						</filter>
-					</filters>
-                    <relocations>
-                        <relocation>
-                            <pattern>co.aikar.commands</pattern>
-                            <shadedPattern>me.EtienneDx.RealEstate.acf</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>me.EtienneDx.AnnotationConfig</pattern>
-                            <shadedPattern>me.EtienneDx.RealEstate.AnnotationConfig</shadedPattern>
-                        </relocation>
-                    </relocations>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>-->
+			<plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-javadoc-plugin</artifactId>
+			  <version>3.3.2</version>
+			  <configuration>
+			    <additionalClasspathElements>
+			      <additionalClasspathElement>${settings.localRepository}/net/kyori/adventure-api/4.18.0/adventure-api-4.18.0.jar</additionalClasspathElement>
+			      <additionalClasspathElement>${settings.localRepository}/net/kyori/adventure-text-serializer-plain/4.18.0/adventure-text-serializer-plain-4.18.0.jar</additionalClasspathElement>
+			    </additionalClasspathElements>
+			    <!-- Optionally disable doclint if needed -->
+			    <additionalOptions>
+			      <additionalOption>-Xdoclint:none</additionalOption>
+			    </additionalOptions>
+			  </configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.4.1</version>
@@ -137,6 +118,10 @@
 	      <id>glaremasters repo</id>
 	      <url>https://repo.glaremasters.me/repository/towny/</url>
 	    </repository>
+	    <repository>
+          <id>adventure</id>
+          <url>https://repo1.maven.org/maven2/</url>
+	    </repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -175,9 +160,9 @@
 		    <scope>provided</scope>
 		</dependency>
 		<dependency>
-		    <groupId>com.griefdefender</groupId>
-		    <artifactId>api</artifactId>
-		    <version>2.1.0-20220122.032038-5</version>
+		    <groupId>com.github.bloodmc</groupId>
+		    <artifactId>GriefDefenderAPI</artifactId>
+		    <version>master-4e5f379629-1</version>
 		    <scope>provided</scope>
 		</dependency>
 	    <dependency>
@@ -202,6 +187,18 @@
   			<artifactId>worldedit-bukkit</artifactId>
   			<version>7.2.0</version>
   			<scope>provided</scope>
+		</dependency>
+		<dependency>
+		  <groupId>net.kyori</groupId>
+		  <artifactId>adventure-api</artifactId>
+		  <version>4.18.0</version>
+		  <scope>provided</scope>
+		</dependency>
+		<dependency>
+		  <groupId>net.kyori</groupId>
+		  <artifactId>adventure-text-serializer-plain</artifactId>
+		  <version>4.18.0</version>
+		  <scope>provided</scope>
 		</dependency>
 		<dependency>
       		<groupId>com.palmergames.bukkit.towny</groupId>

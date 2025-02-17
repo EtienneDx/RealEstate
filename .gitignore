@@ -11,3 +11,4 @@ build.bat
 .vscode
 report.cmd
 report.txt
+javadoc.cmd

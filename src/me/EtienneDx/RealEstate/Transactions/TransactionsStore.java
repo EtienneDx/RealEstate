@@ -32,22 +32,51 @@ import me.EtienneDx.RealEstate.RealEstate;
 import me.EtienneDx.RealEstate.Utils;
 import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 
+/**
+ * Manages real estate transactions including selling, renting, leasing, and auctions.
+ */
 public class TransactionsStore {
 
+	/** Path to the transactions data file. */
     public final String dataFilePath = RealEstate.pluginDirPath + "transactions.yml";
-    // Make these public so that other classes can reference them if needed.
+    
+    /** Date format used for logging transactions. */
     public DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    
+    /** Current date instance used for logging. */
     public Date date = new Date();
 
+    /** Stores all claim sell transactions. */
     public HashMap<String, ClaimSell> claimSell;
+    
+    /** Stores all claim rent transactions. */
     public HashMap<String, ClaimRent> claimRent;
+    
+    /** Stores all claim lease transactions. */
     public HashMap<String, ClaimLease> claimLease;
+    
+    /** Stores all claim auction transactions. */
     public HashMap<String, ClaimAuction> claimAuction;
     
-    public enum StorageType { FILE, MYSQL, SQLITE }
+    /** Enumeration of storage types supported by the plugin. */
+    public enum StorageType { 
+    	/** File-based storage. */
+    	FILE, 
+    	/** MySQL database storage. */
+    	MYSQL, 
+    	/** SQLite database storage. */
+    	SQLITE }
+    
+    /** The storage type used for transaction data. */
     private StorageType storageType;
+    
+    /** The database connection used for transaction data. */
     private Connection dbConnection = null;
 
+    
+    /**
+     * Initializes the transaction store based on the configuration settings.
+     */
     public TransactionsStore() {
         String storageStr = RealEstate.instance.config.databaseType.toLowerCase();
         switch(storageStr) {
@@ -101,7 +130,9 @@ public class TransactionsStore {
         }.runTaskTimer(RealEstate.instance, 1200L, 1200L);
     }
     
-    /* FILE-BASED METHODS */
+    /**
+     * Loads transaction data from a file-based storage system.
+     */
     public void loadDataFromFile() {
         File file = new File(this.dataFilePath);
         if(file.exists()) {
@@ -142,6 +173,9 @@ public class TransactionsStore {
         }
     }
     
+    /**
+     * Saves transaction data to a file-based storage system.
+     */
     public void saveDataToFile() {
         YamlConfiguration config = new YamlConfiguration();
         for (ClaimSell cs : claimSell.values())
@@ -511,6 +545,9 @@ public class TransactionsStore {
         }
     }
     
+    /**
+     * Saves transaction data, either to a file or database depending on configuration.
+     */
     public void saveData() {
         if(storageType == StorageType.FILE)
             saveDataToFile();
@@ -518,6 +555,11 @@ public class TransactionsStore {
             saveDataToDatabase();
     }
     
+    /**
+     * Checks if there is any active transaction on a given claim.
+     * @param claim The claim to check.
+     * @return True if a transaction exists, otherwise false.
+     */
     public boolean anyTransaction(IClaim claim) {
         return claim != null &&
                !claim.isWilderness() &&
@@ -527,6 +569,11 @@ public class TransactionsStore {
                 claimAuction.containsKey(claim.getId()));
     }
     
+    /**
+     * Retrieves the active transaction associated with a given claim.
+     * @param claim The claim to retrieve the transaction for.
+     * @return The transaction if found, otherwise null.
+     */
     public Transaction getTransaction(IClaim claim) {
         if(claimSell.containsKey(claim.getId()))
             return claimSell.get(claim.getId());
@@ -539,6 +586,10 @@ public class TransactionsStore {
         return null;
     }
     
+    /**
+     * Cancels an active transaction associated with a given claim.
+     * @param claim The claim whose transaction needs to be canceled.
+     */
     public void cancelTransaction(IClaim claim) {
         if(anyTransaction(claim)) {
             Transaction tr = getTransaction(claim);
@@ -547,6 +598,10 @@ public class TransactionsStore {
         saveData();
     }
     
+    /**
+     * Cancels a specific transaction.
+     * @param tr The transaction to cancel.
+     */
     public void cancelTransaction(Transaction tr) {
         if(tr.getHolder() != null)
             tr.getHolder().breakNaturally();
@@ -561,6 +616,11 @@ public class TransactionsStore {
         saveData();
     }
     
+    /**
+     * Determines if a given transaction can be canceled.
+     * @param tr The transaction to check.
+     * @return True if the transaction can be canceled, otherwise false.
+     */
     public boolean canCancelTransaction(Transaction tr) {
         // For auction, rent, lease we check if buyer is null (or if cancellation is forced)
         return tr instanceof ClaimSell ||
@@ -569,7 +629,13 @@ public class TransactionsStore {
                (tr instanceof ClaimLease && ((ClaimLease)tr).getBuyer() == null);
     }
     
-    // Transaction creation methods:
+    /**
+     * Creates a new sell transaction for a claim.
+     * @param claim The claim being sold.
+     * @param player The player selling the claim.
+     * @param price The price of the claim.
+     * @param sign The location of the transaction sign.
+     */
     public void sell(IClaim claim, Player player, double price, Location sign) {
         ClaimSell cs = new ClaimSell(claim, claim.isAdminClaim() ? null : player, price, sign);
         claimSell.put(claim.getId(), cs);
@@ -602,7 +668,15 @@ public class TransactionsStore {
     }
 
 
-    
+    /**
+     * Creates a new rent transaction for a claim.
+     * @param claim The claim being rented.
+     * @param player The player renting the claim.
+     * @param price The rental price.
+     * @param sign The location of the transaction sign.
+     * @param duration The rental duration in days.
+     * @param buildTrust Whether the renter gains build trust.
+     */
     public void rent(IClaim claim, Player player, double price, Location sign, int duration, boolean buildTrust) {
         ClaimRent cr = new ClaimRent(claim, claim.isAdminClaim() ? null : player, price, sign, duration, buildTrust);
         claimRent.put(claim.getId(), cr);
@@ -636,6 +710,16 @@ public class TransactionsStore {
         }
     }
     
+    
+    /**
+     * Creates a new lease transaction for a claim.
+     * @param claim The claim being leased.
+     * @param player The player leasing the claim.
+     * @param price The lease price.
+     * @param sign The location of the transaction sign.
+     * @param frequency The payment frequency.
+     * @param paymentsCount The number of payments required.
+     */
     public void lease(IClaim claim, Player player, double price, Location sign, int frequency, int paymentsCount) {
         ClaimLease cl = new ClaimLease(claim, claim.isAdminClaim() ? null : player, price, sign, frequency, paymentsCount);
         claimLease.put(claim.getId(), cl);
@@ -669,6 +753,15 @@ public class TransactionsStore {
         }
     }
     
+    /**
+     * Creates a new auction transaction for a claim.
+     * @param claim The claim being auctioned.
+     * @param player The player starting the auction.
+     * @param price The starting price.
+     * @param sign The location of the transaction sign.
+     * @param duration The auction duration in days.
+     * @param bidStep The minimum bid step.
+     */
     public void auction(IClaim claim, Player player, double price, Location sign, int duration, double bidStep) {
         LocalDateTime endDate = LocalDateTime.now().plusDays(duration);
         // Use the Auction constructor with a LocalDateTime endDate.
@@ -706,6 +799,11 @@ public class TransactionsStore {
         }
     }
     
+    /**
+     * Retrieves the active transaction associated with a player.
+     * @param player The player to check.
+     * @return The transaction if found, otherwise null.
+     */
     public Transaction getTransaction(Player player) {
         if(player == null) return null;
         IClaim c = RealEstate.claimAPI.getClaimAt(player.getLocation());
