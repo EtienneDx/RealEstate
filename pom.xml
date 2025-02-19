@@ -4,9 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>Me.EtienneDx</groupId>
 	<artifactId>real-estate</artifactId>
-	<version>1.4.1</version>
+	<version>1.4.4</version>
+
 	<name>RealEstate</name>
-	<description>A spigot plugin for selling, renting and leasing GriefPrevention claims</description>
+	<description>A spigot plugin for selling, renting, leasing and auctioning GriefPrevention and GriefDefender claims</description>
 	<build>
         <finalName>${project.name}</finalName>
 		<sourceDirectory>src</sourceDirectory>
@@ -17,6 +18,7 @@
 				<targetPath>.</targetPath>
 				<includes>
 					<include>plugin.yml</include>
+					<include>paper-plugin.yml</include>
 				</includes>
 			</resource>
 			<resource>
@@ -34,39 +36,20 @@
 				</configuration>
 			</plugin>
 			<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-					<createDependencyReducedPom>false</createDependencyReducedPom>
-					<filters>
-						<filter>
-							<artifact>*:*</artifact>
-							<excludes>
-								<exclude>META-INF/MANIFEST.MF</exclude>
-							</excludes>
-						</filter>
-					</filters>
-                    <relocations>
-                        <relocation>
-                            <pattern>co.aikar.commands</pattern>
-                            <shadedPattern>me.EtienneDx.RealEstate.acf</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>me.EtienneDx.AnnotationConfig</pattern>
-                            <shadedPattern>me.EtienneDx.RealEstate.AnnotationConfig</shadedPattern>
-                        </relocation>
-                    </relocations>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-javadoc-plugin</artifactId>
+			  <version>3.3.2</version>
+			  <configuration>
+			    <additionalClasspathElements>
+			      <additionalClasspathElement>${settings.localRepository}/net/kyori/adventure-api/4.18.0/adventure-api-4.18.0.jar</additionalClasspathElement>
+			      <additionalClasspathElement>${settings.localRepository}/net/kyori/adventure-text-serializer-plain/4.18.0/adventure-text-serializer-plain-4.18.0.jar</additionalClasspathElement>
+			    </additionalClasspathElements>
+			    <!-- Optionally disable doclint if needed -->
+			    <additionalOptions>
+			      <additionalOption>-Xdoclint:none</additionalOption>
+			    </additionalOptions>
+			  </configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.4.1</version>
@@ -115,10 +98,29 @@
 	        <id>aikar</id>
 	        <url>https://repo.aikar.co/content/groups/aikar/</url>
     	</repository>
-    	<!-- EssentialsX repo -->
     	<repository>
 	        <id>ess-repo</id>
 	        <url>https://ci.ender.zone/plugin/repository/everything/</url>
+	    </repository>
+		<repository>
+	        <id>glaremasters</id>
+	        <url>https://repo.glaremasters.me/repository/bloodshot</url>
+	    </repository>
+	    <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+        <repository>
+        	<id>sk89q-repo</id>
+        	<url>https://maven.enginehub.org/repo/</url>
+    	</repository>
+	    <repository>
+	      <id>glaremasters repo</id>
+	      <url>https://repo.glaremasters.me/repository/towny/</url>
+	    </repository>
+	    <repository>
+          <id>adventure</id>
+          <url>https://repo1.maven.org/maven2/</url>
 	    </repository>
 	</repositories>
 	<pluginRepositories>
@@ -131,7 +133,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.18.1-R0.1-SNAPSHOT</version>
+			<version>1.21.1-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -143,7 +145,7 @@
 		<dependency>
 	        <groupId>co.aikar</groupId>
 	        <artifactId>acf-bukkit</artifactId>
-	        <version>0.5.0-SNAPSHOT</version>
+	        <version>0.5.1-SNAPSHOT</version>
 	    </dependency>
 	    <dependency>
 	        <groupId>net.ess3</groupId>
@@ -152,15 +154,63 @@
 	        <scope>provided</scope>
 	    </dependency>
 	    <dependency>
-		    <groupId>com.github.TechFortress</groupId>
+		    <groupId>com.github.GriefPrevention</groupId>
 		    <artifactId>GriefPrevention</artifactId>
-		    <version>16.18</version>
+		    <version>16.18.4</version>
+		    <scope>provided</scope>
+		</dependency>
+		<dependency>
+		    <groupId>com.github.bloodmc</groupId>
+		    <artifactId>GriefDefenderAPI</artifactId>
+		    <version>master-4e5f379629-1</version>
 		    <scope>provided</scope>
 		</dependency>
 	    <dependency>
 		    <groupId>com.github.EtienneDx</groupId>
 		    <artifactId>AnnotationConfig</artifactId>
 		    <version>e9eab24</version>
+		</dependency>
+		<dependency>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>1.21.4-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+  			<groupId>com.sk89q.worldguard</groupId>
+  			<artifactId>worldguard-bukkit</artifactId>
+  			<version>7.0.5</version>
+  			<scope>provided</scope>
+		</dependency>
+		<dependency>
+  			<groupId>com.sk89q.worldedit</groupId>
+  			<artifactId>worldedit-bukkit</artifactId>
+  			<version>7.2.0</version>
+  			<scope>provided</scope>
+		</dependency>
+		<dependency>
+		  <groupId>net.kyori</groupId>
+		  <artifactId>adventure-api</artifactId>
+		  <version>4.18.0</version>
+		  <scope>provided</scope>
+		</dependency>
+		<dependency>
+		  <groupId>net.kyori</groupId>
+		  <artifactId>adventure-text-serializer-plain</artifactId>
+		  <version>4.18.0</version>
+		  <scope>provided</scope>
+		</dependency>
+		<dependency>
+      		<groupId>com.palmergames.bukkit.towny</groupId>
+      		<artifactId>towny</artifactId>
+      		<version>0.101.1.0</version>
+     	 	<scope>provided</scope>
+    	</dependency>
+    	<dependency>
+		  <groupId>org.bstats</groupId>
+		  <artifactId>bstats-bukkit</artifactId>
+		  <version>3.0.2</version>
+		  <scope>compile</scope>
 		</dependency>
 	</dependencies>
 </project>

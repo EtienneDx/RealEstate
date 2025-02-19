@@ -1,0 +1,54 @@
+# Usa un editor YAML como NotepadPlusPlus para editar este archivo.
+# Después de editar, haz una copia de seguridad de tus cambios antes de recargar el servidor en caso de que hayas cometido un error de sintaxis.
+# Usa signos de dólar ($) para los códigos de formato, que están documentados aquí: http://minecraft.gamepedia.com/Formatting_codes.
+# Puedes usar {0}, {1} para incluir los diferentes valores indicados en los comentarios.
+RealEstate:
+  Keywords:
+    # Palabras clave utilizadas dentro de otros mensajes pero con un texto más largo al
+      # final solo porque necesito probar algunas cosas.
+    Enabled: habilitado
+    Disabled: deshabilitado
+    Claim: reclamación
+    Subclaim: subreclamación
+    AdminClaimPrefix: un administrador
+    ClaimPrefix: un
+    TheServer: El servidor
+  NoTransactionFound: $c¡No se encontró ninguna transacción!
+  NoTransactionFoundHere: $c¡No se encontró ninguna transacción en tu ubicación!
+  PageMustBePositive: $cLa página debe ser una opción positiva.
+  PageNotExists: $c¡Esta página no existe!
+  # 0: habilitado/deshabilitado; 1:
+    # tipo de reclamación
+  RenewRentNow: $bLa renovación automática ahora está $a{0} $bpara esta {1}
+  # 0: habilitado/deshabilitado;
+    # 1: tipo de reclamación
+  RenewRentCurrently: $bLa renovación automática actualmente está $a{0} $bpara esta {1}
+  Errors:
+    OutOfClaim: $c¡Debes estar dentro de una reclamación para usar este comando!
+    PlayerOnlyCmd: $c¡Solo los jugadores pueden ejecutar este comando!
+    NoOngoingTransaction: $c¡Esta reclamación no tiene transacciones en curso!
+    NotRentNorLease: $c¡Esta reclamación no está en alquiler ni arrendamiento!
+    AlreadyBought: $c¡Esta reclamación ya tiene un comprador!
+    NotPartOfTransaction: $c¡No eres parte de esta transacción!
+    RentOnly: $c¡Este comando solo se aplica a reclamaciones alquiladas!
+    AuctionOnly: $c¡Este comando solo se aplica a reclamaciones subastadas!
+    ValueGreaterThanZero: $c¡El valor debe ser mayor que cero!
+    InvalidOption: $c¡Opción inválida proporcionada!
+  List:
+    # 0: Ofertas de RE|Ofertas de Venta|Ofertas de Alquiler|Ofertas de Arrendamiento; 1: Número de página; 2:
+      # Número total de páginas
+    Header: $1----= $f[ $6{0} página $2 {1} $6/ $2{2} $f] $1=----
+    # 0: todo|venta|alquiler|arrendamiento; 1:
+      # número de la próxima página
+    NextPage: $6Para ver la próxima página, escribe $a/re list {0} {1}
+  Sign:
+    Auction:
+      # 0: nombre del jugador, 1:
+        # precio formateado
+      HighestBidder: '$b{0}: $a{1}'
+      NoBider: $bSin postor
+      # 0: tiempo restante formateado
+      RemainingTime: $b$a{0}
+      Ended: $bSubasta finalizada
+      # siguiente línea: ganador
+      Won: $bSubasta ganada por
