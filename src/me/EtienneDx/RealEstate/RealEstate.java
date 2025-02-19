@@ -16,13 +16,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import com.earth2me.essentials.Essentials;
-
 import co.aikar.commands.BukkitCommandManager;
 import co.aikar.commands.ConditionFailedException;
 import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
@@ -37,6 +34,7 @@ import me.EtienneDx.RealEstate.Transactions.ClaimSell;
 import me.EtienneDx.RealEstate.Transactions.ExitOffer;
 import me.EtienneDx.RealEstate.Transactions.Transaction;
 import me.EtienneDx.RealEstate.Transactions.TransactionsStore;
+import me.EtienneDx.RealEstate.Metrics;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
@@ -187,9 +185,17 @@ public class RealEstate extends JavaPlugin {
         manager.registerCommand(new RECommand());
         
         copyResourcesIntoPluginDirectory();
+        
+        activateMetrics();
     }
     
-    /**
+    private void activateMetrics() {
+    	int id = 24834;
+        new Metrics(this, id);
+        this.log.info("Starting Metrics. Opt-out using the global bStats config.");
+	}
+
+	/**
      * Checks for the existence of old configuration files and renames them if necessary.
      */
     private void checkForOldFiles() {

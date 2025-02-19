@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>Me.EtienneDx</groupId>
 	<artifactId>real-estate</artifactId>
-	<version>1.4.3</version>
+	<version>1.4.4</version>
 
 	<name>RealEstate</name>
 	<description>A spigot plugin for selling, renting, leasing and auctioning GriefPrevention and GriefDefender claims</description>
@@ -206,5 +206,11 @@
       		<version>0.101.1.0</version>
      	 	<scope>provided</scope>
     	</dependency>
+    	<dependency>
+		  <groupId>org.bstats</groupId>
+		  <artifactId>bstats-bukkit</artifactId>
+		  <version>3.0.2</version>
+		  <scope>compile</scope>
+		</dependency>
 	</dependencies>
 </project>
