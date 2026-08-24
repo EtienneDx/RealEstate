@@ -12,6 +12,7 @@
 ## New Features
 
 - **PlaceholderAPI support:** exposes `%realestate_claim_rent_amount%`, `%realestate_claim_sell_amount%`, and `%realestate_claim_lease_amount%`, showing the price of the transaction sign at a player's current location.
+- **Automatic claim snapshot/restore for rent and lease:** when a claim is put up for rent or lease, its blocks are now snapshotted automatically; once a tenant's rental period or lease ends (expiry without renewal, failed payment, or admin-forced cancellation), the claim is restored back to that snapshot, undoing anything the tenant built or destroyed. This does not apply when a lease completes and ownership transfers to the buyer — the new owner's changes are kept. Controlled by the new `RealEstate.Rules.ClaimSnapshots` config option (default: enabled). Currently only implemented for GriefDefender (via its `ClaimSnapshot` API); GriefPrevention, WorldGuard, and Towny claims are unaffected and behave exactly as before.
 
 ## Improvements
 

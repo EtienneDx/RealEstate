@@ -33,6 +33,9 @@ import net.md_5.bungee.api.ChatColor;
  */
 public class ClaimRent extends BoughtTransaction {
 
+    /** Name under which this claim's pre-rent block snapshot is stored, if snapshots are enabled. */
+    public static final String SNAPSHOT_NAME = "realestate_rent";
+
     /** The date and time when the lease started or the last payment was made. */
     LocalDateTime startDate = null;
     /** The duration (in days) of the lease period. */
@@ -174,6 +177,9 @@ public class ClaimRent extends BoughtTransaction {
     private void unRent(boolean msgBuyer) {
         IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
         claim.dropPlayerPermissions(buyer);
+        if (RealEstate.instance.config.cfgClaimSnapshots) {
+            claim.restoreSnapshot(SNAPSHOT_NAME);
+        }
         claim.removeManager(buyer);
         claim.setInheritPermissions(true);
         RealEstate.claimAPI.saveClaim(claim);

@@ -36,6 +36,9 @@ import net.md_5.bungee.api.ChatColor;
  */
 public class ClaimLease extends BoughtTransaction {
 
+    /** Name under which this claim's pre-lease block snapshot is stored, if snapshots are enabled. */
+    public static final String SNAPSHOT_NAME = "realestate_lease";
+
     /** The time when the last lease payment was made. */
     public LocalDateTime lastPayment = null;
     
@@ -283,6 +286,9 @@ public class ClaimLease extends BoughtTransaction {
             
             claim.removeManager(buyer);
             claim.dropPlayerPermissions(buyer);
+            if (RealEstate.instance.config.cfgClaimSnapshots) {
+                claim.restoreSnapshot(SNAPSHOT_NAME);
+            }
         } else {
             getHolder().breakNaturally(); // Sign remains if lease never started.
         }

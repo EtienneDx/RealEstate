@@ -176,6 +176,13 @@ public class Config extends AnnotationConfig {
     public boolean cfgDestroyLeaseSigns = true;
 
     /**
+     * Whether a claim's blocks should be automatically snapshotted when put up for rent/lease,
+     * and restored once the tenant's rental/lease ends.
+     */
+    @ConfigField(name="RealEstate.Rules.ClaimSnapshots", comment = "Should a claim's blocks be automatically snapshotted when it is put up for rent/lease, and restored to that snapshot once the tenant's rental/lease ends? Protects the owner from griefing by tenants. Currently only supported on GriefDefender; ignored on other claim providers.")
+    public boolean cfgClaimSnapshots = true;
+
+    /**
      * Whether claim blocks are transferred to the new owner on purchase.
      */
     @ConfigField(name="RealEstate.Rules.TransferClaimBlocks", comment = "Are the claim blocks transferred to the new owner on purchase or should the buyer provide them?")
