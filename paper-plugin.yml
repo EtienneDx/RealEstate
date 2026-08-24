@@ -37,6 +37,10 @@ dependencies:
       load: BEFORE
       required: false
       join-classpath: true
+    PlaceholderAPI:
+      load: BEFORE
+      required: false
+      join-classpath: true
 commands:
   re:
     description: Access to the claim transaction information.

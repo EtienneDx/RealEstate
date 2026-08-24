@@ -17,6 +17,7 @@ softdepend:
   - WorldGuard
   - WorldEdit
   - Towny
+  - PlaceholderAPI
 api-version: 1.21.4
 commands:
   re:

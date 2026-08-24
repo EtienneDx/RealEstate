@@ -145,36 +145,30 @@ public class ClaimSell extends ClaimTransaction {
         // Process payment and transfer ownership.
         if (Utils.makePayment(owner, player.getUniqueId(), price, false, true)) { // Payment succeeded
             Utils.transferClaim(claim, player.getUniqueId(), owner);
-            // Log transaction if claim ownership transfer is successful.
-            if (claim.isSubClaim() || claim.getOwner().equals(player.getUniqueId())) {
-                String location = "[" + player.getLocation().getWorld() + ", " +
+            String location = "[" + player.getLocation().getWorld() + ", " +
+                "X: " + player.getLocation().getBlockX() + ", " +
+                "Y: " + player.getLocation().getBlockY() + ", " +
+                "Z: " + player.getLocation().getBlockZ() + "]";
+            Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimBuyerSold,
+                    claimTypeDisplay, RealEstate.econ.format(price));
+            RealEstate.instance.addLogEntry(
+                    "[" + RealEstate.transactionsStore.dateFormat.format(RealEstate.transactionsStore.date) + "] " +
+                    player.getName() + " has purchased a " + claimType + " at " +
+                    "[" + player.getLocation().getWorld() + ", " +
                     "X: " + player.getLocation().getBlockX() + ", " +
                     "Y: " + player.getLocation().getBlockY() + ", " +
-                    "Z: " + player.getLocation().getBlockZ() + "]";
-                Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimBuyerSold,
-                        claimTypeDisplay, RealEstate.econ.format(price));
-                RealEstate.instance.addLogEntry(
-                        "[" + RealEstate.transactionsStore.dateFormat.format(RealEstate.transactionsStore.date) + "] " +
-                        player.getName() + " has purchased a " + claimType + " at " +
-                        "[" + player.getLocation().getWorld() + ", " +
-                        "X: " + player.getLocation().getBlockX() + ", " +
-                        "Y: " + player.getLocation().getBlockY() + ", " +
-                        "Z: " + player.getLocation().getBlockZ() + "] " +
-                        "Price: " + price + " " + RealEstate.econ.currencyNamePlural());
-                if (RealEstate.instance.config.cfgMessageOwner && owner != null) {
-                    OfflinePlayer oldOwner = Bukkit.getOfflinePlayer(owner);
-                    if (oldOwner.isOnline()) {
-                        Messages.sendMessage(oldOwner.getPlayer(), RealEstate.instance.messages.msgInfoClaimOwnerSold,
-                                player.getName(), claimTypeDisplay, RealEstate.econ.format(price), location);
-                    } else if (RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null) {
-                        User u = RealEstate.ess.getUser(owner);
-                        u.addMail(Messages.getMessage(RealEstate.instance.messages.msgInfoClaimOwnerSold,
-                                player.getName(), claimTypeDisplay, RealEstate.econ.format(price), location));
-                    }
+                    "Z: " + player.getLocation().getBlockZ() + "] " +
+                    "Price: " + price + " " + RealEstate.econ.currencyNamePlural());
+            if (RealEstate.instance.config.cfgMessageOwner && owner != null) {
+                OfflinePlayer oldOwner = Bukkit.getOfflinePlayer(owner);
+                if (oldOwner.isOnline()) {
+                    Messages.sendMessage(oldOwner.getPlayer(), RealEstate.instance.messages.msgInfoClaimOwnerSold,
+                            player.getName(), claimTypeDisplay, RealEstate.econ.format(price), location);
+                } else if (RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null) {
+                    User u = RealEstate.ess.getUser(owner);
+                    u.addMail(Messages.getMessage(RealEstate.instance.messages.msgInfoClaimOwnerSold,
+                            player.getName(), claimTypeDisplay, RealEstate.econ.format(price), location));
                 }
-            } else {
-                Messages.sendMessage(player, RealEstate.instance.messages.msgErrorUnexpected);
-                return;
             }
             RealEstate.transactionsStore.cancelTransaction(claim);
         }

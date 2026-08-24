@@ -6,10 +6,17 @@
 
 - **Sign destruction ignored config:** `DestroySigns.Rent` and `DestroySigns.Lease` in `config.yml` stopped being honored after the 1.4.2 claim API refactor — signs were always destroyed on rent/lease regardless of the setting. Both are now respected again. (#84, #87)
 - **`/re info` could crash on an orphaned transaction:** if the claim tied to a sign's transaction could no longer be found (e.g. the claim was resized, abandoned, or deleted while a transaction was still open), previewing that transaction threw an unhandled `NullPointerException` instead of showing an error. Sell, rent, lease, and auction previews now report the problem to the player and log a warning instead of crashing. (#87)
+- **Parent claim purchases always reported an error:** buying a parent (non-sub) claim always sent the buyer an "unexpected error" message even though the purchase and ownership transfer had already succeeded. The stale post-transfer verification causing this has been removed.
+- **The project failed to build entirely:** the `GriefDefenderAPI` dependency was pinned to a JitPack build of a commit that no longer exists upstream after a history rewrite, so it could never be resolved. Repointed to the real `com.griefdefender:api` coordinate GriefDefender actually publishes, with its already-shaded transitive dependencies excluded.
+
+## New Features
+
+- **PlaceholderAPI support:** exposes `%realestate_claim_rent_amount%`, `%realestate_claim_sell_amount%`, and `%realestate_claim_lease_amount%`, showing the price of the transaction sign at a player's current location.
 
 ## Improvements
 
 - **Dependency alignment:** bumped the `spigot-api` dependency from 1.21.1 to 1.21.4 to match `paper-api` and the plugin's declared `api-version`.
+- **CI:** the build workflow's `actions/upload-artifact@v3` step was hard-deprecated by GitHub and failed before checkout even ran; bumped to v4.
 
 # Version 1.4.3 (2025-02-14)
 
