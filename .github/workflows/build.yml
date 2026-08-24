@@ -34,7 +34,7 @@ jobs:
           echo "::set-output name=version::$VERSION"
 
       - name: 'Upload artifact'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: RealEstate-${{ steps.pomVersion.outputs.version }}.jar
           path: target/RealEstate-${{ steps.pomVersion.outputs.version }}.jar
