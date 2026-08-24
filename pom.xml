@@ -8,6 +8,31 @@
 
 	<name>RealEstate</name>
 	<description>A spigot plugin for selling, renting, leasing and auctioning GriefPrevention and GriefDefender claims</description>
+
+	<properties>
+		<!-- Target Minecraft/Paper/Spigot version. Override any of these
+		     together (they must describe the same Minecraft version) to
+		     build against a different target, e.g.:
+		       mvn package -Dminecraft.api.version=1.21.11 \
+		                   -Dspigot.api.version=1.21.11-R0.1-SNAPSHOT \
+		                   -Dpaper.api.version=1.21.11-R0.1-SNAPSHOT \
+		                   -Dskip.spigot.api=false
+		     Minecraft/Paper moved to a new calendar-based version scheme
+		     after 1.21.11 (e.g. 26.1.2). Spigot itself has not published a
+		     spigot-api under that scheme -- as of this writing 1.21.11 is
+		     the newest Minecraft version with a spigot-api release, so the
+		     26.x target below is Paper-only (skip.spigot.api=true, the
+		     default). -->
+		<minecraft.api.version>26.1.2</minecraft.api.version>
+		<paper.api.version>[26.1.2.build,)</paper.api.version>
+		<spigot.api.version>26.1.2-R0.1-SNAPSHOT</spigot.api.version>
+		<!-- No spigot-api is published for the 26.x scheme, so it's excluded
+		     from the default (latest/primary) build target. Set to false
+		     for older, pre-26.x targets where spigot-api and paper-api
+		     coexist. -->
+		<skip.spigot.api>true</skip.spigot.api>
+	</properties>
+
 	<build>
         <finalName>${project.name}</finalName>
 		<sourceDirectory>src</sourceDirectory>
@@ -142,12 +167,6 @@
 	</pluginRepositories>
 	<dependencies>
 		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot-api</artifactId>
-			<version>1.21.4-R0.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>net.milkbowl.vault</groupId>
 			<artifactId>VaultAPI</artifactId>
 			<version>1.7</version>
@@ -200,7 +219,7 @@
 		<dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.4-R0.1-SNAPSHOT</version>
+            <version>${paper.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -240,4 +259,26 @@
 		  <scope>compile</scope>
 		</dependency>
 	</dependencies>
+	<profiles>
+		<!-- spigot-api is only added when skip.spigot.api=false, since no
+		     spigot-api build exists for the 26.x Minecraft version scheme
+		     (see the note on skip.spigot.api in <properties> above). -->
+		<profile>
+			<id>with-spigot-api</id>
+			<activation>
+				<property>
+					<name>skip.spigot.api</name>
+					<value>false</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.spigotmc</groupId>
+					<artifactId>spigot-api</artifactId>
+					<version>${spigot.api.version}</version>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 </project>

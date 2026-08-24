@@ -1,7 +1,7 @@
 name: RealEstate
 main: me.EtienneDx.RealEstate.RealEstate
 version: ${project.version}
-api-version: 1.21.4
+api-version: ${minecraft.api.version}
 authors:
   - EtienneDx
   - DmitryRendov
