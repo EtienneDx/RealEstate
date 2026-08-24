@@ -164,6 +164,16 @@
 		    <artifactId>api</artifactId>
 		    <version>2.1.1-SNAPSHOT</version>
 		    <scope>provided</scope>
+		    <exclusions>
+		        <!-- The published jar already shades and relocates all of these
+		             under com.griefdefender.lib.*; the unshaded transitives are
+		             unneeded and some (e.g. net.kyori:event-api:5.0.0-SNAPSHOT)
+		             are no longer resolvable from any configured repository. -->
+		        <exclusion>
+		            <groupId>*</groupId>
+		            <artifactId>*</artifactId>
+		        </exclusion>
+		    </exclusions>
 		</dependency>
 	    <dependency>
 		    <groupId>com.github.EtienneDx</groupId>
