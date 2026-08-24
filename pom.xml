@@ -160,9 +160,9 @@
 		    <scope>provided</scope>
 		</dependency>
 		<dependency>
-		    <groupId>com.github.bloodmc</groupId>
-		    <artifactId>GriefDefenderAPI</artifactId>
-		    <version>master-4e5f379629-1</version>
+		    <groupId>com.griefdefender</groupId>
+		    <artifactId>api</artifactId>
+		    <version>2.1.1-SNAPSHOT</version>
 		    <scope>provided</scope>
 		</dependency>
 	    <dependency>
