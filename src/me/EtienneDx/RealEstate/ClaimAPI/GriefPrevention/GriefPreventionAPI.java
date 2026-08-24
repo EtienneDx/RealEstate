@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 import me.EtienneDx.RealEstate.ClaimAPI.IClaimAPI;
 import me.EtienneDx.RealEstate.ClaimAPI.IPlayerData;
+import me.EtienneDx.RealEstate.Transactions.Transaction;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.ryanhamshire.GriefPrevention.Claim;
 
@@ -60,5 +61,23 @@ public class GriefPreventionAPI implements IClaimAPI {
     @Override
     public void registerEvents() {
         new ClaimPermissionListener().registerEvents();
+    }
+
+    /**
+     * Not supported for GriefPrevention.
+     * <p>
+     * GriefPrevention claims are identified internally by a {@code long}, and this
+     * codebase only looks claims up by location (see {@link #getClaimAt(Location)}) or by
+     * an already-resolved {@link IClaim}, so there is no existing facility to resolve a
+     * claim from a {@link UUID} alone. GriefPrevention does not ship a map integration
+     * that would need this hook, so this always returns {@code null}.
+     * </p>
+     *
+     * @param claimUniqueId unused
+     * @return always {@code null}
+     */
+    @Override
+    public Transaction getTransaction(UUID claimUniqueId) {
+        return null;
     }
 }

@@ -3,14 +3,17 @@ package me.EtienneDx.RealEstate.ClaimAPI.GriefDefender;
 import java.util.UUID;
 
 import com.griefdefender.api.GriefDefender;
+import com.griefdefender.api.claim.Claim;
 import com.griefdefender.api.claim.ClaimResult;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
+import me.EtienneDx.RealEstate.RealEstate;
 import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 import me.EtienneDx.RealEstate.ClaimAPI.IClaimAPI;
 import me.EtienneDx.RealEstate.ClaimAPI.IPlayerData;
+import me.EtienneDx.RealEstate.Transactions.Transaction;
 
 /**
  * GriefDefenderAPI is an implementation of the {@link IClaimAPI} interface that integrates with the GriefDefender plugin.
@@ -89,5 +92,29 @@ public class GriefDefenderAPI implements IClaimAPI {
     @Override
     public void registerEvents() {
         new GDPermissionListener();
+    }
+
+    /**
+     * Retrieves the ongoing RealEstate transaction associated with the GriefDefender
+     * claim that has the given unique ID.
+     * <p>
+     * GriefDefender identifies claims by a {@link UUID}, so this is a direct lookup via
+     * {@link GriefDefender#getCore()}. This is the data-access hook that GriefDefender's
+     * own map integration (e.g. its built-in BlueMap/Dynmap support) can use to display
+     * RealEstate transaction details in its claim popups; RealEstate does not render any
+     * map UI itself.
+     * </p>
+     *
+     * @param claimUniqueId the GriefDefender claim's unique ID
+     * @return the {@link Transaction} associated with the claim, or {@code null} if no
+     *         such claim exists or no transaction is currently associated with it
+     */
+    @Override
+    public Transaction getTransaction(UUID claimUniqueId) {
+        final Claim claim = GriefDefender.getCore().getClaim(claimUniqueId);
+        if (claim == null) {
+            return null;
+        }
+        return RealEstate.transactionsStore.getTransaction(new GDClaim(claim));
     }
 }
