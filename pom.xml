@@ -29,10 +29,17 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
+				<version>3.13.0</version>
 				<configuration>
-					<source>16</source>
-					<target>16</target>
+					<!-- Paper's own build (as of the 26.x version scheme) compiles
+					     against a JDK 25 toolchain (see PaperMC/Paper's
+					     build.gradle.kts and .github/workflows/build.yml), and
+					     WorldGuard/WorldEdit/Towny at their latest versions publish
+					     JDK 25 (class file 69) bytecode -- unreadable by the
+					     previous JDK 16 toolchain. JDK 25 reads all of that plus
+					     everything older, so it's a single toolchain that covers
+					     every dependency across every target version. -->
+					<release>25</release>
 				</configuration>
 			</plugin>
 			<plugin>
