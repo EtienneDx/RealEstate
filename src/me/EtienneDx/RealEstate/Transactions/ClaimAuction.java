@@ -123,6 +123,20 @@ public class ClaimAuction extends ClaimTransaction {
                         Messages.sendMessage(buyerPlayer.getPlayer(), RealEstate.instance.messages.msgErrorClaimDoesNotExistAuction);
                     }
                     RealEstate.transactionsStore.cancelTransaction(claim);
+                } else if (isBuyerAtPurchaseLimit()) {
+                    // An auction win is conceptually a sale, so it shares the sell-buyer lifetime purchase limit.
+                    int sellBuyerLimit = RealEstate.instance.config.cfgLimitSellBuyer;
+                    if (!Utils.makePayment(buyer, null, price, false, false)) {
+                        RealEstate.instance.log.warning("Couldn't reimburse " + price + " to " + buyerPlayer.getName() + " for the cancellation of an auction (buyer purchase limit reached)");
+                    }
+                    if (buyerPlayer.isOnline()) {
+                        Messages.sendMessage(buyerPlayer.getPlayer(), RealEstate.instance.messages.msgInfoClaimInfoSellBuyerLimit, String.valueOf(sellBuyerLimit));
+                        Messages.sendMessage(buyerPlayer.getPlayer(), RealEstate.instance.messages.msgInfoClaimInfoAuctionCancelled);
+                    }
+                    if (owner != null && ownerPlayer != null && ownerPlayer.isOnline()) {
+                        Messages.sendMessage(ownerPlayer.getPlayer(), RealEstate.instance.messages.msgErrorAuctionCouldntReceiveOwner);
+                    }
+                    RealEstate.transactionsStore.cancelTransaction(claim);
                 } else if (!Utils.makePayment(owner, null, price, false, false)) {
                     RealEstate.instance.log.warning("Couldn't pay " + price + " to " + claim.getOwnerName() + " for the auction of a claim");
                     if (buyerPlayer.isOnline()) {
@@ -140,6 +154,7 @@ public class ClaimAuction extends ClaimTransaction {
                     RealEstate.transactionsStore.cancelTransaction(claim);
                 } else {
                     Utils.transferClaim(claim, buyer, owner);
+                    RealEstate.transactionsStore.incrementPurchasedClaims(buyer);
                     if (getHolder().getState() instanceof Sign) {
                         RealEstateSign s = new RealEstateSign((Sign) getHolder().getState());
                         s.setLine(0, "");
@@ -291,6 +306,18 @@ public class ClaimAuction extends ClaimTransaction {
         this.price = price;
         update();
         RealEstate.transactionsStore.saveData();
+    }
+
+    /**
+     * Checks whether the current highest bidder has already reached their lifetime purchase limit
+     * ({@code cfgLimitSellBuyer}). An auction win is conceptually a sale, so it counts against the
+     * same limit as buying a claim outright via a sell sign.
+     *
+     * @return {@code true} if a buyer is set and they are at or above the configured limit
+     */
+    private boolean isBuyerAtPurchaseLimit() {
+        int sellBuyerLimit = RealEstate.instance.config.cfgLimitSellBuyer;
+        return sellBuyerLimit >= 0 && RealEstate.transactionsStore.getTotalPurchasedClaims(buyer) >= sellBuyerLimit;
     }
 
     /**
