@@ -287,7 +287,11 @@ public class ClaimLease extends BoughtTransaction {
             claim.removeManager(buyer);
             claim.dropPlayerPermissions(buyer);
             if (RealEstate.instance.config.cfgClaimSnapshots) {
-                claim.restoreSnapshot(SNAPSHOT_NAME);
+                if (!claim.restoreSnapshot(SNAPSHOT_NAME)) {
+                    RealEstate.instance.log.warning("Could not restore pre-lease snapshot \"" + SNAPSHOT_NAME + "\" for claim at " +
+                            "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]; " +
+                            "the claim will not be restored to its pre-lease state.");
+                }
             }
         } else {
             getHolder().breakNaturally(); // Sign remains if lease never started.
@@ -378,6 +382,13 @@ public class ClaimLease extends BoughtTransaction {
             buyer = player.getUniqueId();
             lastPayment = LocalDateTime.now();
             paymentsLeft--;
+            if (RealEstate.instance.config.cfgClaimSnapshots) {
+                if (!claim.createSnapshot(SNAPSHOT_NAME)) {
+                    RealEstate.instance.log.warning("Could not create pre-lease snapshot \"" + SNAPSHOT_NAME + "\" for claim at " +
+                            "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]; " +
+                            "the claim will not be protected from tenant changes when the lease ends.");
+                }
+            }
             claim.addPlayerPermissions(buyer, ClaimPermission.BUILD);
             claim.addPlayerPermissions(player.getUniqueId(), ClaimPermission.MANAGE);
             RealEstate.claimAPI.saveClaim(claim);

@@ -740,9 +740,9 @@ public class TransactionsStore {
     public void rent(IClaim claim, Player player, double price, Location sign, int duration, boolean buildTrust) {
         ClaimRent cr = new ClaimRent(claim, claim.isAdminClaim() ? null : player, price, sign, duration, buildTrust);
         claimRent.put(claim.getId(), cr);
-        if (RealEstate.instance.config.cfgClaimSnapshots) {
-            claim.createSnapshot(ClaimRent.SNAPSHOT_NAME);
-        }
+        // Note: the pre-rent block snapshot is taken at move-in time (see ClaimRent.interact()),
+        // not here at listing time, so it captures the claim's state right before the tenant
+        // gains access rather than whatever it looked like when the owner listed it.
         // Immediately update the sign (using a slight delay if needed)
         Bukkit.getScheduler().runTaskLater(RealEstate.instance, () -> cr.update(), 1L);
         saveData();
@@ -786,9 +786,9 @@ public class TransactionsStore {
     public void lease(IClaim claim, Player player, double price, Location sign, int frequency, int paymentsCount) {
         ClaimLease cl = new ClaimLease(claim, claim.isAdminClaim() ? null : player, price, sign, frequency, paymentsCount);
         claimLease.put(claim.getId(), cl);
-        if (RealEstate.instance.config.cfgClaimSnapshots) {
-            claim.createSnapshot(ClaimLease.SNAPSHOT_NAME);
-        }
+        // Note: the pre-lease block snapshot is taken at move-in time (see ClaimLease.interact()),
+        // not here at listing time, so it captures the claim's state right before the tenant
+        // gains access rather than whatever it looked like when the owner listed it.
         // Immediately update the sign (using a slight delay if needed)
         Bukkit.getScheduler().runTaskLater(RealEstate.instance, () -> cl.update(), 1L);
         saveData();
