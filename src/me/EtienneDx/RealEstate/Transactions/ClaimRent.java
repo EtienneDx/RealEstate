@@ -346,7 +346,13 @@ public class ClaimRent extends BoughtTransaction {
             Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimAlreadyRented, claimTypeDisplay);
             return;
         }
-        
+
+        int rentBuyerLimit = RealEstate.instance.config.cfgLimitRentBuyer;
+        if(rentBuyerLimit >= 0 && RealEstate.transactionsStore.getActiveRentCount(player.getUniqueId()) >= rentBuyerLimit) {
+            Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimInfoRentBuyerLimit, String.valueOf(rentBuyerLimit));
+            return;
+        }
+
         if(Utils.makePayment(owner, player.getUniqueId(), price, false, true)) { // if payment succeed
             buyer = player.getUniqueId();
             startDate = LocalDateTime.now();

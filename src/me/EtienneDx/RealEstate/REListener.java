@@ -147,6 +147,14 @@ public class REListener implements Listener {
                     return;
                 }
 
+                int sellOwnerLimit = RealEstate.instance.config.cfgLimitSellOwner;
+                if (sellOwnerLimit >= 0 && RealEstate.transactionsStore.getSellListingCount(player.getUniqueId()) >= sellOwnerLimit) {
+                    Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimInfoSellOwnerLimit, String.valueOf(sellOwnerLimit));
+                    event.setCancelled(true);
+                    event.getBlock().breakNaturally();
+                    return;
+                }
+
                 // All checks passed; create the sell transaction.
                 event.setCancelled(true); // Cancel the event so the sign can be updated elsewhere.
                 RealEstate.transactionsStore.sell(claim, claim.isAdminClaim() ? null : player, price, event.getBlock().getLocation());
@@ -215,6 +223,14 @@ public class REListener implements Listener {
                     }
                 } else if (type.equals("claim") && !player.getUniqueId().equals(claim.getOwner())) { // only owner may rent his claim
                     Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotOwner, typeDisplay);
+                    event.setCancelled(true);
+                    event.getBlock().breakNaturally();
+                    return;
+                }
+
+                int rentOwnerLimit = RealEstate.instance.config.cfgLimitRentOwner;
+                if (rentOwnerLimit >= 0 && RealEstate.transactionsStore.getRentListingCount(player.getUniqueId()) >= rentOwnerLimit) {
+                    Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimInfoRentOwnerLimit, String.valueOf(rentOwnerLimit));
                     event.setCancelled(true);
                     event.getBlock().breakNaturally();
                     return;
@@ -302,6 +318,14 @@ public class REListener implements Listener {
                     }
                 } else if (type.equals("claim") && !player.getUniqueId().equals(claim.getOwner())) { // only owner may lease his claim
                     Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotOwner, typeDisplay);
+                    event.setCancelled(true);
+                    event.getBlock().breakNaturally();
+                    return;
+                }
+
+                int leaseOwnerLimit = RealEstate.instance.config.cfgLimitLeaseOwner;
+                if (leaseOwnerLimit >= 0 && RealEstate.transactionsStore.getLeaseListingCount(player.getUniqueId()) >= leaseOwnerLimit) {
+                    Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimInfoLeaseOwnerLimit, String.valueOf(leaseOwnerLimit));
                     event.setCancelled(true);
                     event.getBlock().breakNaturally();
                     return;

@@ -367,7 +367,13 @@ public class ClaimLease extends BoughtTransaction {
             Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimAlreadyLeased, claimTypeDisplay);
             return;
         }
-        
+
+        int leaseBuyerLimit = RealEstate.instance.config.cfgLimitLeaseBuyer;
+        if (leaseBuyerLimit >= 0 && RealEstate.transactionsStore.getActiveLeaseCount(player.getUniqueId()) >= leaseBuyerLimit) {
+            Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimInfoLeaseBuyerLimit, String.valueOf(leaseBuyerLimit));
+            return;
+        }
+
         if (Utils.makePayment(owner, player.getUniqueId(), price, false, true)) { // If payment succeeds.
             buyer = player.getUniqueId();
             lastPayment = LocalDateTime.now();

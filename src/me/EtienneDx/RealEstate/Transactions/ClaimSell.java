@@ -140,11 +140,17 @@ public class ClaimSell extends ClaimTransaction {
             int area = claim.getArea();
             Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimNoClaimBlocks,
                 area + "", remaining + "", (area - remaining) + "");
-            return;			
+            return;
+        }
+        int sellBuyerLimit = RealEstate.instance.config.cfgLimitSellBuyer;
+        if (sellBuyerLimit >= 0 && RealEstate.transactionsStore.getTotalPurchasedClaims(player.getUniqueId()) >= sellBuyerLimit) {
+            Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimInfoSellBuyerLimit, String.valueOf(sellBuyerLimit));
+            return;
         }
         // Process payment and transfer ownership.
         if (Utils.makePayment(owner, player.getUniqueId(), price, false, true)) { // Payment succeeded
             Utils.transferClaim(claim, player.getUniqueId(), owner);
+            RealEstate.transactionsStore.incrementPurchasedClaims(player.getUniqueId());
             String location = "[" + player.getLocation().getWorld() + ", " +
                 "X: " + player.getLocation().getBlockX() + ", " +
                 "Y: " + player.getLocation().getBlockY() + ", " +
