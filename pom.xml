@@ -263,18 +263,24 @@
   			    </exclusion>
   			</exclusions>
 		</dependency>
-		<dependency>
-		  <groupId>net.kyori</groupId>
-		  <artifactId>adventure-api</artifactId>
-		  <version>4.18.0</version>
-		  <scope>provided</scope>
-		</dependency>
-		<dependency>
-		  <groupId>net.kyori</groupId>
-		  <artifactId>adventure-text-serializer-plain</artifactId>
-		  <version>4.18.0</version>
-		  <scope>provided</scope>
-		</dependency>
+		<!-- No explicit net.kyori:adventure-api / adventure-text-serializer-plain
+		     dependency here (deliberately, as of this multi-target update):
+		     this project's own source never imports net.kyori.adventure.*
+		     directly (GriefDefender's public API methods use it in their
+		     signatures, and paper-api's own org.bukkit.entity.Player
+		     implements Adventure's Audience and similar interfaces, so
+		     something on the classpath must provide it). A pinned version
+		     here previously shadowed paper-api's own transitively-supplied
+		     Adventure version via Maven's "nearest wins" mediation, which
+		     broke compilation against the 26.x target specifically (paper-
+		     api's Player interface referenced newer Adventure classes,
+		     e.g. net.kyori.adventure.text.object.PlayerHeadObjectContents,
+		     that the old pinned 4.18.0 jar didn't have (a "cannot access
+		     ... class file ... not found"). paper-api (and spigot-api, on
+		     targets where it's present) already exposes adventure-api and
+		     adventure-text-serializer-plain as transitive API dependencies
+		     at a version matched to that specific target, so leaving them
+		     unpinned lets each target resolve its own correct version. -->
 		<dependency>
       		<groupId>com.palmergames.bukkit.towny</groupId>
       		<artifactId>towny</artifactId>
