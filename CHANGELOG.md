@@ -21,6 +21,13 @@
 - **Dependency alignment:** bumped the `spigot-api` dependency from 1.21.1 to 1.21.4 to match `paper-api` and the plugin's declared `api-version`.
 - **CI:** the build workflow's `actions/upload-artifact@v3` step was hard-deprecated by GitHub and failed before checkout even ran; bumped to v4.
 
+## Dependency Updates
+
+- **GriefPrevention: `16.18.4` → `17.0.0`** (skipped `18.0.0`). The API surface this codebase actually calls (`Claim#getID/getArea/isAdminClaim/getLesserBoundaryCorner/setPermission/dropPermission/clearPermissions/setSubclaimRestrictions`, the `children`/`parent`/`managers`/`ownerID` fields, `ClaimPermission`, `DataStore#getClaimAt/saveClaim/getPlayerData/changeClaimOwner`, `PlayerData`'s claim-block getters/setters, and the `ClaimDeletedEvent`/`ClaimPermissionCheckEvent` classes) is byte-for-byte unchanged between `16.18.4` and `17.0.0` — confirmed by diffing the real source at both tags in `GriefPrevention/GriefPrevention` on GitHub. `18.0.0` was deliberately not taken: its `pom.xml` sets `maven.compiler.release=21` (up from `16` in `17.0.0`, matching this project's own `16` target and the CI JDK), a hard requirement change that risks the JDK 16 CI toolchain being unable to compile against it, and it also reorders the `ClaimPermission` enum so `Manage` grants `Build`/`Inventory`/`Access` (previously a separate track that granted nothing) — a real behavior change to permission semantics this codebase relies on via `GPClaim#addPlayerPermissions`. `17.0.0` gets a full major version closer to current with none of that risk.
+- **WorldGuard: `7.0.5` → `7.0.18`.** Same `7.0.x` line, 13 patch releases. Diffed `ProtectedRegion`, `ApplicableRegionSet`, `RegionContainer`, `RegionQuery`, `WorldGuard`, and `DefaultDomain` between the two tags on GitHub — every method this codebase calls (`getId`, `getMinimumPoint`/`getMaximumPoint`, `getOwners`/`getMembers`, `addPlayer`/`removePlayer`/`getPlayers`/`getUniqueIds`, `createQuery`, `getApplicableRegions(Location)`, `size`/iteration) is unchanged.
+- **WorldEdit: `7.2.0` → `7.4.5`.** Confirmed `BukkitAdapter.adapt(org.bukkit.Location)` and `BlockVector3`'s `getX`/`getY`/`getZ`/`getMinimumPoint`/`getMaximumPoint` usage still compile; `BlockVector3#getX/getY/getZ/getBlockX/getBlockY/getBlockZ` were marked `@Deprecated(forRemoval = true)` in favor of `x()/y()/z()` in this range but not yet removed, so no source changes were needed.
+- **Towny: `0.101.1.0` → `0.103.2.0`.** This codebase's entire Towny API surface is `TownyUniverse.getInstance().getResident(String)` (the "claim" wrapper itself is a synthetic `Location`-based object with no other Towny calls); both methods are unchanged between the two tags on GitHub.
+
 # Version 1.4.3 (2025-02-14)
 
 ## New Features
