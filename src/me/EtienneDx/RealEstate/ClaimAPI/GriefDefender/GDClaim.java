@@ -306,6 +306,16 @@ public class GDClaim implements IClaim {
     }
 
     /**
+     * GriefDefender implements real block snapshots via {@link ClaimSnapshot}.
+     *
+     * @return always {@code true}
+     */
+    @Override
+    public boolean supportsSnapshots() {
+        return true;
+    }
+
+    /**
      * Creates (or overwrites) a named GriefDefender {@link ClaimSnapshot} of this claim's
      * current blocks.
      *

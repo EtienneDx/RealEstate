@@ -287,25 +287,6 @@ public class TownyClaim implements IClaim {
         // Not applicable for Towny.
     }
 
-    /**
-     * Block snapshots are not supported by Towny.
-     *
-     * @param name unused
-     * @return always {@code false}
-     */
-    @Override
-    public boolean createSnapshot(String name) {
-        return false;
-    }
-
-    /**
-     * Block snapshots are not supported by Towny.
-     *
-     * @param name unused
-     * @return always {@code false}
-     */
-    @Override
-    public boolean restoreSnapshot(String name) {
-        return false;
-    }
+    // Block snapshots are not supported by Towny; IClaim's default
+    // createSnapshot()/restoreSnapshot()/supportsSnapshots() implementations apply.
 }

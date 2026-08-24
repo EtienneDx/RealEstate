@@ -329,25 +329,6 @@ public class WGClaim implements IClaim {
         // Not supported.
     }
 
-    /**
-     * Block snapshots are not supported by WorldGuard.
-     *
-     * @param name unused
-     * @return always {@code false}
-     */
-    @Override
-    public boolean createSnapshot(String name) {
-        return false;
-    }
-
-    /**
-     * Block snapshots are not supported by WorldGuard.
-     *
-     * @param name unused
-     * @return always {@code false}
-     */
-    @Override
-    public boolean restoreSnapshot(String name) {
-        return false;
-    }
+    // Block snapshots are not supported by WorldGuard; IClaim's default
+    // createSnapshot()/restoreSnapshot()/supportsSnapshots() implementations apply.
 }

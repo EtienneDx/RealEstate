@@ -177,7 +177,7 @@ public class ClaimRent extends BoughtTransaction {
     private void unRent(boolean msgBuyer) {
         IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
         claim.dropPlayerPermissions(buyer);
-        if (RealEstate.instance.config.cfgClaimSnapshots) {
+        if (RealEstate.instance.config.cfgClaimSnapshots && claim.supportsSnapshots()) {
             if (!claim.restoreSnapshot(SNAPSHOT_NAME)) {
                 RealEstate.instance.log.warning("Could not restore pre-rent snapshot \"" + SNAPSHOT_NAME + "\" for claim at " +
                         "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]; " +
@@ -361,7 +361,7 @@ public class ClaimRent extends BoughtTransaction {
             buyer = player.getUniqueId();
             startDate = LocalDateTime.now();
             autoRenew = false;
-            if (RealEstate.instance.config.cfgClaimSnapshots) {
+            if (RealEstate.instance.config.cfgClaimSnapshots && claim.supportsSnapshots()) {
                 if (!claim.createSnapshot(SNAPSHOT_NAME)) {
                     RealEstate.instance.log.warning("Could not create pre-rent snapshot \"" + SNAPSHOT_NAME + "\" for claim at " +
                             "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]; " +

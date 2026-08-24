@@ -157,6 +157,21 @@ public interface IClaim {
     public void setInheritPermissions(boolean inherit);
 
     /**
+     * Whether this claim provider supports block snapshots ({@link #createSnapshot(String)} /
+     * {@link #restoreSnapshot(String)}).
+     * <p>
+     * Callers should check this before treating a {@code false} return from either method as a
+     * genuine failure worth surfacing to an admin/owner — on a provider that doesn't support
+     * snapshots at all, {@code false} is the expected, silent outcome, not an error.
+     * </p>
+     *
+     * @return {@code true} if this claim's provider implements real snapshot support
+     */
+    public default boolean supportsSnapshots() {
+        return false;
+    }
+
+    /**
      * Creates (or overwrites) a named snapshot of this claim's current blocks.
      * <p>
      * Used to capture a claim's state before it is handed over to a tenant on a rent
@@ -164,21 +179,25 @@ public interface IClaim {
      * once the tenant leaves.
      * </p>
      * <p>
-     * Not every claim provider supports block snapshots; implementations that do not
-     * should simply return {@code false} rather than throwing.
+     * Not every claim provider supports block snapshots; the default implementation is a
+     * no-op returning {@code false}. Check {@link #supportsSnapshots()} first if you need to
+     * distinguish "unsupported" from "supported but failed."
      * </p>
      *
      * @param name the identifier under which the snapshot should be stored
      * @return {@code true} if the snapshot was created successfully, {@code false} if
      *         snapshotting is unsupported by this claim provider or creation failed
      */
-    public boolean createSnapshot(String name);
+    public default boolean createSnapshot(String name) {
+        return false;
+    }
 
     /**
      * Restores this claim's blocks from a previously created named snapshot.
      * <p>
-     * Not every claim provider supports block snapshots; implementations that do not
-     * should simply return {@code false} rather than throwing.
+     * Not every claim provider supports block snapshots; the default implementation is a
+     * no-op returning {@code false}. Check {@link #supportsSnapshots()} first if you need to
+     * distinguish "unsupported" from "supported but failed."
      * </p>
      *
      * @param name the identifier of the snapshot to restore
@@ -186,5 +205,7 @@ public interface IClaim {
      *         snapshotting is unsupported by this claim provider, no such snapshot
      *         exists, or the restore failed
      */
-    public boolean restoreSnapshot(String name);
+    public default boolean restoreSnapshot(String name) {
+        return false;
+    }
 }

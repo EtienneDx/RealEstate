@@ -286,7 +286,7 @@ public class ClaimLease extends BoughtTransaction {
             
             claim.removeManager(buyer);
             claim.dropPlayerPermissions(buyer);
-            if (RealEstate.instance.config.cfgClaimSnapshots) {
+            if (RealEstate.instance.config.cfgClaimSnapshots && claim.supportsSnapshots()) {
                 if (!claim.restoreSnapshot(SNAPSHOT_NAME)) {
                     RealEstate.instance.log.warning("Could not restore pre-lease snapshot \"" + SNAPSHOT_NAME + "\" for claim at " +
                             "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]; " +
@@ -382,7 +382,7 @@ public class ClaimLease extends BoughtTransaction {
             buyer = player.getUniqueId();
             lastPayment = LocalDateTime.now();
             paymentsLeft--;
-            if (RealEstate.instance.config.cfgClaimSnapshots) {
+            if (RealEstate.instance.config.cfgClaimSnapshots && claim.supportsSnapshots()) {
                 if (!claim.createSnapshot(SNAPSHOT_NAME)) {
                     RealEstate.instance.log.warning("Could not create pre-lease snapshot \"" + SNAPSHOT_NAME + "\" for claim at " +
                             "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]; " +
