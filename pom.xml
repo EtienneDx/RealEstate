@@ -297,22 +297,24 @@
 	<profiles>
 		<!-- paper-api is declared in both of these mutually-exclusive
 		     profiles (rather than unconditionally in <dependencies> above)
-		     so that, on the with-spigot-api leg, spigot-api can be ordered
-		     immediately BEFORE it. Both jars are alternate builds of the
+		     so that, on the with-spigot-api leg, spigot-api is ordered
+		     immediately BEFORE it, the same relative order this project
+		     has always shipped with. Both jars are alternate builds of the
 		     same org.bukkit.* API surface (paper-api is a superset; see
 		     Paper's own paper-api build.gradle.kts, which declares an
 		     outgoing "org.spigotmc:spigot-api" capability conflict at the
 		     same version specifically to stop Gradle consumers combining
 		     both). Maven has no equivalent capability-conflict concept, so
-		     when both jars are on the compile classpath simultaneously,
-		     whichever's org.bukkit.block.Sign (etc.) class the compiler
-		     resolves first wins; that ordering follows dependency
-		     declaration order. spigot-api-then-paper-api is the order this
-		     project has always shipped with; declaring them out of order
-		     previously broke compilation with a spurious
-		     "cannot find symbol: method getSide(Side)" on
-		     RealEstateSign.java, since the wrong Sign class shadowed the
-		     other. -->
+		     if both ever define overlapping classes, classpath order
+		     between them could matter for which one the compiler resolves
+		     first. (The actual "cannot find symbol: method getSide(Side)"
+		     failure hit while wiring up this multi-target build turned out
+		     to be caused by something else entirely: old transitive
+		     spigot-api/bukkit pulled in by EssentialsX/WorldGuard, now
+		     excluded above, not by this pair's own relative order; this
+		     ordering is kept simply to match historical layout, not
+		     because it was proven necessary.) -->
+
 		<profile>
 			<id>with-spigot-api</id>
 			<activation>
