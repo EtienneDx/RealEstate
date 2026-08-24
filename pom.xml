@@ -199,13 +199,13 @@
         <dependency>
   			<groupId>com.sk89q.worldguard</groupId>
   			<artifactId>worldguard-bukkit</artifactId>
-  			<version>7.0.18</version>
+  			<version>7.0.5</version>
   			<scope>provided</scope>
 		</dependency>
 		<dependency>
   			<groupId>com.sk89q.worldedit</groupId>
   			<artifactId>worldedit-bukkit</artifactId>
-  			<version>7.4.5</version>
+  			<version>7.2.0</version>
   			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -223,7 +223,7 @@
 		<dependency>
       		<groupId>com.palmergames.bukkit.towny</groupId>
       		<artifactId>towny</artifactId>
-      		<version>0.103.2.0</version>
+      		<version>0.101.1.0</version>
      	 	<scope>provided</scope>
     	</dependency>
     	<dependency>
