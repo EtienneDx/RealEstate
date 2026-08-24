@@ -182,6 +182,22 @@
 	        <artifactId>EssentialsX</artifactId>
 	        <version>2.16.1</version>
 	        <scope>provided</scope>
+	        <exclusions>
+	            <!-- EssentialsX's legacy-NMS "Provider" submodules transitively
+	                 pull in org.bukkit:bukkit:1.12.2-R0.1-SNAPSHOT, an ancient
+	                 pre-1.20 Bukkit API jar. Since it's a different Maven
+	                 coordinate than our own paper-api, Maven's version
+	                 mediation doesn't apply between them: both land on the
+	                 compile classpath, and whichever's org.bukkit.block.Sign
+	                 class the compiler resolves first wins. The old jar
+	                 lacks the newer Sign#getSide(Side) API this codebase
+	                 uses, so it must be excluded rather than relied on to
+	                 lose that race. -->
+	            <exclusion>
+	                <groupId>org.bukkit</groupId>
+	                <artifactId>bukkit</artifactId>
+	            </exclusion>
+	        </exclusions>
 	    </dependency>
 	    <dependency>
 		    <groupId>com.github.GriefPrevention</groupId>
@@ -216,23 +232,36 @@
 		    <version>2.12.3</version>
 		    <scope>provided</scope>
 		</dependency>
-		<dependency>
-            <groupId>io.papermc.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>${paper.api.version}</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
   			<groupId>com.sk89q.worldguard</groupId>
   			<artifactId>worldguard-bukkit</artifactId>
   			<version>7.0.5</version>
   			<scope>provided</scope>
+  			<exclusions>
+  			    <!-- Transitively pulls org.spigotmc:spigot-api:1.16.2-R0.1-SNAPSHOT
+  			         (a pre-1.20 spigot-api, via worldguard-core), which can
+  			         shadow our own paper-api's org.bukkit.block.Sign class on
+  			         the compile classpath; see the EssentialsX exclusion
+  			         above for the full explanation. -->
+  			    <exclusion>
+  			        <groupId>org.spigotmc</groupId>
+  			        <artifactId>spigot-api</artifactId>
+  			    </exclusion>
+  			</exclusions>
 		</dependency>
 		<dependency>
   			<groupId>com.sk89q.worldedit</groupId>
   			<artifactId>worldedit-bukkit</artifactId>
   			<version>7.2.0</version>
   			<scope>provided</scope>
+  			<exclusions>
+  			    <!-- Same rationale as worldguard-bukkit above: pulls its own
+  			         old transitive org.spigotmc:spigot-api. -->
+  			    <exclusion>
+  			        <groupId>org.spigotmc</groupId>
+  			        <artifactId>spigot-api</artifactId>
+  			    </exclusion>
+  			</exclusions>
 		</dependency>
 		<dependency>
 		  <groupId>net.kyori</groupId>
@@ -260,9 +289,24 @@
 		</dependency>
 	</dependencies>
 	<profiles>
-		<!-- spigot-api is only added when skip.spigot.api=false, since no
-		     spigot-api build exists for the 26.x Minecraft version scheme
-		     (see the note on skip.spigot.api in <properties> above). -->
+		<!-- paper-api is declared in both of these mutually-exclusive
+		     profiles (rather than unconditionally in <dependencies> above)
+		     so that, on the with-spigot-api leg, spigot-api can be ordered
+		     immediately BEFORE it. Both jars are alternate builds of the
+		     same org.bukkit.* API surface (paper-api is a superset; see
+		     Paper's own paper-api build.gradle.kts, which declares an
+		     outgoing "org.spigotmc:spigot-api" capability conflict at the
+		     same version specifically to stop Gradle consumers combining
+		     both). Maven has no equivalent capability-conflict concept, so
+		     when both jars are on the compile classpath simultaneously,
+		     whichever's org.bukkit.block.Sign (etc.) class the compiler
+		     resolves first wins; that ordering follows dependency
+		     declaration order. spigot-api-then-paper-api is the order this
+		     project has always shipped with; declaring them out of order
+		     previously broke compilation with a spurious
+		     "cannot find symbol: method getSide(Side)" on
+		     RealEstateSign.java, since the wrong Sign class shadowed the
+		     other. -->
 		<profile>
 			<id>with-spigot-api</id>
 			<activation>
@@ -276,6 +320,32 @@
 					<groupId>org.spigotmc</groupId>
 					<artifactId>spigot-api</artifactId>
 					<version>${spigot.api.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>io.papermc.paper</groupId>
+					<artifactId>paper-api</artifactId>
+					<version>${paper.api.version}</version>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+		<!-- No spigot-api is published for the 26.x scheme (see the note on
+		     skip.spigot.api in <properties> above), so this target only
+		     ever needs paper-api. -->
+		<profile>
+			<id>paper-only</id>
+			<activation>
+				<property>
+					<name>skip.spigot.api</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>io.papermc.paper</groupId>
+					<artifactId>paper-api</artifactId>
+					<version>${paper.api.version}</version>
 					<scope>provided</scope>
 				</dependency>
 			</dependencies>
