@@ -369,7 +369,8 @@ public class ClaimLease extends BoughtTransaction {
             claim.addPlayerPermissions(buyer, ClaimPermission.BUILD);
             claim.addPlayerPermissions(player.getUniqueId(), ClaimPermission.MANAGE);
             RealEstate.claimAPI.saveClaim(claim);
-            getHolder().breakNaturally(); // Leases do not show remaining time on sign.
+            if (RealEstate.instance.config.cfgDestroyLeaseSigns)
+                getHolder().breakNaturally(); // Leases do not show remaining time on sign.
             update();
             RealEstate.transactionsStore.saveData();
 
@@ -424,6 +425,11 @@ public class ClaimLease extends BoughtTransaction {
     @Override
     public void preview(Player player) {
         IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
+        if (claim == null) {
+            Messages.sendMessage(player, RealEstate.instance.messages.msgErrorUnexpected);
+            RealEstate.instance.log.warning("Could not find claim at sign for an ongoing lease transaction; the claim may have been deleted or resized.");
+            return;
+        }
         if (player.hasPermission("realestate.info")) {
             String claimType = claim.isParentClaim() ? "claim" : "subclaim";
             String claimTypeDisplay = claim.isParentClaim()

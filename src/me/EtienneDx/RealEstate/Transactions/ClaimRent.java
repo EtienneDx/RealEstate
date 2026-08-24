@@ -389,8 +389,9 @@ public class ClaimRent extends BoughtTransaction {
             Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimBuyerRented,
                     claimTypeDisplay,
                     RealEstate.econ.format(price));
-            
-            destroySign();
+
+            if (RealEstate.instance.config.cfgDestroyRentSigns)
+                destroySign();
         }
     }
     
@@ -405,6 +406,11 @@ public class ClaimRent extends BoughtTransaction {
     @Override
     public void preview(Player player) {
         IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
+        if (claim == null) {
+            Messages.sendMessage(player, RealEstate.instance.messages.msgErrorUnexpected);
+            RealEstate.instance.log.warning("Could not find claim at sign for an ongoing rent transaction; the claim may have been deleted or resized.");
+            return;
+        }
         if(player.hasPermission("realestate.info")) {
             String claimType = claim.isParentClaim() ? "claim" : "subclaim";
             String claimTypeDisplay = claim.isParentClaim() ? 

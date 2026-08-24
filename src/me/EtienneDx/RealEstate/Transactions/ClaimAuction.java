@@ -305,6 +305,11 @@ public class ClaimAuction extends ClaimTransaction {
     @Override
     public void preview(Player player) {
         IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
+        if (claim == null) {
+            Messages.sendMessage(player, RealEstate.instance.messages.msgErrorUnexpected);
+            RealEstate.instance.log.warning("Could not find claim at sign for an ongoing auction transaction; the claim may have been deleted or resized.");
+            return;
+        }
         if (player.hasPermission("realestate.info")) {
             String claimType = claim.isParentClaim() ? "claim" : "subclaim";
             String claimTypeDisplay = claim.isParentClaim() ?

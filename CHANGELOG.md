@@ -1,5 +1,16 @@
 # Changelog
 
+# Version 1.4.5 (2026-08-24)
+
+## Bug Fixes
+
+- **Sign destruction ignored config:** `DestroySigns.Rent` and `DestroySigns.Lease` in `config.yml` stopped being honored after the 1.4.2 claim API refactor — signs were always destroyed on rent/lease regardless of the setting. Both are now respected again. (#84, #87)
+- **`/re info` could crash on an orphaned transaction:** if the claim tied to a sign's transaction could no longer be found (e.g. the claim was resized, abandoned, or deleted while a transaction was still open), previewing that transaction threw an unhandled `NullPointerException` instead of showing an error. Sell, rent, lease, and auction previews now report the problem to the player and log a warning instead of crashing. (#87)
+
+## Improvements
+
+- **Dependency alignment:** bumped the `spigot-api` dependency from 1.21.1 to 1.21.4 to match `paper-api` and the plugin's declared `api-version`.
+
 # Version 1.4.3 (2025-02-14)
 
 ## New Features
