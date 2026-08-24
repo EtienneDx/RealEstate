@@ -933,6 +933,23 @@ public class TransactionsStore {
     }
 
     /**
+     * Counts how many claims a player currently has listed for auction. An auction is
+     * conceptually a sale, so this is combined with {@link #getSellListingCount(UUID)} wherever
+     * the sell-owner listing limit is enforced.
+     * @param owner The player's UUID. A null UUID always returns 0.
+     * @return The number of active auction listings owned by that player.
+     */
+    public int getAuctionListingCount(UUID owner) {
+        if(owner == null) return 0;
+        int count = 0;
+        for(ClaimAuction ca : claimAuction.values()) {
+            if(owner.equals(ca.getOwner()))
+                count++;
+        }
+        return count;
+    }
+
+    /**
      * Counts how many claims a player is currently renting.
      * @param buyer The player's UUID. A null UUID always returns 0.
      * @return The number of claims currently rented by that player.

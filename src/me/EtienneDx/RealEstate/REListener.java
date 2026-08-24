@@ -148,7 +148,9 @@ public class REListener implements Listener {
                 }
 
                 int sellOwnerLimit = RealEstate.instance.config.cfgLimitSellOwner;
-                if (!claim.isAdminClaim() && sellOwnerLimit >= 0 && RealEstate.transactionsStore.getSellListingCount(player.getUniqueId()) >= sellOwnerLimit) {
+                if (!claim.isAdminClaim() && sellOwnerLimit >= 0 &&
+                        RealEstate.transactionsStore.getSellListingCount(player.getUniqueId())
+                        + RealEstate.transactionsStore.getAuctionListingCount(player.getUniqueId()) >= sellOwnerLimit) {
                     Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimInfoSellOwnerLimit, String.valueOf(sellOwnerLimit));
                     event.setCancelled(true);
                     event.getBlock().breakNaturally();
@@ -416,9 +418,12 @@ public class REListener implements Listener {
                     return;
                 }
 
-                // An auction is conceptually a sale, so it shares the sell-owner listing limit.
+                // An auction is conceptually a sale, so it shares the sell-owner listing limit
+                // (pooled with existing sell listings, not counted separately).
                 int auctionOwnerLimit = RealEstate.instance.config.cfgLimitSellOwner;
-                if (!claim.isAdminClaim() && auctionOwnerLimit >= 0 && RealEstate.transactionsStore.getSellListingCount(player.getUniqueId()) >= auctionOwnerLimit) {
+                if (!claim.isAdminClaim() && auctionOwnerLimit >= 0 &&
+                        RealEstate.transactionsStore.getSellListingCount(player.getUniqueId())
+                        + RealEstate.transactionsStore.getAuctionListingCount(player.getUniqueId()) >= auctionOwnerLimit) {
                     Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimInfoSellOwnerLimit, String.valueOf(auctionOwnerLimit));
                     event.setCancelled(true);
                     event.getBlock().breakNaturally();
