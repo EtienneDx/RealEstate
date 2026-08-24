@@ -19,7 +19,7 @@
 		                   -Dskip.spigot.api=false
 		     Minecraft/Paper moved to a new calendar-based version scheme
 		     after 1.21.11 (e.g. 26.1.2). Spigot itself has not published a
-		     spigot-api under that scheme -- as of this writing 1.21.11 is
+		     spigot-api under that scheme; as of this writing 1.21.11 is
 		     the newest Minecraft version with a spigot-api release, so the
 		     26.x target below is Paper-only (skip.spigot.api=true, the
 		     default). -->
@@ -60,7 +60,7 @@
 					     against a JDK 25 toolchain (see PaperMC/Paper's
 					     build.gradle.kts and .github/workflows/build.yml), and
 					     WorldGuard/WorldEdit/Towny at their latest versions publish
-					     JDK 25 (class file 69) bytecode -- unreadable by the
+					     JDK 25 (class file 69) bytecode, unreadable by the
 					     previous JDK 16 toolchain. JDK 25 reads all of that plus
 					     everything older, so it's a single toolchain that covers
 					     every dependency across every target version. -->
