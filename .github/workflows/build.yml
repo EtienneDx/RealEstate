@@ -60,10 +60,10 @@ jobs:
       - name: 'Build, test, and package'
         run: >
           mvn -B package --file pom.xml
-          -Dminecraft.api.version=${{ matrix.minecraft-api-version }}
-          -Dspigot.api.version=${{ matrix.spigot-api-version }}
-          -Dpaper.api.version=${{ matrix.paper-api-version }}
-          -Dskip.spigot.api=${{ matrix.skip-spigot-api }}
+          "-Dminecraft.api.version=${{ matrix.minecraft-api-version }}"
+          "-Dspigot.api.version=${{ matrix.spigot-api-version }}"
+          "-Dpaper.api.version=${{ matrix.paper-api-version }}"
+          "-Dskip.spigot.api=${{ matrix.skip-spigot-api }}"
 
       - name: 'Get artifact version'
         id:   pomVersion
