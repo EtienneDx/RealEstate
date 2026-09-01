@@ -344,6 +344,16 @@
 		<profile>
 			<id>paper-only</id>
 			<activation>
+				<!-- activeByDefault covers a plain `mvn package` with no -D flags at
+				     all (e.g. build.yaml's PR check): Maven's property-based activation
+				     only evaluates flags actually passed on the command line, never the
+				     <properties> default declared above, so without this a bare `mvn
+				     package` activates neither profile and paper-api never gets
+				     declared ("package org.bukkit does not exist" everywhere). Maven
+				     automatically suppresses activeByDefault the moment another
+				     profile's own condition is satisfied, so this doesn't cause both
+				     profiles to activate when -Dskip.spigot.api=false is passed. -->
+				<activeByDefault>true</activeByDefault>
 				<property>
 					<name>skip.spigot.api</name>
 					<value>true</value>
