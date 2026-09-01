@@ -23,6 +23,13 @@ WorldGuard plugin can be found [here](https://dev.bukkit.org/projects/worldguard
 
 Towny plugin can be found [here](https://www.spigotmc.org/resources/towny-advanced.72694/).
 
+## Local testing
+To try changes in-game instead of just relying on CI, `scripts/run-server.sh <target>` downloads a matching Paper server (cached under `servers/<target>/`), builds the plugin for that target, and launches the server with it already installed:
+```sh
+./scripts/run-server.sh 1.21.11   # or 1.21.1, 1.21.4, 26.1.2 / latest
+```
+See the script's header comment for full usage and requirements.
+
 ## Translation
 We are looking to increase our language locale. If you speak multiple languages, you can help contribute to our project.
 
