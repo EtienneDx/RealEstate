@@ -3,6 +3,8 @@ package me.EtienneDx.RealEstate.ClaimAPI;
 import java.util.UUID;
 import org.bukkit.Location;
 
+import me.EtienneDx.RealEstate.Transactions.Transaction;
+
 /**
  * The IClaimAPI interface defines the methods for interacting with claims.
  * Implementations of this interface provide functionality to:
@@ -53,4 +55,26 @@ public interface IClaimAPI {
      * Registers any necessary event listeners for claim-related events.
      */
     public void registerEvents();
+
+    /**
+     * Retrieves the ongoing RealEstate transaction (sale, rent, lease, or auction)
+     * associated with the claim that has the given provider-specific unique ID, if any.
+     * <p>
+     * This is a data-access hook, not a UI feature: it exists so that a claim provider's
+     * own map integration (for example GriefDefender's built-in BlueMap/Dynmap support)
+     * can query RealEstate for transaction details (price, buyer, rental period, etc.)
+     * to display in its own claim popups. RealEstate does not render any map UI itself.
+     * </p>
+     * <p>
+     * Not every claim provider is able to look up a claim purely by its unique ID
+     * (some only support lookup by location); implementations that cannot should
+     * simply return {@code null} rather than throwing.
+     * </p>
+     *
+     * @param claimUniqueId the provider-specific unique ID of the claim to look up
+     * @return the {@link Transaction} currently associated with the claim, or {@code null}
+     *         if no such claim could be found, this provider cannot look up claims by ID,
+     *         or no transaction is currently associated with the claim
+     */
+    public Transaction getTransaction(UUID claimUniqueId);
 }

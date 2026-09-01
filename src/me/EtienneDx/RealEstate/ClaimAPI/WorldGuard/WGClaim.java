@@ -328,4 +328,7 @@ public class WGClaim implements IClaim {
     public void setInheritPermissions(boolean inherit) {
         // Not supported.
     }
+
+    // Block snapshots are not supported by WorldGuard; IClaim's default
+    // createSnapshot()/restoreSnapshot()/supportsSnapshots() implementations apply.
 }

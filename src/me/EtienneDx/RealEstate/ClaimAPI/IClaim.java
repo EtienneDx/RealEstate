@@ -155,4 +155,57 @@ public interface IClaim {
      * @param inherit {@code true} to enable inheritance; {@code false} to disable it
      */
     public void setInheritPermissions(boolean inherit);
+
+    /**
+     * Whether this claim provider supports block snapshots ({@link #createSnapshot(String)} /
+     * {@link #restoreSnapshot(String)}).
+     * <p>
+     * Callers should check this before treating a {@code false} return from either method as a
+     * genuine failure worth surfacing to an admin/owner — on a provider that doesn't support
+     * snapshots at all, {@code false} is the expected, silent outcome, not an error.
+     * </p>
+     *
+     * @return {@code true} if this claim's provider implements real snapshot support
+     */
+    public default boolean supportsSnapshots() {
+        return false;
+    }
+
+    /**
+     * Creates (or overwrites) a named snapshot of this claim's current blocks.
+     * <p>
+     * Used to capture a claim's state before it is handed over to a tenant on a rent
+     * or lease, so it can later be restored with {@link #restoreSnapshot(String)}
+     * once the tenant leaves.
+     * </p>
+     * <p>
+     * Not every claim provider supports block snapshots; the default implementation is a
+     * no-op returning {@code false}. Check {@link #supportsSnapshots()} first if you need to
+     * distinguish "unsupported" from "supported but failed."
+     * </p>
+     *
+     * @param name the identifier under which the snapshot should be stored
+     * @return {@code true} if the snapshot was created successfully, {@code false} if
+     *         snapshotting is unsupported by this claim provider or creation failed
+     */
+    public default boolean createSnapshot(String name) {
+        return false;
+    }
+
+    /**
+     * Restores this claim's blocks from a previously created named snapshot.
+     * <p>
+     * Not every claim provider supports block snapshots; the default implementation is a
+     * no-op returning {@code false}. Check {@link #supportsSnapshots()} first if you need to
+     * distinguish "unsupported" from "supported but failed."
+     * </p>
+     *
+     * @param name the identifier of the snapshot to restore
+     * @return {@code true} if the snapshot was found and restored, {@code false} if
+     *         snapshotting is unsupported by this claim provider, no such snapshot
+     *         exists, or the restore failed
+     */
+    public default boolean restoreSnapshot(String name) {
+        return false;
+    }
 }

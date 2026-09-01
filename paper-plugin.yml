@@ -1,7 +1,7 @@
 name: RealEstate
 main: me.EtienneDx.RealEstate.RealEstate
 version: ${project.version}
-api-version: 1.21.4
+api-version: ${minecraft.api.version}
 authors:
   - EtienneDx
   - DmitryRendov
@@ -34,6 +34,10 @@ dependencies:
       required: false
       join-classpath: true
     Towny:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    PlaceholderAPI:
       load: BEFORE
       required: false
       join-classpath: true

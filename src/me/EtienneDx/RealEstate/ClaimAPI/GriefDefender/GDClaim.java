@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.UUID;
 
 import com.griefdefender.api.claim.Claim;
+import com.griefdefender.api.claim.ClaimSnapshot;
 import com.griefdefender.api.claim.TrustType;
 import com.griefdefender.api.claim.TrustTypes;
 
@@ -302,5 +303,44 @@ public class GDClaim implements IClaim {
     @Override
     public void setInheritPermissions(boolean inherit) {
         claim.getData().setInheritParent(inherit);
+    }
+
+    /**
+     * GriefDefender implements real block snapshots via {@link ClaimSnapshot}.
+     *
+     * @return always {@code true}
+     */
+    @Override
+    public boolean supportsSnapshots() {
+        return true;
+    }
+
+    /**
+     * Creates (or overwrites) a named GriefDefender {@link ClaimSnapshot} of this claim's
+     * current blocks.
+     *
+     * @param name the identifier under which the snapshot should be stored
+     * @return {@code true} if the snapshot was created successfully, {@code false} otherwise
+     */
+    @Override
+    public boolean createSnapshot(String name) {
+        final ClaimSnapshot snapshot = claim.createSnapshot(name, false);
+        return snapshot != null;
+    }
+
+    /**
+     * Restores this claim's blocks from a previously created named {@link ClaimSnapshot}.
+     *
+     * @param name the identifier of the snapshot to restore
+     * @return {@code true} if the snapshot was found and applied, {@code false} if no such
+     *         snapshot exists
+     */
+    @Override
+    public boolean restoreSnapshot(String name) {
+        final ClaimSnapshot snapshot = claim.getSnapshots().get(name);
+        if (snapshot != null) {
+            return snapshot.apply(claim);
+        }
+        return false;
     }
 }

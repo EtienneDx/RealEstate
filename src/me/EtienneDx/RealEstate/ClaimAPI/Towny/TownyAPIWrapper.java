@@ -5,6 +5,7 @@ import com.palmergames.bukkit.towny.object.Resident;
 import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 import me.EtienneDx.RealEstate.ClaimAPI.IClaimAPI;
 import me.EtienneDx.RealEstate.ClaimAPI.IPlayerData;
+import me.EtienneDx.RealEstate.Transactions.Transaction;
 import org.bukkit.Location;
 import java.util.UUID;
 
@@ -105,5 +106,24 @@ public class TownyAPIWrapper implements IClaimAPI {
      */
     public Resident getResident(String name) {
         return TownyUniverse.getInstance().getResident(name);
+    }
+
+    /**
+     * Not supported for Towny.
+     * <p>
+     * Towny "claims" as modeled by {@link TownyClaim} are synthetic wrappers built from a
+     * {@link Location} (see {@link TownyClaim#getId()}), not a real provider-issued unique
+     * ID, and this codebase only ever resolves them via {@link #getClaimAt(Location)}.
+     * There is no existing facility to resolve a Towny claim from a {@link UUID} alone.
+     * Towny does not ship a map integration that would need this hook, so this always
+     * returns {@code null}.
+     * </p>
+     *
+     * @param claimUniqueId unused
+     * @return always {@code null}
+     */
+    @Override
+    public Transaction getTransaction(UUID claimUniqueId) {
+        return null;
     }
 }

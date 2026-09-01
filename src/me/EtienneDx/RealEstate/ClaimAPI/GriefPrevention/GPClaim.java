@@ -286,4 +286,7 @@ public class GPClaim implements IClaim {
     public void clearManagers() {
         claim.managers.clear();
     }
+
+    // Block snapshots are not supported by GriefPrevention; IClaim's default
+    // createSnapshot()/restoreSnapshot()/supportsSnapshots() implementations apply.
 }

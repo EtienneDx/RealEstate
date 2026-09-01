@@ -33,6 +33,9 @@ import net.md_5.bungee.api.ChatColor;
  */
 public class ClaimRent extends BoughtTransaction {
 
+    /** Name under which this claim's pre-rent block snapshot is stored, if snapshots are enabled. */
+    public static final String SNAPSHOT_NAME = "realestate_rent";
+
     /** The date and time when the lease started or the last payment was made. */
     LocalDateTime startDate = null;
     /** The duration (in days) of the lease period. */
@@ -174,6 +177,13 @@ public class ClaimRent extends BoughtTransaction {
     private void unRent(boolean msgBuyer) {
         IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
         claim.dropPlayerPermissions(buyer);
+        if (RealEstate.instance.config.cfgClaimSnapshots && claim.supportsSnapshots()) {
+            if (!claim.restoreSnapshot(SNAPSHOT_NAME)) {
+                RealEstate.instance.log.warning("Could not restore pre-rent snapshot \"" + SNAPSHOT_NAME + "\" for claim at " +
+                        "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]; " +
+                        "the claim will not be restored to its pre-rent state.");
+            }
+        }
         claim.removeManager(buyer);
         claim.setInheritPermissions(true);
         RealEstate.claimAPI.saveClaim(claim);
@@ -340,11 +350,24 @@ public class ClaimRent extends BoughtTransaction {
             Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimAlreadyRented, claimTypeDisplay);
             return;
         }
-        
+
+        int rentBuyerLimit = RealEstate.instance.config.cfgLimitRentBuyer;
+        if(rentBuyerLimit >= 0 && RealEstate.transactionsStore.getActiveRentCount(player.getUniqueId()) >= rentBuyerLimit) {
+            Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimInfoRentBuyerLimit, String.valueOf(rentBuyerLimit));
+            return;
+        }
+
         if(Utils.makePayment(owner, player.getUniqueId(), price, false, true)) { // if payment succeed
             buyer = player.getUniqueId();
             startDate = LocalDateTime.now();
             autoRenew = false;
+            if (RealEstate.instance.config.cfgClaimSnapshots && claim.supportsSnapshots()) {
+                if (!claim.createSnapshot(SNAPSHOT_NAME)) {
+                    RealEstate.instance.log.warning("Could not create pre-rent snapshot \"" + SNAPSHOT_NAME + "\" for claim at " +
+                            "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]; " +
+                            "the claim will not be protected from tenant changes when the rent ends.");
+                }
+            }
             claim.addPlayerPermissions(buyer, buildTrust ? ClaimPermission.BUILD : ClaimPermission.CONTAINER);
             claim.addPlayerPermissions(player.getUniqueId(), ClaimPermission.MANAGE);
             claim.addManager(player.getUniqueId());
@@ -389,8 +412,9 @@ public class ClaimRent extends BoughtTransaction {
             Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimBuyerRented,
                     claimTypeDisplay,
                     RealEstate.econ.format(price));
-            
-            destroySign();
+
+            if (RealEstate.instance.config.cfgDestroyRentSigns)
+                destroySign();
         }
     }
     
@@ -405,6 +429,11 @@ public class ClaimRent extends BoughtTransaction {
     @Override
     public void preview(Player player) {
         IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
+        if (claim == null) {
+            Messages.sendMessage(player, RealEstate.instance.messages.msgErrorUnexpected);
+            RealEstate.instance.log.warning("Could not find claim at sign for an ongoing rent transaction; the claim may have been deleted or resized.");
+            return;
+        }
         if(player.hasPermission("realestate.info")) {
             String claimType = claim.isParentClaim() ? "claim" : "subclaim";
             String claimTypeDisplay = claim.isParentClaim() ? 

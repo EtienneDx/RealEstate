@@ -1076,6 +1076,60 @@ public class Messages extends AnnotationConfig {
     public String msgInfoClaimInfoRentCancelled = "$bThe rent for the {0} at $a{1} $bis now over, your access has been revoked.";
 
     /**
+     * Sent to a player who tries to put a claim up for sale while already at their sell listing limit.
+     * <p>
+     * Placeholders: {0} - the limit.
+     * </p>
+     */
+    @ConfigField(name = "RealEstate.Info.Claim.Info.Sell.LimitOwner", comment = "0: limit")
+    public String msgInfoClaimInfoSellOwnerLimit = "$cYou cannot put this claim up for sale. You already have $a{0}$c claims listed for sale.";
+
+    /**
+     * Sent to a player who tries to put a claim up for rent while already at their rent listing limit.
+     * <p>
+     * Placeholders: {0} - the limit.
+     * </p>
+     */
+    @ConfigField(name = "RealEstate.Info.Claim.Info.Rent.LimitOwner", comment = "0: limit")
+    public String msgInfoClaimInfoRentOwnerLimit = "$cYou cannot put this claim up for rent. You already have $a{0}$c claims listed for rent.";
+
+    /**
+     * Sent to a player who tries to put a claim up for lease while already at their lease listing limit.
+     * <p>
+     * Placeholders: {0} - the limit.
+     * </p>
+     */
+    @ConfigField(name = "RealEstate.Info.Claim.Info.Lease.LimitOwner", comment = "0: limit")
+    public String msgInfoClaimInfoLeaseOwnerLimit = "$cYou cannot put this claim up for lease. You already have $a{0}$c claims listed for lease.";
+
+    /**
+     * Sent to a player who tries to buy a claim while already at their lifetime purchase limit.
+     * <p>
+     * Placeholders: {0} - the limit.
+     * </p>
+     */
+    @ConfigField(name = "RealEstate.Info.Claim.Info.Sell.LimitBuyer", comment = "0: limit")
+    public String msgInfoClaimInfoSellBuyerLimit = "$cYou cannot buy this claim. You have reached your limit of $a{0}$c purchased claims.";
+
+    /**
+     * Sent to a player who tries to rent a claim while already at their concurrent rental limit.
+     * <p>
+     * Placeholders: {0} - the limit.
+     * </p>
+     */
+    @ConfigField(name = "RealEstate.Info.Claim.Info.Rent.LimitBuyer", comment = "0: limit")
+    public String msgInfoClaimInfoRentBuyerLimit = "$cYou cannot rent this claim. You are already renting $a{0}$c claims.";
+
+    /**
+     * Sent to a player who tries to lease a claim while already at their concurrent lease limit.
+     * <p>
+     * Placeholders: {0} - the limit.
+     * </p>
+     */
+    @ConfigField(name = "RealEstate.Info.Claim.Info.Lease.LimitBuyer", comment = "0: limit")
+    public String msgInfoClaimInfoLeaseBuyerLimit = "$cYou cannot lease this claim. You are already leasing $a{0}$c claims.";
+
+    /**
      * Header for the sale information display.
      */
     @ConfigField(name = "RealEstate.Info.Claim.Info.Sell.Header")

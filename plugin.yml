@@ -17,7 +17,8 @@ softdepend:
   - WorldGuard
   - WorldEdit
   - Towny
-api-version: 1.21.4
+  - PlaceholderAPI
+api-version: ${minecraft.api.version}
 commands:
   re:
     description: Access to the claim transaction information.

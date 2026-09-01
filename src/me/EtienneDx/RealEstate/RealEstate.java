@@ -185,7 +185,9 @@ public class RealEstate extends JavaPlugin {
         manager.registerCommand(new RECommand());
         
         copyResourcesIntoPluginDirectory();
-        
+
+        new PlaceholderProvider();
+
         activateMetrics();
     }
     

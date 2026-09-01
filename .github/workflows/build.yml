@@ -1,6 +1,6 @@
 name: build
 
-on: 
+on:
   workflow_dispatch:
   push:
 
@@ -8,33 +8,76 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Legacy (pre-calendar-versioning) Minecraft/Spigot/Paper targets:
+          # both spigot-api and paper-api are published as
+          # "<version>-R0.1-SNAPSHOT" for these.
+          - target: '1.21.1'
+            minecraft-api-version: '1.21.1'
+            spigot-api-version: '1.21.1-R0.1-SNAPSHOT'
+            paper-api-version: '1.21.1-R0.1-SNAPSHOT'
+            skip-spigot-api: 'false'
+          - target: '1.21.4'
+            minecraft-api-version: '1.21.4'
+            spigot-api-version: '1.21.4-R0.1-SNAPSHOT'
+            paper-api-version: '1.21.4-R0.1-SNAPSHOT'
+            skip-spigot-api: 'false'
+          - target: '1.21.11'
+            minecraft-api-version: '1.21.11'
+            spigot-api-version: '1.21.11-R0.1-SNAPSHOT'
+            paper-api-version: '1.21.11-R0.1-SNAPSHOT'
+            skip-spigot-api: 'false'
+          # Current/latest target: Minecraft's new calendar-based version
+          # scheme (26.x+). Paper publishes paper-api as
+          # "<version>.build.<n>-<channel>"; "[<version>.build,)" resolves
+          # to the newest published build. Spigot has not published a
+          # spigot-api under this scheme, so this target is Paper-only.
+          - target: '26.1.2'
+            minecraft-api-version: '26.1.2'
+            spigot-api-version: '' # unused, skip-spigot-api is true
+            paper-api-version: '[26.1.2.build,)'
+            skip-spigot-api: 'true'
+
     steps:
       - name: 'Checkout source code'
         uses: actions/checkout@v4
       - name: 'Set up JDK'
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          java-version: '16'
-          distribution: 'adopt'
+          java-version: '25'
+          distribution: 'temurin'
 
       - name: 'Cache dependencies'
         uses: actions/cache@v3
         with:
           path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+          key: ${{ runner.os }}-m2-${{ matrix.target }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2-${{ matrix.target }}
 
       - name: 'Build, test, and package'
-        run: mvn -B package --file pom.xml
+        run: >
+          mvn -B package --file pom.xml
+          "-Dminecraft.api.version=${{ matrix.minecraft-api-version }}"
+          "-Dspigot.api.version=${{ matrix.spigot-api-version }}"
+          "-Dpaper.api.version=${{ matrix.paper-api-version }}"
+          "-Dskip.spigot.api=${{ matrix.skip-spigot-api }}"
 
       - name: 'Get artifact version'
         id:   pomVersion
         run: |
           VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
-          echo "::set-output name=version::$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: 'Rename artifact for this target'
+        run: |
+          cp "target/RealEstate-${{ steps.pomVersion.outputs.version }}.jar" \
+             "RealEstate-${{ matrix.target }}-${{ steps.pomVersion.outputs.version }}.jar"
 
       - name: 'Upload artifact'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: RealEstate-${{ steps.pomVersion.outputs.version }}.jar
-          path: target/RealEstate-${{ steps.pomVersion.outputs.version }}.jar
+          name: RealEstate-${{ matrix.target }}-${{ steps.pomVersion.outputs.version }}.jar
+          path: RealEstate-${{ matrix.target }}-${{ steps.pomVersion.outputs.version }}.jar

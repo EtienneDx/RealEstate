@@ -36,6 +36,9 @@ import net.md_5.bungee.api.ChatColor;
  */
 public class ClaimLease extends BoughtTransaction {
 
+    /** Name under which this claim's pre-lease block snapshot is stored, if snapshots are enabled. */
+    public static final String SNAPSHOT_NAME = "realestate_lease";
+
     /** The time when the last lease payment was made. */
     public LocalDateTime lastPayment = null;
     
@@ -283,6 +286,13 @@ public class ClaimLease extends BoughtTransaction {
             
             claim.removeManager(buyer);
             claim.dropPlayerPermissions(buyer);
+            if (RealEstate.instance.config.cfgClaimSnapshots && claim.supportsSnapshots()) {
+                if (!claim.restoreSnapshot(SNAPSHOT_NAME)) {
+                    RealEstate.instance.log.warning("Could not restore pre-lease snapshot \"" + SNAPSHOT_NAME + "\" for claim at " +
+                            "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]; " +
+                            "the claim will not be restored to its pre-lease state.");
+                }
+            }
         } else {
             getHolder().breakNaturally(); // Sign remains if lease never started.
         }
@@ -361,15 +371,29 @@ public class ClaimLease extends BoughtTransaction {
             Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimAlreadyLeased, claimTypeDisplay);
             return;
         }
-        
+
+        int leaseBuyerLimit = RealEstate.instance.config.cfgLimitLeaseBuyer;
+        if (leaseBuyerLimit >= 0 && RealEstate.transactionsStore.getActiveLeaseCount(player.getUniqueId()) >= leaseBuyerLimit) {
+            Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimInfoLeaseBuyerLimit, String.valueOf(leaseBuyerLimit));
+            return;
+        }
+
         if (Utils.makePayment(owner, player.getUniqueId(), price, false, true)) { // If payment succeeds.
             buyer = player.getUniqueId();
             lastPayment = LocalDateTime.now();
             paymentsLeft--;
+            if (RealEstate.instance.config.cfgClaimSnapshots && claim.supportsSnapshots()) {
+                if (!claim.createSnapshot(SNAPSHOT_NAME)) {
+                    RealEstate.instance.log.warning("Could not create pre-lease snapshot \"" + SNAPSHOT_NAME + "\" for claim at " +
+                            "[" + sign.getWorld().getName() + ", X: " + sign.getBlockX() + ", Y: " + sign.getBlockY() + ", Z: " + sign.getBlockZ() + "]; " +
+                            "the claim will not be protected from tenant changes when the lease ends.");
+                }
+            }
             claim.addPlayerPermissions(buyer, ClaimPermission.BUILD);
             claim.addPlayerPermissions(player.getUniqueId(), ClaimPermission.MANAGE);
             RealEstate.claimAPI.saveClaim(claim);
-            getHolder().breakNaturally(); // Leases do not show remaining time on sign.
+            if (RealEstate.instance.config.cfgDestroyLeaseSigns)
+                getHolder().breakNaturally(); // Leases do not show remaining time on sign.
             update();
             RealEstate.transactionsStore.saveData();
 
@@ -424,6 +448,11 @@ public class ClaimLease extends BoughtTransaction {
     @Override
     public void preview(Player player) {
         IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
+        if (claim == null) {
+            Messages.sendMessage(player, RealEstate.instance.messages.msgErrorUnexpected);
+            RealEstate.instance.log.warning("Could not find claim at sign for an ongoing lease transaction; the claim may have been deleted or resized.");
+            return;
+        }
         if (player.hasPermission("realestate.info")) {
             String claimType = claim.isParentClaim() ? "claim" : "subclaim";
             String claimTypeDisplay = claim.isParentClaim()

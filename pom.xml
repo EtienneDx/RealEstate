@@ -4,10 +4,35 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>Me.EtienneDx</groupId>
 	<artifactId>real-estate</artifactId>
-	<version>1.4.4</version>
+	<version>1.4.5</version>
 
 	<name>RealEstate</name>
 	<description>A spigot plugin for selling, renting, leasing and auctioning GriefPrevention and GriefDefender claims</description>
+
+	<properties>
+		<!-- Target Minecraft/Paper/Spigot version. Override any of these
+		     together (they must describe the same Minecraft version) to
+		     build against a different target, e.g.:
+		       mvn package -Dminecraft.api.version=1.21.11 \
+		                   -Dspigot.api.version=1.21.11-R0.1-SNAPSHOT \
+		                   -Dpaper.api.version=1.21.11-R0.1-SNAPSHOT \
+		                   -Dskip.spigot.api=false
+		     Minecraft/Paper moved to a new calendar-based version scheme
+		     after 1.21.11 (e.g. 26.1.2). Spigot itself has not published a
+		     spigot-api under that scheme; as of this writing 1.21.11 is
+		     the newest Minecraft version with a spigot-api release, so the
+		     26.x target below is Paper-only (skip.spigot.api=true, the
+		     default). -->
+		<minecraft.api.version>26.1.2</minecraft.api.version>
+		<paper.api.version>[26.1.2.build,)</paper.api.version>
+		<spigot.api.version>26.1.2-R0.1-SNAPSHOT</spigot.api.version>
+		<!-- No spigot-api is published for the 26.x scheme, so it's excluded
+		     from the default (latest/primary) build target. Set to false
+		     for older, pre-26.x targets where spigot-api and paper-api
+		     coexist. -->
+		<skip.spigot.api>true</skip.spigot.api>
+	</properties>
+
 	<build>
         <finalName>${project.name}</finalName>
 		<sourceDirectory>src</sourceDirectory>
@@ -29,10 +54,17 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
+				<version>3.13.0</version>
 				<configuration>
-					<source>16</source>
-					<target>16</target>
+					<!-- Paper's own build (as of the 26.x version scheme) compiles
+					     against a JDK 25 toolchain (see PaperMC/Paper's
+					     build.gradle.kts and .github/workflows/build.yml), and
+					     WorldGuard/WorldEdit/Towny at their latest versions publish
+					     JDK 25 (class file 69) bytecode, unreadable by the
+					     previous JDK 16 toolchain. JDK 25 reads all of that plus
+					     everything older, so it's a single toolchain that covers
+					     every dependency across every target version. -->
+					<release>25</release>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -122,6 +154,10 @@
           <id>adventure</id>
           <url>https://repo1.maven.org/maven2/</url>
 	    </repository>
+	    <repository>
+	        <id>placeholderapi</id>
+	        <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+	    </repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -130,12 +166,6 @@
 		</pluginRepository>
 	</pluginRepositories>
 	<dependencies>
-		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot-api</artifactId>
-			<version>1.21.1-R0.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
 		<dependency>
 			<groupId>net.milkbowl.vault</groupId>
 			<artifactId>VaultAPI</artifactId>
@@ -152,18 +182,44 @@
 	        <artifactId>EssentialsX</artifactId>
 	        <version>2.16.1</version>
 	        <scope>provided</scope>
+	        <exclusions>
+	            <!-- EssentialsX's legacy-NMS "Provider" submodules transitively
+	                 pull in org.bukkit:bukkit:1.12.2-R0.1-SNAPSHOT, an ancient
+	                 pre-1.20 Bukkit API jar. Since it's a different Maven
+	                 coordinate than our own paper-api, Maven's version
+	                 mediation doesn't apply between them: both land on the
+	                 compile classpath, and whichever's org.bukkit.block.Sign
+	                 class the compiler resolves first wins. The old jar
+	                 lacks the newer Sign#getSide(Side) API this codebase
+	                 uses, so it must be excluded rather than relied on to
+	                 lose that race. -->
+	            <exclusion>
+	                <groupId>org.bukkit</groupId>
+	                <artifactId>bukkit</artifactId>
+	            </exclusion>
+	        </exclusions>
 	    </dependency>
 	    <dependency>
 		    <groupId>com.github.GriefPrevention</groupId>
 		    <artifactId>GriefPrevention</artifactId>
-		    <version>16.18.4</version>
+		    <version>17.0.0</version>
 		    <scope>provided</scope>
 		</dependency>
 		<dependency>
-		    <groupId>com.github.bloodmc</groupId>
-		    <artifactId>GriefDefenderAPI</artifactId>
-		    <version>master-4e5f379629-1</version>
+		    <groupId>com.griefdefender</groupId>
+		    <artifactId>api</artifactId>
+		    <version>2.1.1-SNAPSHOT</version>
 		    <scope>provided</scope>
+		    <exclusions>
+		        <!-- The published jar already shades and relocates all of these
+		             under com.griefdefender.lib.*; the unshaded transitives are
+		             unneeded and some (e.g. net.kyori:event-api:5.0.0-SNAPSHOT)
+		             are no longer resolvable from any configured repository. -->
+		        <exclusion>
+		            <groupId>*</groupId>
+		            <artifactId>*</artifactId>
+		        </exclusion>
+		    </exclusions>
 		</dependency>
 	    <dependency>
 		    <groupId>com.github.EtienneDx</groupId>
@@ -171,39 +227,64 @@
 		    <version>e9eab24</version>
 		</dependency>
 		<dependency>
-            <groupId>io.papermc.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.21.4-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
+		    <groupId>me.clip</groupId>
+		    <artifactId>placeholderapi</artifactId>
+		    <version>2.12.3</version>
+		    <scope>provided</scope>
+		</dependency>
         <dependency>
   			<groupId>com.sk89q.worldguard</groupId>
   			<artifactId>worldguard-bukkit</artifactId>
-  			<version>7.0.5</version>
+  			<version>7.0.18</version>
   			<scope>provided</scope>
+  			<exclusions>
+  			    <!-- Transitively pulls org.spigotmc:spigot-api:1.16.2-R0.1-SNAPSHOT
+  			         (a pre-1.20 spigot-api, via worldguard-core), which can
+  			         shadow our own paper-api's org.bukkit.block.Sign class on
+  			         the compile classpath; see the EssentialsX exclusion
+  			         above for the full explanation. -->
+  			    <exclusion>
+  			        <groupId>org.spigotmc</groupId>
+  			        <artifactId>spigot-api</artifactId>
+  			    </exclusion>
+  			</exclusions>
 		</dependency>
 		<dependency>
   			<groupId>com.sk89q.worldedit</groupId>
   			<artifactId>worldedit-bukkit</artifactId>
-  			<version>7.2.0</version>
+  			<version>7.4.5</version>
   			<scope>provided</scope>
+  			<exclusions>
+  			    <!-- Same rationale as worldguard-bukkit above: pulls its own
+  			         old transitive org.spigotmc:spigot-api. -->
+  			    <exclusion>
+  			        <groupId>org.spigotmc</groupId>
+  			        <artifactId>spigot-api</artifactId>
+  			    </exclusion>
+  			</exclusions>
 		</dependency>
-		<dependency>
-		  <groupId>net.kyori</groupId>
-		  <artifactId>adventure-api</artifactId>
-		  <version>4.18.0</version>
-		  <scope>provided</scope>
-		</dependency>
-		<dependency>
-		  <groupId>net.kyori</groupId>
-		  <artifactId>adventure-text-serializer-plain</artifactId>
-		  <version>4.18.0</version>
-		  <scope>provided</scope>
-		</dependency>
+		<!-- No explicit net.kyori:adventure-api / adventure-text-serializer-plain
+		     dependency here (deliberately, as of this multi-target update):
+		     this project's own source never imports net.kyori.adventure.*
+		     directly (GriefDefender's public API methods use it in their
+		     signatures, and paper-api's own org.bukkit.entity.Player
+		     implements Adventure's Audience and similar interfaces, so
+		     something on the classpath must provide it). A pinned version
+		     here previously shadowed paper-api's own transitively-supplied
+		     Adventure version via Maven's "nearest wins" mediation, which
+		     broke compilation against the 26.x target specifically (paper-
+		     api's Player interface referenced newer Adventure classes,
+		     e.g. net.kyori.adventure.text.object.PlayerHeadObjectContents,
+		     that the old pinned 4.18.0 jar didn't have (a "cannot access
+		     ... class file ... not found"). paper-api (and spigot-api, on
+		     targets where it's present) already exposes adventure-api and
+		     adventure-text-serializer-plain as transitive API dependencies
+		     at a version matched to that specific target, so leaving them
+		     unpinned lets each target resolve its own correct version. -->
 		<dependency>
       		<groupId>com.palmergames.bukkit.towny</groupId>
       		<artifactId>towny</artifactId>
-      		<version>0.101.1.0</version>
+      		<version>0.103.2.0</version>
      	 	<scope>provided</scope>
     	</dependency>
     	<dependency>
@@ -213,4 +294,79 @@
 		  <scope>compile</scope>
 		</dependency>
 	</dependencies>
+	<profiles>
+		<!-- paper-api is declared in both of these mutually-exclusive
+		     profiles (rather than unconditionally in <dependencies> above)
+		     so that, on the with-spigot-api leg, spigot-api is ordered
+		     immediately BEFORE it, the same relative order this project
+		     has always shipped with. Both jars are alternate builds of the
+		     same org.bukkit.* API surface (paper-api is a superset; see
+		     Paper's own paper-api build.gradle.kts, which declares an
+		     outgoing "org.spigotmc:spigot-api" capability conflict at the
+		     same version specifically to stop Gradle consumers combining
+		     both). Maven has no equivalent capability-conflict concept, so
+		     if both ever define overlapping classes, classpath order
+		     between them could matter for which one the compiler resolves
+		     first. (The actual "cannot find symbol: method getSide(Side)"
+		     failure hit while wiring up this multi-target build turned out
+		     to be caused by something else entirely: old transitive
+		     spigot-api/bukkit pulled in by EssentialsX/WorldGuard, now
+		     excluded above, not by this pair's own relative order; this
+		     ordering is kept simply to match historical layout, not
+		     because it was proven necessary.) -->
+
+		<profile>
+			<id>with-spigot-api</id>
+			<activation>
+				<property>
+					<name>skip.spigot.api</name>
+					<value>false</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.spigotmc</groupId>
+					<artifactId>spigot-api</artifactId>
+					<version>${spigot.api.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>io.papermc.paper</groupId>
+					<artifactId>paper-api</artifactId>
+					<version>${paper.api.version}</version>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+		<!-- No spigot-api is published for the 26.x scheme (see the note on
+		     skip.spigot.api in <properties> above), so this target only
+		     ever needs paper-api. -->
+		<profile>
+			<id>paper-only</id>
+			<activation>
+				<!-- activeByDefault covers a plain `mvn package` with no -D flags at
+				     all (e.g. build.yaml's PR check): Maven's property-based activation
+				     only evaluates flags actually passed on the command line, never the
+				     <properties> default declared above, so without this a bare `mvn
+				     package` activates neither profile and paper-api never gets
+				     declared ("package org.bukkit does not exist" everywhere). Maven
+				     automatically suppresses activeByDefault the moment another
+				     profile's own condition is satisfied, so this doesn't cause both
+				     profiles to activate when -Dskip.spigot.api=false is passed. -->
+				<activeByDefault>true</activeByDefault>
+				<property>
+					<name>skip.spigot.api</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>io.papermc.paper</groupId>
+					<artifactId>paper-api</artifactId>
+					<version>${paper.api.version}</version>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 </project>

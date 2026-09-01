@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -57,7 +58,17 @@ public class TransactionsStore {
     
     /** Stores all claim auction transactions. */
     public HashMap<String, ClaimAuction> claimAuction;
-    
+
+    /**
+     * Tracks, per player, how many claims they have purchased outright (via a sell transaction)
+     * over the lifetime of this data store. Unlike the other maps above, entries here are never
+     * removed when a transaction completes or is cancelled - this is what backs the buyer-side
+     * "total purchases" limit ({@code cfgLimitSellBuyer}), which by definition must outlive the
+     * transaction itself. Kept here (rather than on the claim, via a claim-provider-specific
+     * attribute) so the limit works identically on every supported claim provider.
+     */
+    public HashMap<UUID, Integer> purchaseCounts;
+
     /** Enumeration of storage types supported by the plugin. */
     public enum StorageType { 
     	/** File-based storage. */
@@ -99,7 +110,8 @@ public class TransactionsStore {
         claimRent = new HashMap<>();
         claimLease = new HashMap<>();
         claimAuction = new HashMap<>();
-        
+        purchaseCounts = new HashMap<>();
+
         if(storageType == StorageType.FILE) {
             loadDataFromFile();
         } else {
@@ -170,6 +182,16 @@ public class TransactionsStore {
                     claimAuction.put(key, ca);
                 }
             }
+            ConfigurationSection purchases = config.getConfigurationSection("PurchaseCounts");
+            if(purchases != null) {
+                for(String key : purchases.getKeys(false)) {
+                    try {
+                        purchaseCounts.put(UUID.fromString(key), purchases.getInt(key));
+                    } catch (IllegalArgumentException e) {
+                        // Malformed UUID key; skip it.
+                    }
+                }
+            }
         }
     }
     
@@ -186,6 +208,8 @@ public class TransactionsStore {
             config.set("Lease." + cl.getClaim().getId(), cl);
         for (ClaimAuction ca : claimAuction.values())
             config.set("Auction." + ca.getClaim().getId(), ca);
+        for (Map.Entry<UUID, Integer> entry : purchaseCounts.entrySet())
+            config.set("PurchaseCounts." + entry.getKey().toString(), entry.getValue());
         try {
             config.save(new File(this.dataFilePath));
         } catch (IOException e) {
@@ -285,11 +309,19 @@ public class TransactionsStore {
             try(PreparedStatement ps = dbConnection.prepareStatement(createClaimAuction)) {
                 ps.executeUpdate();
             }
+            // PurchaseCounts table: how many claims each player has purchased, lifetime.
+            String createPurchaseCounts = "CREATE TABLE IF NOT EXISTS " + prefix + "PurchaseCounts ("
+                    + " player CHAR(36) NOT NULL PRIMARY KEY, "
+                    + " count INT NOT NULL DEFAULT 0"
+                    + ");";
+            try(PreparedStatement ps = dbConnection.prepareStatement(createPurchaseCounts)) {
+                ps.executeUpdate();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    
+
     private void loadDataFromDatabase() {
         String prefix = RealEstate.instance.config.mysqlPrefix;
         try {
@@ -431,11 +463,25 @@ public class TransactionsStore {
                     claimAuction.put(claimId, ca);
                 }
             }
+            // --- Load PurchaseCounts ---
+            String queryPurchases = "SELECT * FROM " + prefix + "PurchaseCounts;";
+            try (PreparedStatement ps = dbConnection.prepareStatement(queryPurchases);
+                 ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    String playerStr = rs.getString("player");
+                    int count = rs.getInt("count");
+                    try {
+                        purchaseCounts.put(UUID.fromString(playerStr), count);
+                    } catch (IllegalArgumentException e) {
+                        // Malformed UUID; skip it.
+                    }
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    
+
     private void saveDataToDatabase() {
         String prefix = RealEstate.instance.config.mysqlPrefix;
         try {
@@ -539,12 +585,26 @@ public class TransactionsStore {
                 }
                 ps.executeBatch();
             }
-            
+            // --- Save PurchaseCounts ---
+            String deletePurchases = "DELETE FROM " + prefix + "PurchaseCounts;";
+            try (PreparedStatement ps = dbConnection.prepareStatement(deletePurchases)) {
+                ps.executeUpdate();
+            }
+            String insertPurchases = "INSERT INTO " + prefix + "PurchaseCounts (player, count) VALUES (?, ?);";
+            try (PreparedStatement ps = dbConnection.prepareStatement(insertPurchases)) {
+                for (Map.Entry<UUID, Integer> entry : purchaseCounts.entrySet()) {
+                    ps.setString(1, entry.getKey().toString());
+                    ps.setInt(2, entry.getValue());
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Saves transaction data, either to a file or database depending on configuration.
      */
@@ -680,6 +740,9 @@ public class TransactionsStore {
     public void rent(IClaim claim, Player player, double price, Location sign, int duration, boolean buildTrust) {
         ClaimRent cr = new ClaimRent(claim, claim.isAdminClaim() ? null : player, price, sign, duration, buildTrust);
         claimRent.put(claim.getId(), cr);
+        // Note: the pre-rent block snapshot is taken at move-in time (see ClaimRent.interact()),
+        // not here at listing time, so it captures the claim's state right before the tenant
+        // gains access rather than whatever it looked like when the owner listed it.
         // Immediately update the sign (using a slight delay if needed)
         Bukkit.getScheduler().runTaskLater(RealEstate.instance, () -> cr.update(), 1L);
         saveData();
@@ -723,6 +786,9 @@ public class TransactionsStore {
     public void lease(IClaim claim, Player player, double price, Location sign, int frequency, int paymentsCount) {
         ClaimLease cl = new ClaimLease(claim, claim.isAdminClaim() ? null : player, price, sign, frequency, paymentsCount);
         claimLease.put(claim.getId(), cl);
+        // Note: the pre-lease block snapshot is taken at move-in time (see ClaimLease.interact()),
+        // not here at listing time, so it captures the claim's state right before the tenant
+        // gains access rather than whatever it looked like when the owner listed it.
         // Immediately update the sign (using a slight delay if needed)
         Bukkit.getScheduler().runTaskLater(RealEstate.instance, () -> cl.update(), 1L);
         saveData();
@@ -808,5 +874,130 @@ public class TransactionsStore {
         if(player == null) return null;
         IClaim c = RealEstate.claimAPI.getClaimAt(player.getLocation());
         return getTransaction(c);
+    }
+
+    /* PER-PLAYER LIMIT COUNTS
+     *
+     * Owner-side and buyer-side "how many active transactions" counts are derived by iterating
+     * the maps above directly, rather than kept as separate counters, so they can never drift out
+     * of sync with the actual listings/holdings. Note that for admin claims (owner == null), these
+     * counts never attribute the listing to the player who placed the sign - matching the fact
+     * that an admin-claim listing belongs to the server, not to any individual admin.
+     */
+
+    /**
+     * Counts how many claims a player currently has listed for sale.
+     * @param owner The player's UUID. A null UUID always returns 0.
+     * @return The number of active sell listings owned by that player.
+     */
+    public int getSellListingCount(UUID owner) {
+        if(owner == null) return 0;
+        int count = 0;
+        for(ClaimSell cs : claimSell.values()) {
+            if(owner.equals(cs.getOwner()))
+                count++;
+        }
+        return count;
+    }
+
+    /**
+     * Counts how many claims a player currently has listed for rent (whether or not a tenant
+     * has already moved in).
+     * @param owner The player's UUID. A null UUID always returns 0.
+     * @return The number of active rent listings owned by that player.
+     */
+    public int getRentListingCount(UUID owner) {
+        if(owner == null) return 0;
+        int count = 0;
+        for(ClaimRent cr : claimRent.values()) {
+            if(owner.equals(cr.getOwner()))
+                count++;
+        }
+        return count;
+    }
+
+    /**
+     * Counts how many claims a player currently has listed for lease (whether or not a tenant
+     * has already moved in).
+     * @param owner The player's UUID. A null UUID always returns 0.
+     * @return The number of active lease listings owned by that player.
+     */
+    public int getLeaseListingCount(UUID owner) {
+        if(owner == null) return 0;
+        int count = 0;
+        for(ClaimLease cl : claimLease.values()) {
+            if(owner.equals(cl.getOwner()))
+                count++;
+        }
+        return count;
+    }
+
+    /**
+     * Counts how many claims a player currently has listed for auction. An auction is
+     * conceptually a sale, so this is combined with {@link #getSellListingCount(UUID)} wherever
+     * the sell-owner listing limit is enforced.
+     * @param owner The player's UUID. A null UUID always returns 0.
+     * @return The number of active auction listings owned by that player.
+     */
+    public int getAuctionListingCount(UUID owner) {
+        if(owner == null) return 0;
+        int count = 0;
+        for(ClaimAuction ca : claimAuction.values()) {
+            if(owner.equals(ca.getOwner()))
+                count++;
+        }
+        return count;
+    }
+
+    /**
+     * Counts how many claims a player is currently renting.
+     * @param buyer The player's UUID. A null UUID always returns 0.
+     * @return The number of claims currently rented by that player.
+     */
+    public int getActiveRentCount(UUID buyer) {
+        if(buyer == null) return 0;
+        int count = 0;
+        for(ClaimRent cr : claimRent.values()) {
+            if(buyer.equals(cr.getBuyer()))
+                count++;
+        }
+        return count;
+    }
+
+    /**
+     * Counts how many claims a player is currently leasing.
+     * @param buyer The player's UUID. A null UUID always returns 0.
+     * @return The number of claims currently leased by that player.
+     */
+    public int getActiveLeaseCount(UUID buyer) {
+        if(buyer == null) return 0;
+        int count = 0;
+        for(ClaimLease cl : claimLease.values()) {
+            if(buyer.equals(cl.getBuyer()))
+                count++;
+        }
+        return count;
+    }
+
+    /**
+     * Retrieves how many claims a player has ever purchased outright (via a sell transaction),
+     * across the entire lifetime of this data store.
+     * @param buyer The player's UUID. A null UUID always returns 0.
+     * @return The player's total number of purchases.
+     */
+    public int getTotalPurchasedClaims(UUID buyer) {
+        if(buyer == null) return 0;
+        return purchaseCounts.getOrDefault(buyer, 0);
+    }
+
+    /**
+     * Records that a player has purchased a claim, incrementing their lifetime purchase count
+     * and persisting the change immediately.
+     * @param buyer The player's UUID. A null UUID (admin purchase) is a no-op.
+     */
+    public void incrementPurchasedClaims(UUID buyer) {
+        if(buyer == null) return;
+        purchaseCounts.merge(buyer, 1, Integer::sum);
+        saveData();
     }
 }

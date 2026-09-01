@@ -140,41 +140,41 @@ public class ClaimSell extends ClaimTransaction {
             int area = claim.getArea();
             Messages.sendMessage(player, RealEstate.instance.messages.msgErrorClaimNoClaimBlocks,
                 area + "", remaining + "", (area - remaining) + "");
-            return;			
+            return;
+        }
+        int sellBuyerLimit = RealEstate.instance.config.cfgLimitSellBuyer;
+        if (sellBuyerLimit >= 0 && RealEstate.transactionsStore.getTotalPurchasedClaims(player.getUniqueId()) >= sellBuyerLimit) {
+            Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimInfoSellBuyerLimit, String.valueOf(sellBuyerLimit));
+            return;
         }
         // Process payment and transfer ownership.
         if (Utils.makePayment(owner, player.getUniqueId(), price, false, true)) { // Payment succeeded
             Utils.transferClaim(claim, player.getUniqueId(), owner);
-            // Log transaction if claim ownership transfer is successful.
-            if (claim.isSubClaim() || claim.getOwner().equals(player.getUniqueId())) {
-                String location = "[" + player.getLocation().getWorld() + ", " +
+            RealEstate.transactionsStore.incrementPurchasedClaims(player.getUniqueId());
+            String location = "[" + player.getLocation().getWorld() + ", " +
+                "X: " + player.getLocation().getBlockX() + ", " +
+                "Y: " + player.getLocation().getBlockY() + ", " +
+                "Z: " + player.getLocation().getBlockZ() + "]";
+            Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimBuyerSold,
+                    claimTypeDisplay, RealEstate.econ.format(price));
+            RealEstate.instance.addLogEntry(
+                    "[" + RealEstate.transactionsStore.dateFormat.format(RealEstate.transactionsStore.date) + "] " +
+                    player.getName() + " has purchased a " + claimType + " at " +
+                    "[" + player.getLocation().getWorld() + ", " +
                     "X: " + player.getLocation().getBlockX() + ", " +
                     "Y: " + player.getLocation().getBlockY() + ", " +
-                    "Z: " + player.getLocation().getBlockZ() + "]";
-                Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimBuyerSold,
-                        claimTypeDisplay, RealEstate.econ.format(price));
-                RealEstate.instance.addLogEntry(
-                        "[" + RealEstate.transactionsStore.dateFormat.format(RealEstate.transactionsStore.date) + "] " +
-                        player.getName() + " has purchased a " + claimType + " at " +
-                        "[" + player.getLocation().getWorld() + ", " +
-                        "X: " + player.getLocation().getBlockX() + ", " +
-                        "Y: " + player.getLocation().getBlockY() + ", " +
-                        "Z: " + player.getLocation().getBlockZ() + "] " +
-                        "Price: " + price + " " + RealEstate.econ.currencyNamePlural());
-                if (RealEstate.instance.config.cfgMessageOwner && owner != null) {
-                    OfflinePlayer oldOwner = Bukkit.getOfflinePlayer(owner);
-                    if (oldOwner.isOnline()) {
-                        Messages.sendMessage(oldOwner.getPlayer(), RealEstate.instance.messages.msgInfoClaimOwnerSold,
-                                player.getName(), claimTypeDisplay, RealEstate.econ.format(price), location);
-                    } else if (RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null) {
-                        User u = RealEstate.ess.getUser(owner);
-                        u.addMail(Messages.getMessage(RealEstate.instance.messages.msgInfoClaimOwnerSold,
-                                player.getName(), claimTypeDisplay, RealEstate.econ.format(price), location));
-                    }
+                    "Z: " + player.getLocation().getBlockZ() + "] " +
+                    "Price: " + price + " " + RealEstate.econ.currencyNamePlural());
+            if (RealEstate.instance.config.cfgMessageOwner && owner != null) {
+                OfflinePlayer oldOwner = Bukkit.getOfflinePlayer(owner);
+                if (oldOwner.isOnline()) {
+                    Messages.sendMessage(oldOwner.getPlayer(), RealEstate.instance.messages.msgInfoClaimOwnerSold,
+                            player.getName(), claimTypeDisplay, RealEstate.econ.format(price), location);
+                } else if (RealEstate.instance.config.cfgMailOffline && RealEstate.ess != null) {
+                    User u = RealEstate.ess.getUser(owner);
+                    u.addMail(Messages.getMessage(RealEstate.instance.messages.msgInfoClaimOwnerSold,
+                            player.getName(), claimTypeDisplay, RealEstate.econ.format(price), location));
                 }
-            } else {
-                Messages.sendMessage(player, RealEstate.instance.messages.msgErrorUnexpected);
-                return;
             }
             RealEstate.transactionsStore.cancelTransaction(claim);
         }
@@ -191,6 +191,11 @@ public class ClaimSell extends ClaimTransaction {
     @Override
     public void preview(Player player) {
         IClaim claim = RealEstate.claimAPI.getClaimAt(sign);
+        if (claim == null) {
+            Messages.sendMessage(player, RealEstate.instance.messages.msgErrorUnexpected);
+            RealEstate.instance.log.warning("Could not find claim at sign for an ongoing sell transaction; the claim may have been deleted or resized.");
+            return;
+        }
         if (player.hasPermission("realestate.info")) {
             String claimType = claim.isParentClaim() ? "claim" : "subclaim";
             String claimTypeDisplay = claim.isParentClaim() ?

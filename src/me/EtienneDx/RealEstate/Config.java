@@ -176,6 +176,13 @@ public class Config extends AnnotationConfig {
     public boolean cfgDestroyLeaseSigns = true;
 
     /**
+     * Whether a claim's blocks should be automatically snapshotted when put up for rent/lease,
+     * and restored once the tenant's rental/lease ends.
+     */
+    @ConfigField(name="RealEstate.Rules.ClaimSnapshots", comment = "Should a claim's blocks be automatically snapshotted when it is put up for rent/lease, and restored to that snapshot once the tenant's rental/lease ends? Protects the owner from griefing by tenants. Currently only supported on GriefDefender; ignored on other claim providers.")
+    public boolean cfgClaimSnapshots = true;
+
+    /**
      * Whether claim blocks are transferred to the new owner on purchase.
      */
     @ConfigField(name="RealEstate.Rules.TransferClaimBlocks", comment = "Are the claim blocks transferred to the new owner on purchase or should the buyer provide them?")
@@ -280,7 +287,45 @@ public class Config extends AnnotationConfig {
      */
     @ConfigField(name="RealEstate.Default.LeasePaymentsCount", comment = "How many lease periods are required before the buyer gets the claim's ownership by default")
     public int cfgLeasePayments = 5;
-    
+
+    // Per-player listing/holding limits
+
+    /**
+     * How many claims a player may simultaneously have listed for sale. -1 means unlimited.
+     */
+    @ConfigField(name="RealEstate.Default.Limit.Sell.Owner", comment = "How many claims a player can put up for sale at the same time. -1 for unlimited.")
+    public int cfgLimitSellOwner = -1;
+
+    /**
+     * How many claims a player may simultaneously have listed for rent. -1 means unlimited.
+     */
+    @ConfigField(name="RealEstate.Default.Limit.Rent.Owner", comment = "How many claims a player can put up for rent at the same time. -1 for unlimited.")
+    public int cfgLimitRentOwner = -1;
+
+    /**
+     * How many claims a player may simultaneously have listed for lease. -1 means unlimited.
+     */
+    @ConfigField(name="RealEstate.Default.Limit.Lease.Owner", comment = "How many claims a player can put up for lease at the same time. -1 for unlimited.")
+    public int cfgLimitLeaseOwner = -1;
+
+    /**
+     * How many claims a player may be renting at the same time. -1 means unlimited.
+     */
+    @ConfigField(name="RealEstate.Default.Limit.Rent.Buyer", comment = "How many claims a player can rent at the same time. -1 for unlimited.")
+    public int cfgLimitRentBuyer = -1;
+
+    /**
+     * How many claims a player may be leasing at the same time. -1 means unlimited.
+     */
+    @ConfigField(name="RealEstate.Default.Limit.Lease.Buyer", comment = "How many claims a player can lease at the same time. -1 for unlimited.")
+    public int cfgLimitLeaseBuyer = -1;
+
+    /**
+     * How many claims a player may purchase in total, over the lifetime of their data. -1 means unlimited.
+     */
+    @ConfigField(name="RealEstate.Default.Limit.Sell.Buyer", comment = "How many claims a player can purchase in total (lifetime). -1 for unlimited.")
+    public int cfgLimitSellBuyer = -1;
+
     /**
      * The number of offers to display per page in the '/re list' command.
      */

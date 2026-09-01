@@ -12,3 +12,7 @@ build.bat
 report.cmd
 report.txt
 javadoc.cmd
+
+# Local test servers set up by scripts/run-server.sh (downloaded Paper
+# jars, world data, logs, etc.) — not something to commit.
+/servers/

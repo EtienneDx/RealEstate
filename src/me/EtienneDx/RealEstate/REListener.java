@@ -147,6 +147,16 @@ public class REListener implements Listener {
                     return;
                 }
 
+                int sellOwnerLimit = RealEstate.instance.config.cfgLimitSellOwner;
+                if (!claim.isAdminClaim() && sellOwnerLimit >= 0 &&
+                        RealEstate.transactionsStore.getSellListingCount(player.getUniqueId())
+                        + RealEstate.transactionsStore.getAuctionListingCount(player.getUniqueId()) >= sellOwnerLimit) {
+                    Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimInfoSellOwnerLimit, String.valueOf(sellOwnerLimit));
+                    event.setCancelled(true);
+                    event.getBlock().breakNaturally();
+                    return;
+                }
+
                 // All checks passed; create the sell transaction.
                 event.setCancelled(true); // Cancel the event so the sign can be updated elsewhere.
                 RealEstate.transactionsStore.sell(claim, claim.isAdminClaim() ? null : player, price, event.getBlock().getLocation());
@@ -215,6 +225,14 @@ public class REListener implements Listener {
                     }
                 } else if (type.equals("claim") && !player.getUniqueId().equals(claim.getOwner())) { // only owner may rent his claim
                     Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotOwner, typeDisplay);
+                    event.setCancelled(true);
+                    event.getBlock().breakNaturally();
+                    return;
+                }
+
+                int rentOwnerLimit = RealEstate.instance.config.cfgLimitRentOwner;
+                if (!claim.isAdminClaim() && rentOwnerLimit >= 0 && RealEstate.transactionsStore.getRentListingCount(player.getUniqueId()) >= rentOwnerLimit) {
+                    Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimInfoRentOwnerLimit, String.valueOf(rentOwnerLimit));
                     event.setCancelled(true);
                     event.getBlock().breakNaturally();
                     return;
@@ -307,6 +325,14 @@ public class REListener implements Listener {
                     return;
                 }
 
+                int leaseOwnerLimit = RealEstate.instance.config.cfgLimitLeaseOwner;
+                if (!claim.isAdminClaim() && leaseOwnerLimit >= 0 && RealEstate.transactionsStore.getLeaseListingCount(player.getUniqueId()) >= leaseOwnerLimit) {
+                    Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimInfoLeaseOwnerLimit, String.valueOf(leaseOwnerLimit));
+                    event.setCancelled(true);
+                    event.getBlock().breakNaturally();
+                    return;
+                }
+
                 // Create the lease transaction.
                 event.setCancelled(true);
                 RealEstate.transactionsStore.lease(claim, player, price, event.getBlock().getLocation(), frequency, paymentsCount);
@@ -387,6 +413,18 @@ public class REListener implements Listener {
                     }
                 } else if (type.equals("claim") && !player.getUniqueId().equals(claim.getOwner())) { // only owner may auction his claim
                     Messages.sendMessage(player, RealEstate.instance.messages.msgErrorSignNotOwner, typeDisplay);
+                    event.setCancelled(true);
+                    event.getBlock().breakNaturally();
+                    return;
+                }
+
+                // An auction is conceptually a sale, so it shares the sell-owner listing limit
+                // (pooled with existing sell listings, not counted separately).
+                int auctionOwnerLimit = RealEstate.instance.config.cfgLimitSellOwner;
+                if (!claim.isAdminClaim() && auctionOwnerLimit >= 0 &&
+                        RealEstate.transactionsStore.getSellListingCount(player.getUniqueId())
+                        + RealEstate.transactionsStore.getAuctionListingCount(player.getUniqueId()) >= auctionOwnerLimit) {
+                    Messages.sendMessage(player, RealEstate.instance.messages.msgInfoClaimInfoSellOwnerLimit, String.valueOf(auctionOwnerLimit));
                     event.setCancelled(true);
                     event.getBlock().breakNaturally();
                     return;

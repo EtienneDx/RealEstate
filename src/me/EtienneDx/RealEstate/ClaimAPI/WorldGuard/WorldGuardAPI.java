@@ -11,6 +11,7 @@ import me.EtienneDx.RealEstate.ClaimAPI.IClaim;
 import me.EtienneDx.RealEstate.ClaimAPI.IClaimAPI;
 import me.EtienneDx.RealEstate.ClaimAPI.IPlayerData;
 import me.EtienneDx.RealEstate.ClaimAPI.ClaimPermission;
+import me.EtienneDx.RealEstate.Transactions.Transaction;
 
 import java.util.UUID;
 
@@ -148,5 +149,23 @@ public class WorldGuardAPI implements IClaimAPI {
         if (claim instanceof WGClaim) {
             ((WGClaim) claim).dropPlayerPermissions(player);
         }
+    }
+
+    /**
+     * Not supported for WorldGuard.
+     * <p>
+     * WorldGuard regions are identified by a name/{@link String} ID (see
+     * {@link WGClaim#getId()}), and this codebase only ever resolves a region via a
+     * spatial query in {@link #getClaimAt(Location)} — there is no existing facility to
+     * resolve a region from a {@link UUID} alone. WorldGuard does not ship a map
+     * integration that would need this hook, so this always returns {@code null}.
+     * </p>
+     *
+     * @param claimUniqueId unused
+     * @return always {@code null}
+     */
+    @Override
+    public Transaction getTransaction(UUID claimUniqueId) {
+        return null;
     }
 }

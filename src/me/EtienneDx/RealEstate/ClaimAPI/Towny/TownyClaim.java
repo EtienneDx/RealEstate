@@ -286,4 +286,7 @@ public class TownyClaim implements IClaim {
     public void setInheritPermissions(boolean inherit) {
         // Not applicable for Towny.
     }
+
+    // Block snapshots are not supported by Towny; IClaim's default
+    // createSnapshot()/restoreSnapshot()/supportsSnapshots() implementations apply.
 }
